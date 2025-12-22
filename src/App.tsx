@@ -1,11 +1,16 @@
-import { Button } from "./components/ui/button";
+import { Toaster } from "sonner";
 
 function App() {
   return (
-    <div>
-      <h1>Hello, world!</h1>
-      <Button>Click aqui</Button>
-    </div>
+    <>
+      <Toaster
+        position="top-right"
+        richColors
+        closeButton
+        duration={4000}
+        expand={true}
+      />
+    </>
   );
 }
 

@@ -1,0 +1,71 @@
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { setCookie, deleteCookie, getCookie } from 'cookies-next';
+
+interface User {
+    idUsuario: string;
+    correo: string;
+    nombreUsuario: string;
+    rol: {
+        idRol: string;
+        nombreRol: string;
+        descripcionRol?: string;
+        activo?: boolean;
+        fechaCreacion?: string;
+        fechaModificacion?: string;
+    };
+}
+
+interface AuthState {
+    user: User | null;
+    isAuthenticated: boolean;
+    isLoading: boolean;
+    login: (user: User, token: string) => void;
+    logout: () => void;
+    setLoading: (loading: boolean) => void;
+    initializeAuth: () => void;
+}
+
+export const useAuthStore = create<AuthState>()(
+    persist(
+        (set, get) => ({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            login: (user, token) => {
+                setCookie('auth-token', token, {
+                    maxAge: 60 * 60 * 24 * 7, // 7 días
+                    path: '/',
+                    sameSite: 'lax',
+                });
+                set({ user, isAuthenticated: true });
+            },
+            logout: () => {
+                deleteCookie('auth-token');
+                set({ user: null, isAuthenticated: false });
+            },
+            setLoading: (loading) => set({ isLoading: loading }),
+            initializeAuth: () => {
+                const token = getCookie('auth-token');
+                const state = get();
+
+                // Si hay token pero no hay usuario en el estado, significa que se recargó la página
+                // El estado persistido de Zustand debería tener el usuario
+                if (token && state.user) {
+                    set({ isAuthenticated: true });
+                } else if (!token) {
+                    // Si no hay token, limpiar el estado
+                    set({ user: null, isAuthenticated: false });
+                }
+            },
+        }),
+        {
+            name: 'auth-storage',
+            storage: createJSONStorage(() => localStorage),
+            partialize: (state) => ({
+                user: state.user,
+                isAuthenticated: state.isAuthenticated,
+            }),
+        }
+    )
+);
