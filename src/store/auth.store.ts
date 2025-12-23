@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { setCookie, deleteCookie, getCookie } from 'cookies-next';
+import Cookies from 'js-cookie';
 
 interface User {
     idUsuario: string;
@@ -33,20 +33,20 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: false,
             isLoading: false,
             login: (user, token) => {
-                setCookie('auth-token', token, {
-                    maxAge: 60 * 60 * 24 * 7, // 7 días
+                Cookies.set('auth-token', token, {
+                    expires: 7, // 7 días (js-cookie uses days)
                     path: '/',
                     sameSite: 'lax',
                 });
                 set({ user, isAuthenticated: true });
             },
             logout: () => {
-                deleteCookie('auth-token');
+                Cookies.remove('auth-token');
                 set({ user: null, isAuthenticated: false });
             },
             setLoading: (loading) => set({ isLoading: loading }),
             initializeAuth: () => {
-                const token = getCookie('auth-token');
+                const token = Cookies.get('auth-token');
                 const state = get();
 
                 // Si hay token pero no hay usuario en el estado, significa que se recargó la página

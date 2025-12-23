@@ -1,4 +1,4 @@
-export default function CompaniasPage() {
+export const CompaniasPage = () => {
   return (
     <div>
       <h1>Hello Page</h1>

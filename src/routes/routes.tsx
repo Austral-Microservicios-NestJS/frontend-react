@@ -7,18 +7,20 @@ import { Roles } from "@/utils/roles";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 
 // Importar componentes del dashboard
-import Dashboard from "@/pages/shared/DashboardPage";
+import { Sidebar } from "@/components/sidebar/Sidebar";
+import LoginPage from "@/pages/auth/login/LoginPage";
 import Home from "@/pages/shared/home/Home";
+import { CompaniasPage } from "@/pages/admin/maestros/companias/CompaniasPage";
 
 // Definición de rutas
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Login />,
+    element: <LoginPage />,
   },
   {
-    path: "/auht/login",
-    element: <Login />,
+    path: "/auth/login",
+    element: <LoginPage />,
   },
   {
     path: "*",
@@ -28,7 +30,7 @@ const router = createBrowserRouter([
     path: "/dashboard",
     element: (
       <ProtectedRoute>
-        <Dashboard />
+        <Sidebar />
       </ProtectedRoute>
     ),
     children: [
@@ -38,106 +40,35 @@ const router = createBrowserRouter([
       },
       // Seccion de analitica
       {
-        path: "analitica/comisiones-comercial",
+        path: "admin/maestros/companias",
         element: (
           <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.COMERCIAL]}
+            requiredRoles={[Roles.ADMINISTRADOR]}
           >
-            <ComisionesComercial />
-          </ProtectedRoute>
-        ),
-      },
-      // Seccion de recursos humanos
-      {
-        path: "recursos-humanos/trabajadores",
-        element: (
-          <ProtectedRoute requiredRoles={[Roles.ADMINISTRADOR]}>
-            <TrabajadoresPage />
-          </ProtectedRoute>
-        ),
-      },
-      // Seccion de proyectos
-      {
-        path: "proyectos/clientes",
-        element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.COMERCIAL]}
-          >
-            <ClientesPage />
+            <CompaniasPage />
           </ProtectedRoute>
         ),
       },
       {
-        path: "proyectos/proyecciones",
+        path: "admin/maestros/ramos",
         element: (
           <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.COMERCIAL]}
+            requiredRoles={[Roles.ADMINISTRADOR]}
           >
-            <ProyeccionesPage />
+            <CompaniasPage />
           </ProtectedRoute>
         ),
       },
       {
-        path: "proyectos/proyecciones/detalle",
+        path: "admin/maestros/productos",
         element: (
           <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.COMERCIAL]}
+            requiredRoles={[Roles.ADMINISTRADOR]}
           >
-            <DetalleProyeccionesPage />
+            <CompaniasPage />
           </ProtectedRoute>
         ),
-      },
-      {
-        path: "proyectos/proyectos",
-        element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.COMERCIAL]}
-          >
-            <ProyectosPage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "proyectos/auditoria-proyectos",
-        element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.COMERCIAL]}
-          >
-            <AuditoriaProyectoPage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "proyectos/asesoria-tecnica",
-        element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.COMERCIAL]}
-          >
-            <SeleccionIngenieroPage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "proyectos/asesoria-tecnica/:idIngeniero",
-        element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.COMERCIAL]}
-          >
-            <AsesoriaTecnicaPage />
-          </ProtectedRoute>
-        ),
-      },
-      // Seccion de despachos
-      {
-        path: "despachos/productos",
-        element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.COMERCIAL]}
-          >
-            <ProductosPage />
-          </ProtectedRoute>
-        ),
-      },
+      }
     ],
   },
 ]);

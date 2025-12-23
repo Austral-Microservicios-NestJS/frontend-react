@@ -1,10 +1,20 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
-import { useAuth } from "@context/AuthContext";
+import { useAuthStore } from "@/store/auth.store";
 
-const ProtectedRoute = ({ children, requiredRoles = [] }) => {
-  const { isAuthenticated, loading, hasRole } = useAuth();
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  requiredRoles?: string[];
+}
+
+const ProtectedRoute = ({ children, requiredRoles = [] }: ProtectedRouteProps) => {
+  const { isAuthenticated, isLoading: loading, user } = useAuthStore();
   const location = useLocation();
+
+  const hasRole = (roles: string[]) => {
+     if (!user || !user.rol) return false;
+     return roles.includes(user.rol.nombreRol);
+  };
 
   // Mostrar indicador de carga mientras se verifica la autenticación
   if (loading) {

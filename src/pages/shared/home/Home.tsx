@@ -1,7 +1,7 @@
-import { useAuth } from "@context/AuthContext";
+import { useAuthStore } from "@/store/auth.store";
 
 const Home = () => {
-  const { user } = useAuth();
+  const { user } = useAuthStore();
 
   return (
     <div className="relative min-h-screen bg-white overflow-hidden">
@@ -45,7 +45,7 @@ const Home = () => {
                 </span>
               </div>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 leading-tight">
-                {user?.nombre}
+                {user?.nombreUsuario}
               </h1>
               <div className="h-1.5 w-32 bg-linear-to-r from-amber-600 to-amber-800 rounded-full" />
             </div>
@@ -58,7 +58,7 @@ const Home = () => {
                   <p className="text-gray-600 text-xs uppercase tracking-wider font-semibold">
                     Rol actual
                   </p>
-                  <p className="text-gray-900 text-lg font-bold">{user?.rol}</p>
+                  <p className="text-gray-900 text-lg font-bold">{user?.rol.nombreRol}</p>
                 </div>
               </div>
             </div>

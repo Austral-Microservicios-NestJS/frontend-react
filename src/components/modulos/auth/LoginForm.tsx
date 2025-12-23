@@ -1,23 +1,29 @@
-"use client";
+
 
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema, LoginFormData } from "@/lib/schemas/auth.schema";
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { useAuth } from "@/lib/hooks/useAuth";
+import { useAuthStore } from "@/store/auth.store";
+import { authService } from "@/services/auth.services";
 import { Eye, EyeOff, Loader2, AlertCircle, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
+interface LoginFormData {
+  usuario: string;
+  contrasena: string;
+  recordarme: boolean;
+}
+
 export default function LoginForm() {
-  const searchParams = useSearchParams();
-  const { login, isLoading } = useAuth();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { login: storeLogin, isLoading, setLoading } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -26,7 +32,6 @@ export default function LoginForm() {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
     defaultValues: {
       usuario: "",
       contrasena: "",
@@ -51,19 +56,32 @@ export default function LoginForm() {
   }, [searchParams]);
 
   const onSubmit = async (data: LoginFormData) => {
+    setLoading(true);
     try {
-      await login({
+      const response = await authService.login({
         usuario: data.usuario,
         contrasena: data.contrasena,
       });
-    } catch (error) {
+      
+      // Assume response contains user and token
+      if (response && response.token && response.user) {
+         storeLogin(response.user, response.token);
+         navigate("/dashboard");
+      } else {
+         throw new Error("Respuesta inválida del servidor");
+      }
+
+    } catch (error: any) {
       console.error("Error en login:", error);
       toast.error("Error al iniciar sesión", {
         description:
-          error instanceof Error ? error.message : "Error desconocido",
+          error.response?.data?.message || error.message || "Error desconocido",
       });
+    } finally {
+      setLoading(false);
     }
   };
+
 
   return (
     <motion.div
@@ -196,8 +214,8 @@ export default function LoginForm() {
                 Recordarme
               </label>
             </div>
-            <Link
-              href="/forgot-password"
+              <Link
+                to="/forgot-password"
               className="text-sm lg:text-primary text-zinc-300 lg:hover:text-primary/80 hover:text-white hover:underline transition-colors"
               tabIndex={isLoading ? -1 : 0}
             >
