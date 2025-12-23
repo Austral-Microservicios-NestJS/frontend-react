@@ -15,7 +15,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
 interface LoginFormData {
-  usuario: string;
+  correo: string;
   contrasena: string;
   recordarme: boolean;
 }
@@ -33,7 +33,7 @@ export default function LoginForm() {
     formState: { errors },
   } = useForm<LoginFormData>({
     defaultValues: {
-      usuario: "",
+      correo: "",
       contrasena: "",
       recordarme: false,
     },
@@ -59,7 +59,7 @@ export default function LoginForm() {
     setLoading(true);
     try {
       const response = await authService.login({
-        usuario: data.usuario,
+        correo: data.correo,
         contrasena: data.contrasena,
       });
       
@@ -136,14 +136,14 @@ export default function LoginForm() {
               type="text"
               placeholder="admin@austral.com"
               className="h-12 lg:bg-muted/30 bg-white/10 lg:backdrop-blur-none backdrop-blur-sm lg:border-input/60 border-white/20 focus:bg-background lg:text-foreground text-white placeholder:text-zinc-400 transition-all duration-300"
-              {...register("usuario")}
+              {...register("correo")}
               autoComplete="username"
               disabled={isLoading}
             />
-            {errors.usuario && (
+            {errors.correo && (
               <div className="flex items-center gap-1 text-sm lg:text-destructive text-red-300 animate-in slide-in-from-left-1 fade-in">
                 <AlertCircle className="h-4 w-4" />
-                <span>{errors.usuario.message}</span>
+                <span>{errors.correo.message}</span>
               </div>
             )}
           </motion.div>

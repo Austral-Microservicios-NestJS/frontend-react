@@ -1,12 +1,12 @@
-import { api } from "@/config/api-client";
+  import { api } from "@/config/api-client";
 
 export const authService = {
-    async login(credentials: { usuario: string; contrasena: string }) {
+    async login(credentials: { correo: string; contrasena: string }) {
         try {
             const response = await api.post("/auth/login", credentials);
             return response.data;
         } catch (error: any) {
-            throw new Error(error.message || "Error al iniciar sesión");
+            throw new Error(error.response?.data?.message || "Error al iniciar sesión");
         }
     },
 
