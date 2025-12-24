@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import Cookies from 'js-cookie';
 
-interface User {
+export interface User {
     idUsuario: string;
     correo: string;
     nombreUsuario: string;

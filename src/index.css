@@ -45,6 +45,12 @@
 }
 
 :root {
+  /* Colores de Austral */
+  --austral-azul: #003D5C;
+  --austral-blanco: #FFFFFF;
+  --austral-rojo: #D71440;
+  --austral-negro: #000000;
+
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

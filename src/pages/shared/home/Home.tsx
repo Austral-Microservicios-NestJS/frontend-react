@@ -6,7 +6,7 @@ const Home = () => {
   return (
     <div className="relative min-h-screen bg-white overflow-hidden">
       {/* Imagen de construcción en la parte inferior derecha */}
-      <div className="absolute -bottom-60 -right-10 md:-bottom-20 md:right-5 lg:top-3 lg:right-20 w-full h-[100%] pointer-events-none">
+      <div className="absolute -bottom-60 -right-10 md:-bottom-20 md:right-5 lg:top-3 lg:right-20 w-full h-full pointer-events-none">
         <img
           src="/images/torrebg.png"
           alt="Construcción"

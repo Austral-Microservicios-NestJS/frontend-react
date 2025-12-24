@@ -73,17 +73,17 @@ export const Sidebar = () => {
           {/* Header */}
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center gap-3 mb-3">
-              <div className="relative">
+              {/* <div className="relative">
                 <img
                   className="w-10 h-10 rounded-lg object-contain"
-                  src="/images/betondecken-logo.png"
-                  alt="BetonDecken Logo"
+                  src="/images/austral-logo.png"
+                  alt="Austral Logo"
                 />
                 <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border border-white"></div>
-              </div>
+              </div> */}
               <div className="flex flex-col min-w-0">
                 <h1 className="text-base font-bold text-gray-900 truncate">
-                  Beton Decken
+                  Austral Corredores
                 </h1>
                 <p className="text-xs text-gray-500">Sistema de Gestión</p>
               </div>
@@ -93,14 +93,14 @@ export const Sidebar = () => {
             {user && (
               <div className="p-2.5 bg-gray-50 rounded-lg border border-gray-100">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-amber-800 rounded-lg flex items-center justify-center text-white font-semibold text-xs shrink-0">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-semibold text-xs shrink-0" style={{ backgroundColor: 'var(--austral-azul)' }}>
                     {user.nombreUsuario?.charAt(0).toUpperCase() || "U"}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-gray-900 truncate">
                       {user.nombreUsuario || "Usuario"}
                     </p>
-                    <p className="text-xs text-amber-800">{userRole}</p>
+                    <p className="text-xs" style={{ color: 'var(--austral-azul)' }}>{userRole}</p>
                   </div>
                 </div>
               </div>
@@ -144,10 +144,11 @@ export const Sidebar = () => {
                             text-sm transition-colors
                             ${
                               isActive
-                                ? "bg-amber-800 text-white"
-                                : "text-gray-700 hover:bg-gray-100 hover:text-amber-800"
+                                ? "text-white"
+                                : "text-gray-700 hover:bg-gray-100"
                             }
                           `}
+                            style={isActive ? { backgroundColor: 'var(--austral-azul)' } : {}}
                           >
                             <div
                               className={`
@@ -155,7 +156,7 @@ export const Sidebar = () => {
                             ${
                               isActive
                                 ? "bg-white/20 text-white"
-                                : "bg-gray-100 text-gray-600 group-hover:bg-amber-100 group-hover:text-amber-800"
+                                : "bg-gray-100 text-gray-600"
                             }
                           `}
                             >
@@ -186,8 +187,9 @@ export const Sidebar = () => {
             <button
               onClick={handleLogout}
               className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 
-                     bg-amber-800 text-white rounded-lg text-sm font-semibold
-                     transition-colors hover:bg-amber-900"
+                     text-white rounded-lg text-sm font-semibold
+                     transition-colors hover:opacity-90"
+              style={{ backgroundColor: 'var(--austral-azul)' }}
             >
               <LogOut size={16} />
               <span>Cerrar Sesión</span>
