@@ -23,6 +23,7 @@ import RamosPage from "@/pages/admin/maestros/ramos/RamosPage";
 import ProductosPage from "@/pages/admin/maestros/productos/ProductosPage";
 import PolizasPage from "@/pages/shared/gestion-trabajo/polizas/PolizasPage";
 import LeadsPage from "@/pages/shared/gestion-trabajo/leads/LeadsPage";
+import ClientePolizasPage from "@/pages/shared/gestion-trabajo/clientes/[id]/polizas/ClientePolizasPage";
 
 // Definición de rutas
 const router = createBrowserRouter([
@@ -78,6 +79,16 @@ const router = createBrowserRouter([
             requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
           >
             <ClientesPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "gestion-trabajo/clientes/:id/polizas",
+        element: (
+          <ProtectedRoute
+            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
+          >
+            <ClientePolizasPage />
           </ProtectedRoute>
         ),
       },

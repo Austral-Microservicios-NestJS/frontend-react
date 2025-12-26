@@ -1,4 +1,12 @@
-import { BookUser, Bot, FishingHook, FolderCog, Handshake, NotebookPen, User } from "lucide-react";
+import {
+  BookUser,
+  Bot,
+  FishingHook,
+  FolderCog,
+  Handshake,
+  NotebookPen,
+  User,
+} from "lucide-react";
 import { Roles } from "@/utils/roles";
 
 // Categorías de módulos
@@ -42,7 +50,7 @@ export const moduleCategories = [
         path: "/dashboard/gestion-trabajo/polizas",
         icon: FolderCog,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
-      }
+      },
     ],
   },
   {

@@ -16,7 +16,7 @@ export const clienteApi = {
   },
 
   getById: async (id: string) => {
-    const response = await api.get<Cliente>(`/clientes/${id}`);
+    const response = await api.get<Cliente>(`/clientes/id/${id}`);
     return response.data;
   },
 

@@ -88,7 +88,7 @@ export const RegistrarCliente = ({
   };
 
   return (
-    <ModalContainer isOpen={isOpen} onClose={onClose} size="lg">
+    <ModalContainer isOpen={isOpen} onClose={onClose} size="xl">
       <Modal>
         <ModalHeader title="Registrar Nuevo Cliente" onClose={onClose} />
 

@@ -1,12 +1,16 @@
 import { Table } from "@/components/shared";
 import { type ColumnDef } from "@tanstack/react-table";
 import { type Cliente } from "@/types/cliente.interface";
+import { useNavigate } from "react-router-dom";
+import { FileText } from "lucide-react";
 
 interface TablaClientesProps {
   clientes: Cliente[];
 }
 
 export const TablaClientes = ({ clientes }: TablaClientesProps) => {
+  const navigate = useNavigate();
+
   const columns: ColumnDef<Cliente>[] = [
     {
       accessorKey: "tipoPersona",
@@ -140,6 +144,21 @@ export const TablaClientes = ({ clientes }: TablaClientesProps) => {
     //     </div>
     //   ),
     // },
+    {
+      id: "acciones",
+      header: "Acciones",
+      cell: ({ row }) => (
+        <button
+          onClick={() => navigate(`/dashboard/gestion-trabajo/clientes/${row.original.idCliente}/polizas`)}
+          className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white rounded-lg transition-colors hover:opacity-90"
+          style={{ backgroundColor: "var(--austral-azul)" }}
+          title="Ver pólizas del cliente"
+        >
+          <FileText className="w-4 h-4" />
+          Pólizas
+        </button>
+      ),
+    },
   ];
 
   return (
