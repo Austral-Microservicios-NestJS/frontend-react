@@ -34,7 +34,6 @@ export default function UsuariosPage() {
       <RegistrarUsuario
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        // addUsuario={addUsuario}
         addUsuario={addUsuario}
         roles={roles}
         user={user!}

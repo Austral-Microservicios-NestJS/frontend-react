@@ -18,6 +18,7 @@ import ClientesPage from "@/pages/shared/gestion-trabajo/clientes/ClientesPage";
 // Componentes de maestros
 import UsuariosPage from "@/pages/admin/maestros/usuarios/UsuariosPage";
 import AgentesPage from "@/pages/broker/agentes/AgentesPage";
+import AgenteDniPage from "@/pages/shared/agentes-ia/documentos/agente-dni/AgenteDniPage";
 
 // Definición de rutas
 const router = createBrowserRouter([
@@ -120,7 +121,19 @@ const router = createBrowserRouter([
             <AgentesPage />
           </ProtectedRoute>
         ),
-      }
+      },
+
+      // Agentes de IA
+      {
+        path: "agentes-ia/agente-dni",
+        element: (
+          <ProtectedRoute
+            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
+          >
+            <AgenteDniPage />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
 ]);

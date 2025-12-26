@@ -36,6 +36,13 @@ export const moduleCategories = [
         icon: User,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
       },
+      {
+        id: 55,
+        name: "Polizas",
+        path: "/dashboard/gestion-trabajo/polizas",
+        icon: User,
+        roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+      }
     ],
   },
   {
