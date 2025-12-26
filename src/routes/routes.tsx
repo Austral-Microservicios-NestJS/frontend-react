@@ -17,6 +17,7 @@ import ClientesPage from "@/pages/shared/gestion-trabajo/clientes/ClientesPage";
 
 // Componentes de maestros
 import UsuariosPage from "@/pages/admin/maestros/usuarios/UsuariosPage";
+import AgentesPage from "@/pages/broker/agentes/AgentesPage";
 
 // Definición de rutas
 const router = createBrowserRouter([
@@ -76,7 +77,7 @@ const router = createBrowserRouter([
         ),
       },
 
-      // Seccion de maestros
+      // Seccion de maestros - Administrador
       {
         path: "admin/maestros/companias",
         element: (
@@ -106,6 +107,17 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requiredRoles={[Roles.ADMINISTRADOR]}>
             <UsuariosPage />
+          </ProtectedRoute>
+        ),
+      },
+
+      // Fin seccion maestros
+
+      {
+        path: "broker/agentes",
+        element: (
+          <ProtectedRoute requiredRoles={[Roles.BROKER]}>
+            <AgentesPage />
           </ProtectedRoute>
         ),
       }

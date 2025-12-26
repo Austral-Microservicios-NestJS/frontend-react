@@ -219,7 +219,10 @@ export const Table = <T,>({
                     ? serverSearch.onSearchChange(e.target.value)
                     : setGlobalFilter(e.target.value)
                 }
-                className="w-full pl-9 pr-3 py-1.5 border border-gray-300 rounded-lg transition-all duration-200 text-xs focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                className="w-full pl-9 pr-3 py-1.5 border border-gray-300 rounded-lg transition-all duration-200 text-xs focus:ring-2 focus:ring-offset-0 outline-none"
+                style={{ borderColor: 'gray' }}
+                onFocus={(e) => e.target.style.borderColor = 'var(--austral-azul)'}
+                onBlur={(e) => e.target.style.borderColor = ''}
               />
             </div>
           )}
@@ -309,7 +312,7 @@ export const Table = <T,>({
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-amber-800 border-b border-gray-200">
+            <thead className="border-b border-gray-200" style={{ backgroundColor: 'var(--austral-azul)' }}>
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
@@ -318,10 +321,13 @@ export const Table = <T,>({
                     return (
                       <th
                         key={header.id}
-                        className="px-2 sm:px-3 py-2 text-left text-xs font-semibold text-white cursor-pointer hover:bg-amber-700 whitespace-nowrap group relative"
+                        className="px-2 sm:px-3 py-2 text-left text-xs font-semibold text-white cursor-pointer whitespace-nowrap group relative"
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#002a42'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--austral-azul)'}
                         onClick={(e) => handleHeaderClick(header, e)}
                         title="Click para ordenar | Alt+Click para minimizar"
                         style={{
+                          backgroundColor: 'var(--austral-azul)',
                           width: width ? `${width}px` : undefined,
                           minWidth: width ? `${width}px` : undefined,
                           maxWidth: width ? `${width}px` : undefined,
@@ -350,7 +356,7 @@ export const Table = <T,>({
                                 <div className="flex items-center gap-0.5">
                                   {/* Indicador de orden para multi-sorting */}
                                   {header.column.getIsSorted() && (
-                                    <span className="text-[10px] font-bold text-white bg-amber-600 rounded-full w-3.5 h-3.5 flex items-center justify-center">
+                                    <span className="text-[10px] font-bold text-white rounded-full w-3.5 h-3.5 flex items-center justify-center" style={{ backgroundColor: '#002a42' }}>
                                       {header.column.getSortIndex() + 1}
                                     </span>
                                   )}
@@ -360,7 +366,7 @@ export const Table = <T,>({
                                       className={`${
                                         header.column.getIsSorted() === "asc"
                                           ? "text-white"
-                                          : "text-amber-300"
+                                          : "text-blue-200"
                                       }`}
                                     />
                                     <ChevronDown
@@ -368,7 +374,7 @@ export const Table = <T,>({
                                       className={`${
                                         header.column.getIsSorted() === "desc"
                                           ? "text-white"
-                                          : "text-amber-300"
+                                          : "text-blue-200"
                                       }`}
                                     />
                                   </div>
@@ -570,9 +576,10 @@ export const Table = <T,>({
                           }
                           className={`w-7 h-7 text-xs font-medium rounded-lg transition-colors duration-150 ${
                             currentPage === page
-                              ? "bg-amber-800 text-white"
+                              ? "text-white"
                               : "text-gray-700 hover:bg-gray-100"
                           }`}
+                          style={currentPage === page ? { backgroundColor: 'var(--austral-azul)' } : {}}
                         >
                           {page + 1}
                         </button>

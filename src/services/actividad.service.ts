@@ -10,8 +10,8 @@ export const ACTIVIDADES_KEY = ["actividades"];
 
 export const actividadApi = {
   getAll: async () => {
-    const response = await api.get<{ data: Actividad[] }>(`/actividades`);
-    return response.data.data || [];
+    const response = await api.get<Actividad[]>(`/actividades`);
+    return response.data || [];
   },
 
   getAllByUsuario: async (idUsuario: string) => {

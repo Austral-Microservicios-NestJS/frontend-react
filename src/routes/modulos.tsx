@@ -28,7 +28,14 @@ export const moduleCategories = [
         path: "/dashboard/gestion-trabajo/clientes",
         icon: User,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
-      }
+      },
+      {
+        id: 54,
+        name: "Leads",
+        path: "/dashboard/gestion-trabajo/leads",
+        icon: User,
+        roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+      },
     ],
   },
   {
@@ -56,7 +63,7 @@ export const moduleCategories = [
         path: "/dashboard/agentes-ia/agente-polizas",
         icon: User,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
-      }
+      },
     ],
   },
   {
@@ -90,7 +97,23 @@ export const moduleCategories = [
         path: "/dashboard/admin/maestros/usuarios",
         icon: User,
         roles: [Roles.ADMINISTRADOR],
-      }
+      },
+    ],
+  },
+  {
+    id: "modulos",
+    title: "Módulos",
+    modules: [
+      // Modulos Compartidos
+
+      // Modulos de broker
+      {
+        id: 201,
+        name: "Mis Agentes",
+        path: "/dashboard/broker/agentes",
+        icon: User,
+        roles: [Roles.BROKER],
+      },
     ],
   },
 ];
