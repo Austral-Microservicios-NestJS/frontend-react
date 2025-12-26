@@ -1,4 +1,4 @@
-import { User } from "lucide-react";
+import { BookUser, Bot, FishingHook, FolderCog, Handshake, NotebookPen, User } from "lucide-react";
 import { Roles } from "@/utils/roles";
 
 // Categorías de módulos
@@ -12,35 +12,35 @@ export const moduleCategories = [
         id: 51,
         name: "Actividades",
         path: "/dashboard/gestion-trabajo/actividades",
-        icon: User,
+        icon: BookUser,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
       },
       {
         id: 52,
         name: "Tareas",
         path: "/dashboard/gestion-trabajo/tareas",
-        icon: User,
+        icon: NotebookPen,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
       },
       {
         id: 53,
         name: "Clientes",
         path: "/dashboard/gestion-trabajo/clientes",
-        icon: User,
+        icon: Handshake,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
       },
       {
         id: 54,
         name: "Leads",
         path: "/dashboard/gestion-trabajo/leads",
-        icon: User,
+        icon: FishingHook,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
       },
       {
         id: 55,
         name: "Polizas",
         path: "/dashboard/gestion-trabajo/polizas",
-        icon: User,
+        icon: FolderCog,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
       }
     ],
@@ -54,21 +54,21 @@ export const moduleCategories = [
         id: 61,
         name: "Agente de Facturas",
         path: "/dashboard/agentes-ia/agente-facturas",
-        icon: User,
+        icon: Bot,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
       },
       {
         id: 62,
         name: "Agente de DNI",
         path: "/dashboard/agentes-ia/agente-dni",
-        icon: User,
+        icon: Bot,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
       },
       {
         id: 63,
         name: "Agente de Pólizas",
         path: "/dashboard/agentes-ia/agente-polizas",
-        icon: User,
+        icon: Bot,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
       },
     ],

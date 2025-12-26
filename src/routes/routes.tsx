@@ -19,6 +19,10 @@ import ClientesPage from "@/pages/shared/gestion-trabajo/clientes/ClientesPage";
 import UsuariosPage from "@/pages/admin/maestros/usuarios/UsuariosPage";
 import AgentesPage from "@/pages/broker/agentes/AgentesPage";
 import AgenteDniPage from "@/pages/shared/agentes-ia/documentos/agente-dni/AgenteDniPage";
+import RamosPage from "@/pages/admin/maestros/ramos/RamosPage";
+import ProductosPage from "@/pages/admin/maestros/productos/ProductosPage";
+import PolizasPage from "@/pages/shared/gestion-trabajo/polizas/PolizasPage";
+import LeadsPage from "@/pages/shared/gestion-trabajo/leads/LeadsPage";
 
 // Definición de rutas
 const router = createBrowserRouter([
@@ -77,6 +81,26 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      {
+        path: "gestion-trabajo/leads",
+        element: (
+          <ProtectedRoute
+            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
+          >
+            <LeadsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "gestion-trabajo/polizas",
+        element: (
+          <ProtectedRoute
+            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
+          >
+            <PolizasPage />
+          </ProtectedRoute>
+        ),
+      },
 
       // Seccion de maestros - Administrador
       {
@@ -91,7 +115,7 @@ const router = createBrowserRouter([
         path: "admin/maestros/ramos",
         element: (
           <ProtectedRoute requiredRoles={[Roles.ADMINISTRADOR]}>
-            <CompaniasPage />
+            <RamosPage />
           </ProtectedRoute>
         ),
       },
@@ -99,7 +123,7 @@ const router = createBrowserRouter([
         path: "admin/maestros/productos",
         element: (
           <ProtectedRoute requiredRoles={[Roles.ADMINISTRADOR]}>
-            <CompaniasPage />
+            <ProductosPage />
           </ProtectedRoute>
         ),
       },
