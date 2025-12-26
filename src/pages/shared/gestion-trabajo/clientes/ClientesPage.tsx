@@ -2,11 +2,15 @@ import { useState } from "react";
 import { Header, BotonRegistro } from "@/components/shared";
 import { useSidebar } from "@/components/sidebar/Sidebar";
 import { useAuthStore } from "@/store/auth.store";
+import { RegistrarCliente } from "@/components/modulos/clientes/modales/RegistrarCliente";
+import { useClientes } from "@/hooks/useCliente";
+import { TablaClientes } from "@/components/modulos/clientes/tablas/TablaClientes";
 
 export default function ClientesPage() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useAuthStore();
+  const { clientes, addCliente } = useClientes();
 
   return (
     <>
@@ -22,15 +26,15 @@ export default function ClientesPage() {
         />
       </Header>
 
-      {/* Aquí iría el contenido principal de la página de actividades */}
-      {/* <ActividadesGrid actividades={actividades} /> */}
+      {/* Aquí iría el contenido principal de la página de clientes */}
+      <TablaClientes clientes={clientes} />
 
-      {/* <RegistrarActividad
+      <RegistrarCliente
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        addActividad={addActividad}
+        addCliente={addCliente}
         user={user!}
-      /> */}
+      />
     </>
   );
 }

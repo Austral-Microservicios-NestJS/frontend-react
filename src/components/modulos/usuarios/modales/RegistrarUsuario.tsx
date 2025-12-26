@@ -18,7 +18,12 @@ import {
 } from "@/components/ui";
 import { useForm, Controller } from "react-hook-form";
 import type { User } from "@/store/auth.store";
-import { tipoDocumentoOptions, type CreateUsuario, type Rol } from "@/types/usuario.interface";
+import {
+  tipoDocumentoOptions,
+  type CreateUsuario,
+  type Rol,
+} from "@/types/usuario.interface";
+import { useEffect } from "react";
 
 interface RegistrarUsuarioProps {
   isOpen: boolean;
@@ -57,6 +62,13 @@ export const RegistrarUsuario = ({
     },
   });
 
+  // Resetear formulario cuando el modal se cierra
+  useEffect(() => {
+    if (!isOpen) {
+      reset();
+    }
+  }, [isOpen, reset]);
+
   const onSubmit = async (data: any) => {
     // Convertir porcentajeComision a número
     const dataToSend = {
@@ -69,12 +81,7 @@ export const RegistrarUsuario = ({
   };
 
   return (
-    <ModalContainer
-      isOpen={isOpen}
-      onClose={onClose}
-      size="lg"
-      onAfterClose={() => reset()}
-    >
+    <ModalContainer isOpen={isOpen} onClose={onClose} size="lg">
       <Modal>
         <ModalHeader title="Registrar Nuevo Usuario" onClose={onClose} />
 
@@ -196,12 +203,12 @@ export const RegistrarUsuario = ({
                   type="number"
                   placeholder="Ej: 25"
                   step={0.01}
-                  {...register("porcentajeComision", { 
+                  {...register("porcentajeComision", {
                     required: true,
                     max: 100,
                     min: 0,
-                    valueAsNumber: true
-                 })}
+                    valueAsNumber: true,
+                  })}
                 />
               </FormGroup>
             </FormGroupDivisor>

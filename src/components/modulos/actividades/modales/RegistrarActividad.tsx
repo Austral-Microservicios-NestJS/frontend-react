@@ -20,19 +20,20 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import { tipoActividadOptions } from "@/types/actividad.interface";
 import type { User } from "@/store/auth.store";
+import { useEffect } from "react";
 
 interface RegistrarActividadProps {
   isOpen: boolean;
   onClose: () => void;
   addActividad: (data: any) => Promise<void>;
-  user: User
+  user: User;
 }
 
 export const RegistrarActividad = ({
   isOpen,
   onClose,
   addActividad,
-  user
+  user,
 }: RegistrarActividadProps) => {
   const {
     register,
@@ -42,13 +43,20 @@ export const RegistrarActividad = ({
     formState: {},
   } = useForm({
     defaultValues: {
-        titulo: "",
-        tipoActividad: "",
-        fechaActividad: "",
-        descripcion: "",
-        creadaPor: user.idUsuario
-    }
+      titulo: "",
+      tipoActividad: "",
+      fechaActividad: "",
+      descripcion: "",
+      creadaPor: user.idUsuario,
+    },
   });
+
+  // Resetear formulario cuando el modal se cierra
+  useEffect(() => {
+    if (!isOpen) {
+      reset();
+    }
+  }, [isOpen, reset]);
 
   const onSubmit = async (data: any) => {
     await addActividad(data);
@@ -56,9 +64,9 @@ export const RegistrarActividad = ({
   };
 
   return (
-    <ModalContainer 
-      isOpen={isOpen} 
-      onClose={onClose} 
+    <ModalContainer
+      isOpen={isOpen}
+      onClose={onClose}
       size="lg"
       onAfterClose={() => reset()}
     >
