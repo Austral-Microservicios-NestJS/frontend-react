@@ -52,25 +52,26 @@ export default function LeadsPage() {
       title: "Nuevo",
       estado: "NUEVO" as EstadoLead,
       leads: leadsByEstado.NUEVO,
-      color: "bg-blue-600",
+      color: "bg-gradient-to-br from-slate-700 via-slate-600 to-slate-700",
     },
     {
       title: "Contactado",
       estado: "CONTACTADO" as EstadoLead,
       leads: leadsByEstado.CONTACTADO,
-      color: "bg-purple-600",
+      color: "bg-gradient-to-br from-indigo-600 via-indigo-500 to-indigo-600",
     },
     {
       title: "Cerrado",
       estado: "CERRADO" as EstadoLead,
       leads: leadsByEstado.CERRADO,
-      color: "bg-green-600",
+      color:
+        "bg-gradient-to-br from-emerald-600 via-emerald-500 to-emerald-600",
     },
     {
       title: "Perdido",
       estado: "PERDIDO" as EstadoLead,
       leads: leadsByEstado.PERDIDO,
-      color: "bg-red-600",
+      color: "bg-gradient-to-br from-rose-600 via-rose-500 to-rose-600",
     },
   ];
 
@@ -128,35 +129,6 @@ export default function LeadsPage() {
         </div>
       ) : (
         <>
-          {/* Instrucciones */}
-          <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <div className="flex items-start gap-2">
-              <svg
-                className="w-5 h-5 text-blue-600 shrink-0 mt-0.5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <div>
-                <h3 className="font-semibold text-blue-900 text-sm mb-1">
-                  ¿Cómo usar el tablero Kanban?
-                </h3>
-                <p className="text-blue-800 text-xs">
-                  Arrastra y suelta las tarjetas entre columnas para cambiar el
-                  estado de tus leads. Haz clic en una tarjeta para editarla o
-                  en el botón X para eliminarla.
-                </p>
-              </div>
-            </div>
-          </div>
-
           {/* Tablero Kanban */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 h-[calc(100vh-240px)]">
             {kanbanColumns.map((column) => (

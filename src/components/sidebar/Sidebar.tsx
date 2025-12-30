@@ -160,12 +160,49 @@ export const Sidebar = () => {
                         const isActive = location.pathname.startsWith(
                           module.path
                         );
+                        const isAuroraModule = (module as any).isAuroraModule;
+
+                        // Renderizado especial para módulo Austral AI con efecto aurora
+                        if (isAuroraModule) {
+                          return (
+                            <div key={module.id} className="relative group/aurora">
+                              {/* Fondo Aurora */}
+                              <span
+                                aria-hidden
+                                className="absolute inset-0 aurora-bg pointer-events-none opacity-90 rounded-lg"
+                              />
+
+                              {/* Botón del módulo */}
+                              <button
+                                onClick={() => navigateToModule(module.path)}
+                                className={`
+                                  relative w-full flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium
+                                  text-sm transition-all
+                                  ${
+                                    isActive
+                                      ? "text-white bg-white/10"
+                                      : "text-white hover:bg-white/20"
+                                  }
+                                `}
+                              >
+                                <div className="flex items-center justify-center w-7 h-7 rounded-md bg-white/20 text-white transition-colors shrink-0">
+                                  <module.icon className="w-4 h-4" />
+                                </div>
+                                <span className="flex-1 text-left text-sm font-semibold">
+                                  {module.name}
+                                </span>
+                              </button>
+                            </div>
+                          );
+                        }
+
+                        // Renderizado normal para otros módulos
                         return (
                           <button
                             key={module.id}
                             onClick={() => navigateToModule(module.path)}
                             className={`
-                            w-full flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium 
+                            w-full flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium
                             text-sm transition-all duration-200
                             ${
                               isActive

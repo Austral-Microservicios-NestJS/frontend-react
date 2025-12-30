@@ -1,70 +1,92 @@
 import { api } from "@/config/api-client";
-import type { Tarea, CreateTarea } from "@/types/tarea.interface";
+import type { Tarea, CreateTarea, UpdateTarea, TareaFilters } from "@/types/tarea.interface";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-export const TAREAS_KEY = ["tareas"];
+const QUERY_KEY = "tareas";
 
-export const tareaApi = {
-  getAll: async () => {
-    const response = await api.get<Tarea[]>(`/tareas`);
-    return response.data || [];
+// ==================== API FUNCTIONS ====================
+
+export const tareaService = {
+  // Listar todas las tareas con paginación
+  getAll: async (params?: { page?: number; limit?: number }): Promise<{ data: Tarea[]; meta: any }> => {
+    try {
+      const response = await api.get("/tareas", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error al obtener tareas:", error);
+      return { data: [], meta: { total: 0, page: 1, lastPage: 1 } };
+    }
   },
 
-  getAllByUsuario: async (idUsuario: string) => {
-    const response = await api.get<{ data: Tarea[] }>(`/tareas/usuario/${idUsuario}`);
-    return response.data.data || [];
+  // Obtener tarea por ID
+  getById: async (id: string): Promise<Tarea> => {
+    const { data } = await api.get(`/tareas/id/${id}`);
+    return data;
   },
 
-  getById: async (id: string) => {
-    const response = await api.get<Tarea>(`/tareas/${id}`);
-    return response.data;
+  // Listar tareas por usuario con filtros opcionales
+  getByUsuario: async (idUsuario: string, filters?: TareaFilters): Promise<{ data: Tarea[]; meta: any }> => {
+    try {
+      const response = await api.get(`/tareas/usuario/${idUsuario}`, { params: filters });
+      return response.data;
+    } catch (error) {
+      console.error("Error al obtener tareas del usuario:", error);
+      return { data: [], meta: { total: 0, page: 1, lastPage: 1 } };
+    }
   },
 
-  create: async (tarea: CreateTarea) => {
-    const response = await api.post<Tarea>("/tareas", tarea);
-    return response.data;
+  // Crear tarea
+  create: async (tarea: CreateTarea): Promise<Tarea> => {
+    const { data } = await api.post("/tareas", tarea);
+    return data;
   },
 
-  update: async (id: string, tarea: Partial<CreateTarea>) => {
-    const response = await api.patch<Tarea>(`/tareas/${id}`, tarea);
-    return response.data;
+  // Actualizar tarea
+  update: async ({ id, data: tareaData }: { id: string; data: UpdateTarea }): Promise<Tarea> => {
+    const { data } = await api.patch(`/tareas/${id}`, tareaData);
+    return data;
   },
 
-  delete: async (id: string) => {
+  // Eliminar tarea
+  delete: async (id: string): Promise<void> => {
     await api.delete(`/tareas/${id}`);
   },
 
-  // ===== Hooks de React Query =====
+  // ==================== REACT QUERY HOOKS ====================
+
+  useGetAll: (params?: { page?: number; limit?: number }) => {
+    return useQuery({
+      queryKey: [QUERY_KEY, "all", params],
+      queryFn: () => tareaService.getAll(params),
+      retry: false,
+      refetchOnWindowFocus: false,
+    });
+  },
 
   useGetById: (id: string) => {
     return useQuery({
-      queryKey: [...TAREAS_KEY, id],
-      queryFn: () => tareaApi.getById(id),
+      queryKey: [QUERY_KEY, id],
+      queryFn: () => tareaService.getById(id),
       enabled: !!id,
     });
   },
 
-  useGetAll: () => {
+  useGetByUsuario: (idUsuario: string, filters?: TareaFilters) => {
     return useQuery({
-      queryKey: TAREAS_KEY,
-      queryFn: () => tareaApi.getAll(),
-    });
-  },
-
-  useGetAllByUsuario: (idUsuario: string) => {
-    return useQuery({
-      queryKey: [...TAREAS_KEY, "usuario", idUsuario],
-      queryFn: () => tareaApi.getAllByUsuario(idUsuario),
+      queryKey: [QUERY_KEY, "usuario", idUsuario, filters],
+      queryFn: () => tareaService.getByUsuario(idUsuario, filters),
       enabled: !!idUsuario,
+      retry: false,
+      refetchOnWindowFocus: false,
     });
   },
 
   useCreate: () => {
     const queryClient = useQueryClient();
     return useMutation({
-      mutationFn: (data: CreateTarea) => tareaApi.create(data),
+      mutationFn: tareaService.create,
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: TAREAS_KEY });
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
       },
     });
   },
@@ -72,10 +94,9 @@ export const tareaApi = {
   useUpdate: () => {
     const queryClient = useQueryClient();
     return useMutation({
-      mutationFn: ({ id, data }: { id: string; data: Partial<CreateTarea> }) =>
-        tareaApi.update(id, data),
+      mutationFn: tareaService.update,
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: TAREAS_KEY });
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
       },
     });
   },
@@ -83,9 +104,9 @@ export const tareaApi = {
   useDelete: () => {
     const queryClient = useQueryClient();
     return useMutation({
-      mutationFn: (id: string) => tareaApi.delete(id),
+      mutationFn: tareaService.delete,
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: TAREAS_KEY });
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
       },
     });
   },

@@ -1,66 +1,93 @@
+// ==================== ENUMS ====================
+
+export enum TipoTarea {
+  LLAMADA = "LLAMADA",
+  REUNION = "REUNION",
+  EMAIL = "EMAIL",
+  SEGUIMIENTO = "SEGUIMIENTO",
+  REVISION = "REVISION",
+  DOCUMENTO = "DOCUMENTO",
+  OTRO = "OTRO",
+}
+
+export enum PrioridadTarea {
+  ALTA = "ALTA",
+  MEDIA = "MEDIA",
+  BAJA = "BAJA",
+}
+
+export enum EstadoTarea {
+  PENDIENTE = "PENDIENTE",
+  EN_PROCESO = "EN_PROCESO",
+  COMPLETADA = "COMPLETADA",
+  CANCELADA = "CANCELADA",
+}
+
+// ==================== INTERFACES ====================
 
 export interface Tarea {
-    idTarea: string;
-    creadaPor: string;
-    asunto: string;
-    descripcion: string;
-    tipoTarea: string; // "SEGUIMIENTO_LEAD", "ELABORAR_PROPUESTA", etc.
-    fechaVencimiento: string; // ISO String
-    prioridad: string; // "ALTA", "MEDIA", "BAJA"
-    estado: string; // "PENDIENTE", "EN_PROGRESO", "COMPLETADA"
-    disponible: boolean;
-    fechaCreacion: string;
-    fechaModificacion: string;
+  idTarea: string;
+  creadaPor: string;
+  asunto: string;
+  descripcion?: string;
+  tipoTarea: TipoTarea;
+  fechaVencimiento: string;
+  prioridad: PrioridadTarea;
+  estado: EstadoTarea;
+  disponible: boolean;
+  fechaCreacion: string;
+  fechaModificacion: string;
 }
 
 export interface CreateTarea {
-    asunto: string;
-    descripcion?: string;
-    tipoTarea: string;
-    fechaVencimiento: string; // ISO String
-    prioridad: string;
-    estado: string;
-    creadaPor: string;
+  creadaPor: string;
+  asunto: string;
+  descripcion?: string;
+  tipoTarea: TipoTarea;
+  fechaVencimiento: string;
+  prioridad: PrioridadTarea;
+  estado: EstadoTarea;
 }
 
-export enum TipoTarea {
-    // Definir tipos de tarea para una aseguradora
-    RECLAMO = 'RECLAMO',
-    POLIZA = 'POLIZA',
-    PAGO = 'PAGO',
-    INSPECCION = 'INSPECCION',
-    OTRO = 'OTRO',
+export interface UpdateTarea {
+  asunto?: string;
+  descripcion?: string;
+  tipoTarea?: TipoTarea;
+  fechaVencimiento?: string;
+  prioridad?: PrioridadTarea;
+  estado?: EstadoTarea;
 }
 
-export enum Prioridad {
-    BAJA = 'BAJA',
-    MEDIA = 'MEDIA',
-    ALTA = 'ALTA',
+export interface TareaFilters {
+  page?: number;
+  limit?: number;
+  estado?: EstadoTarea;
+  prioridad?: PrioridadTarea;
+  fechaDesde?: string;
+  fechaHasta?: string;
 }
 
-export enum Estado {
-    PENDIENTE = 'PENDIENTE',
-    EN_PROGRESO = 'EN_PROGRESO',
-    COMPLETADA = 'COMPLETADA',
-}
+// ==================== OPTIONS FOR SELECTS ====================
 
-// Opciones para el formulario con labels amigables
 export const tipoTareaOptions = [
-    { value: TipoTarea.RECLAMO, label: "Reclamo" },
-    { value: TipoTarea.POLIZA, label: "Póliza" },
-    { value: TipoTarea.PAGO, label: "Pago" },
-    { value: TipoTarea.INSPECCION, label: "Inspección" },
-    { value: TipoTarea.OTRO, label: "Otro" },
+  { value: TipoTarea.LLAMADA, label: "Llamada" },
+  { value: TipoTarea.REUNION, label: "Reunión" },
+  { value: TipoTarea.EMAIL, label: "Email" },
+  { value: TipoTarea.SEGUIMIENTO, label: "Seguimiento" },
+  { value: TipoTarea.REVISION, label: "Revisión" },
+  { value: TipoTarea.DOCUMENTO, label: "Documento" },
+  { value: TipoTarea.OTRO, label: "Otro" },
 ] as const;
 
-export const prioridadOptions = [
-    { value: Prioridad.BAJA, label: "Baja" },
-    { value: Prioridad.MEDIA, label: "Media" },
-    { value: Prioridad.ALTA, label: "Alta" },
+export const prioridadTareaOptions = [
+  { value: PrioridadTarea.ALTA, label: "Alta" },
+  { value: PrioridadTarea.MEDIA, label: "Media" },
+  { value: PrioridadTarea.BAJA, label: "Baja" },
 ] as const;
 
-export const estadoOptions = [
-    { value: Estado.PENDIENTE, label: "Pendiente" },
-    { value: Estado.EN_PROGRESO, label: "En Progreso" },
-    { value: Estado.COMPLETADA, label: "Completada" },
+export const estadoTareaOptions = [
+  { value: EstadoTarea.PENDIENTE, label: "Pendiente" },
+  { value: EstadoTarea.EN_PROCESO, label: "En Proceso" },
+  { value: EstadoTarea.COMPLETADA, label: "Completada" },
+  { value: EstadoTarea.CANCELADA, label: "Cancelada" },
 ] as const;

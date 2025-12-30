@@ -19,6 +19,7 @@ import ClientesPage from "@/pages/shared/gestion-trabajo/clientes/ClientesPage";
 import AgenteDniPage from "@/pages/shared/agentes-ia/documentos/agente-dni/AgenteDniPage";
 import AgenteFacturaPage from "@/pages/shared/agentes-ia/documentos/agente-factura/AgenteFacturaPage";
 import AgentePolizaPage from "@/pages/shared/agentes-ia/documentos/agente-poliza/AgentePolizaPage";
+import AustralAIPage from "@/pages/shared/agentes-ia/austral-ai/AustralAIPage";
 
 // Componentes de maestros - Administrador
 import UsuariosPage from "@/pages/admin/maestros/usuarios/UsuariosPage";
@@ -208,6 +209,16 @@ const router = createBrowserRouter([
       },
 
       // Agentes de IA
+      {
+        path: "agentes-ia/austral-ai",
+        element: (
+          <ProtectedRoute
+            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
+          >
+            <AustralAIPage />
+          </ProtectedRoute>
+        ),
+      },
       {
         path: "agentes-ia/agente-dni",
         element: (
