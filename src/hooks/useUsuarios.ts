@@ -1,12 +1,8 @@
 import { toast } from "sonner";
 import type { CreateUsuario, UpdateUsuario } from "@/types/usuario.interface";
 import { usuarioApi } from "@/services/usuario.service";
-import { useAuthStore } from "@/store/auth.store";
 
 export const useUsuarios = () => {
-  const { user } = useAuthStore();
-  const idUsuario = user?.idUsuario || "";
-
   const {
     data: usuarios = [],
     isLoading,

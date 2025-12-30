@@ -7,9 +7,9 @@ import { useAuthStore } from "@/store/auth.store";
 
 export default function ActividadesPage() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [, setIsModalOpen] = useState(false);
 
-  const { user } = useAuthStore();
+  const { } = useAuthStore();
   const {
     actividades,
     actividadesProximas,

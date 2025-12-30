@@ -1,9 +1,12 @@
+import type { Rol } from "./usuario.interface";
+
 export interface Asignacion {
   idAsignacion: string;
   supervisor: {
     idUsuario: string;
     nombreUsuario: string;
     correo: string;
+    rol?: Rol;
     persona?: {
       nombres?: string;
       apellidos?: string;
@@ -13,6 +16,7 @@ export interface Asignacion {
     idUsuario: string;
     nombreUsuario: string;
     correo: string;
+    rol?: Rol;
     persona?: {
       nombres?: string;
       apellidos?: string;

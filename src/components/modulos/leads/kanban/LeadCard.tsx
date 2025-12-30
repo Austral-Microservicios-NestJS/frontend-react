@@ -12,7 +12,7 @@ interface LeadCardProps {
   onDelete: (id: string) => void;
 }
 
-export const LeadCard = ({ lead, onEdit, onDelete }: LeadCardProps) => {
+export const LeadCard = ({ lead, onEdit }: LeadCardProps) => {
   const getPriorityBadge = (prioridad: PrioridadLead) => {
     const priority = prioridadLeadOptions.find((p) => p.value === prioridad);
     const styles = {

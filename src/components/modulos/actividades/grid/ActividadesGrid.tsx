@@ -50,14 +50,14 @@ export const ActividadesGrid = ({ actividades }: Props) => {
     }
   };
 
-  const isProxima = (fechaActividad: Date) => {
+  const isProxima = (fechaActividad: string) => {
     const fecha = new Date(fechaActividad);
     const hoy = new Date();
     const diferenciaDias = Math.ceil((fecha.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
     return diferenciaDias >= 0 && diferenciaDias <= 3;
   };
 
-  const isPasada = (fechaActividad: Date) => {
+  const isPasada = (fechaActividad: string) => {
     return new Date(fechaActividad) < new Date();
   };
 

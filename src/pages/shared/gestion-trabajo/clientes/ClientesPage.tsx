@@ -9,16 +9,15 @@ import type { Cliente } from "@/types/cliente.interface";
 
 export default function ClientesPage() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<"ALL" | "NATURAL" | "JURIDICO">("ALL");
 
-  const { user } = useAuthStore();
+  const { } = useAuthStore();
   const {
     clientes,
     clientesPorTipo,
     clientesActivos,
-    clientesPorDocumento,
     isLoading
   } = useClientes();
 

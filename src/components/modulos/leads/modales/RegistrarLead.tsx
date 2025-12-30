@@ -3,9 +3,10 @@ import { useForm } from "react-hook-form";
 import { Car, Stethoscope, Heart, HardHat, FileText, Activity, Shield } from "lucide-react";
 import {
   Modal,
+  ModalBody,
   ModalContainer,
   ModalHeader,
-  FormGroup,
+  ModalFooter,
 } from "@/components/shared";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +20,10 @@ import {
 } from "@/components/ui/select";
 import type { Lead, CreateLead } from "@/types/lead.interface";
 import {
+  EstadoLead,
+  PrioridadLead,
+  FuenteLead,
+  TipoSeguro,
   estadoLeadOptions,
   prioridadLeadOptions,
   fuenteLeadOptions,
@@ -47,10 +52,10 @@ export const RegistrarLead = ({
     watch,
   } = useForm<CreateLead>({
     defaultValues: {
-      estado: "NUEVO",
-      prioridad: "MEDIA",
-      fuente: "FORMULARIO_WEB",
-      tipoSeguro: "AUTO",
+      estado: EstadoLead.NUEVO,
+      prioridad: PrioridadLead.MEDIA,
+      fuente: FuenteLead.FORMULARIO_WEB,
+      tipoSeguro: TipoSeguro.AUTO,
     },
   });
 
@@ -70,10 +75,10 @@ export const RegistrarLead = ({
       setValue("notas", leadToEdit.notas || "");
     } else {
       reset({
-        estado: "NUEVO",
-        prioridad: "MEDIA",
-        fuente: "FORMULARIO_WEB",
-        tipoSeguro: "AUTO",
+        estado: EstadoLead.NUEVO,
+        prioridad: PrioridadLead.MEDIA,
+        fuente: FuenteLead.FORMULARIO_WEB,
+        tipoSeguro: TipoSeguro.AUTO,
       });
     }
   }, [leadToEdit, setValue, reset]);
@@ -114,16 +119,18 @@ export const RegistrarLead = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose}>
-      <ModalContainer size="lg">
+    <ModalContainer isOpen={isOpen} onClose={handleClose} size="lg">
+      <Modal>
         <ModalHeader
           title={leadToEdit ? "Editar Lead" : "Registrar Lead"}
           onClose={handleClose}
         />
 
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
-          {/* Información básica */}
-          <FormGroup title="Información Básica">
+        <form onSubmit={handleSubmit(handleFormSubmit)}>
+          <ModalBody className="space-y-6">
+            {/* Información básica */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Información Básica</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
                 <Label htmlFor="nombre">
@@ -180,10 +187,11 @@ export const RegistrarLead = ({
                 />
               </div>
             </div>
-          </FormGroup>
+            </div>
 
-          {/* Clasificación del Lead */}
-          <FormGroup title="Clasificación del Lead">
+            {/* Clasificación del Lead */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Clasificación del Lead</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="tipoSeguro">
@@ -287,10 +295,11 @@ export const RegistrarLead = ({
                 </Select>
               </div>
             </div>
-          </FormGroup>
+            </div>
 
-          {/* Información Adicional */}
-          <FormGroup title="Información Adicional">
+            {/* Información Adicional */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Información Adicional</h3>
             <div className="grid grid-cols-1 gap-4">
               <div>
                 <Label htmlFor="valorEstimado">Valor Estimado (S/)</Label>
@@ -315,10 +324,10 @@ export const RegistrarLead = ({
                 />
               </div>
             </div>
-          </FormGroup>
+            </div>
 
-          {/* Información sobre detalles */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            {/* Información sobre detalles */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div className="flex items-start gap-2">
               <svg
                 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5"
@@ -344,10 +353,10 @@ export const RegistrarLead = ({
                 </p>
               </div>
             </div>
-          </div>
+            </div>
+          </ModalBody>
 
-          {/* Botones */}
-          <div className="flex justify-end gap-3 pt-4 border-t">
+          <ModalFooter>
             <button
               type="button"
               onClick={handleClose}
@@ -366,9 +375,9 @@ export const RegistrarLead = ({
                 ? "Actualizar"
                 : "Registrar"}
             </button>
-          </div>
+          </ModalFooter>
         </form>
-      </ModalContainer>
-    </Modal>
+      </Modal>
+    </ModalContainer>
   );
 };

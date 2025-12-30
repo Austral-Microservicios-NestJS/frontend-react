@@ -4,7 +4,8 @@
       "Bash(wc:*)",
       "Bash(npm install:*)",
       "Bash(dir:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(pnpm run build:*)"
     ]
   }
 }

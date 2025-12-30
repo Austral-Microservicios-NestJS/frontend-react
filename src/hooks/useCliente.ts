@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { toast } from "sonner";
-import type { CreateCliente, UpdateCliente, TipoPersona } from "@/types/cliente.interface";
+import type { CreateCliente, UpdateCliente } from "@/types/cliente.interface";
 import { clienteService } from "@/services/cliente.service";
 import { useAuthStore } from "@/store/auth.store";
 
