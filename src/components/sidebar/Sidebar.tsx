@@ -56,7 +56,12 @@ export const Sidebar = () => {
         <aside className="w-64 h-full bg-white flex flex-col fixed top-0 left-0 z-40 border-r border-gray-200">
           {/* Header */}
           <div className="p-4 border-b border-gray-200">
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center justify-evenly gap-3 mb-3">
+              <img
+                src="/images/logo-austral-main.png"
+                alt="Logo Austral"
+                className="w-6 h-6"
+              />
               <div className="flex flex-col min-w-0">
                 <h1 className="text-base font-bold text-gray-900 truncate">
                   Austral Corredores
@@ -235,7 +240,7 @@ export const Sidebar = () => {
         ${isSidebarOpen ? "md:ml-64" : "md:ml-0"}
       `}
       >
-        <div className="min-h-screen bg-gray-50 p-3 lg:p-4">
+        <div className="min-h-full bg-gray-50 p-3 lg:p-4">
           <Outlet />
         </div>
       </main>

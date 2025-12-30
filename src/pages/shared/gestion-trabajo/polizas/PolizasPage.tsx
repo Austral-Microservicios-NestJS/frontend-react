@@ -1,29 +1,24 @@
-import { useState } from "react";
-import { Header, BotonRegistro } from "@/components/shared";
+import { Header } from "@/components/shared";
 import { useSidebar } from "@/hooks/useSidebar";
+import { TablaPolizas } from "@/components/modulos/polizas/tablas/TablaPolizas";
+import { usePolizas } from "@/hooks/usePolizas";
 
 export default function PolizasPage() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { polizas } = usePolizas();
 
   return (
     <>
       <Header
-        title="Polizas"
-        description="Gestiona tus polizas"
+        title="Gestión de Pólizas"
+        description="Administra las pólizas de seguros"
         isSidebarOpen={isSidebarOpen}
         onToggleSidebar={toggleSidebar}
       />
 
-      {/* Aquí iría el contenido principal de la página de clientes */}
-      {/* <TablaClientes clientes={clientes} />
-
-      <RegistrarCliente
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        addCliente={addCliente}
-        user={user!}
-      /> */}
+      <div className="mt-6">
+        <TablaPolizas polizas={polizas} />
+      </div>
     </>
   );
 }

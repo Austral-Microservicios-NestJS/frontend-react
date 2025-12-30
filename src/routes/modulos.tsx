@@ -20,6 +20,20 @@ export type ModuleType = "CRM" | "ERP";
 // Categorías de módulos
 export const moduleCategories = [
   {
+    id: "general",
+    title: "General",
+    modules: [
+      {
+        id: 0,
+        name: "Inicio",
+        path: "/dashboard/home",
+        icon: Building2,
+        roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+        type: ["CRM", "ERP"] as ModuleType[],
+      },
+    ],
+  },
+  {
     id: "gestion-trabajo",
     title: "Gestión de Trabajo",
     modules: [
@@ -121,7 +135,7 @@ export const moduleCategories = [
         path: "/dashboard/agentes-ia/agente-polizas",
         icon: Bot,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
-        type: ["CRM"] as ModuleType[],
+        type: ["CRM", "ERP"] as ModuleType[],
       },
     ],
   },
@@ -166,6 +180,20 @@ export const moduleCategories = [
         icon: User,
         roles: [Roles.BROKER],
         type: ["CRM"] as ModuleType[],
+      },
+    ],
+  },
+  {
+    id: "informacion-extra",
+    title: "Información Extra",
+    modules: [
+      {
+        id: 301,
+        name: "Compañias de Seguros",
+        path: "/dashboard/informacion-extra/companias",
+        icon: Building2,
+        roles: [Roles.BROKER, Roles.AGENTE],
+        type: ["CRM", "ERP"] as ModuleType[],
       },
     ],
   },

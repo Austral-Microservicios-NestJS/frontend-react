@@ -15,20 +15,29 @@ import ActividadesPage from "@/pages/shared/gestion-trabajo/actividades/Activida
 import TareasPage from "@/pages/shared/gestion-trabajo/tareas/TareasPage";
 import ClientesPage from "@/pages/shared/gestion-trabajo/clientes/ClientesPage";
 
-// Componentes de maestros
-import UsuariosPage from "@/pages/admin/maestros/usuarios/UsuariosPage";
-import AgentesPage from "@/pages/broker/agentes/AgentesPage";
+// Componentes de agentes IA
 import AgenteDniPage from "@/pages/shared/agentes-ia/documentos/agente-dni/AgenteDniPage";
+import AgenteFacturaPage from "@/pages/shared/agentes-ia/documentos/agente-factura/AgenteFacturaPage";
+import AgentePolizaPage from "@/pages/shared/agentes-ia/documentos/agente-poliza/AgentePolizaPage";
+
+// Componentes de maestros - Administrador
+import UsuariosPage from "@/pages/admin/maestros/usuarios/UsuariosPage";
 import RamosPage from "@/pages/admin/maestros/ramos/RamosPage";
 import PolizasPage from "@/pages/shared/gestion-trabajo/polizas/PolizasPage";
 import LeadsPage from "@/pages/shared/gestion-trabajo/leads/LeadsPage";
 import ClientePolizasPage from "@/pages/shared/gestion-trabajo/clientes/[id]/polizas/ClientePolizasPage";
 import RamoProductosPage from "@/pages/admin/maestros/ramos/[id]/productos/RamoProductosPage";
 
+// Componentes de Broker
+import AgentesPage from "@/pages/broker/agentes/AgentesPage";
+
 // Componentes de control y seguimiento
 import SiniestrosPage from "@/pages/shared/control-seguimiento/siniestros/SiniestrosPage";
 import ComisionesPage from "@/pages/shared/control-seguimiento/comisiones/ComisionesPage";
 import CobranzasPage from "@/pages/shared/control-seguimiento/cobranzas/CobranzasPage";
+
+// Componentes de informacion extra
+import CompaniasExtraPage from "@/pages/shared/informacion-extra/companias/CompaniasExtraPage";
 
 // Definición de rutas
 const router = createBrowserRouter([
@@ -54,6 +63,10 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
+        element: <Home />,
+      },
+      {
+        path: "home",
         element: <Home />,
       },
       // Seccion de gestion de trabajo - Modulos compartidos
@@ -202,6 +215,36 @@ const router = createBrowserRouter([
             requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
           >
             <AgenteDniPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "agentes-ia/agente-facturas",
+        element: (
+          <ProtectedRoute
+            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
+          >
+            <AgenteFacturaPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "agentes-ia/agente-polizas",
+        element: (
+          <ProtectedRoute
+            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
+          >
+            <AgentePolizaPage />
+          </ProtectedRoute>
+        ),
+      },
+
+      // Seccion de informacion extra solo de vista para Brokers y Agentes
+      {
+        path: "informacion-extra/companias",
+        element: (
+          <ProtectedRoute requiredRoles={[Roles.BROKER, Roles.AGENTE]}>
+            <CompaniasExtraPage />
           </ProtectedRoute>
         ),
       },

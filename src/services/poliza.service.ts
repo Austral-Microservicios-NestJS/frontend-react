@@ -1,17 +1,37 @@
 import { api } from "@/config/api-client";
-import type { Poliza, CreatePolizaDto, UpdatePolizaDto } from "@/types/poliza.interface";
+import type {
+  Poliza,
+  CreatePolizaDto,
+  UpdatePolizaDto,
+} from "@/types/poliza.interface";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const POLIZAS_KEY = ["polizas"];
 
 export const polizaApi = {
   getAll: async () => {
-    const response = await api.get<Poliza[]>(`/polizas`);
-    return response.data || [];
+    const response = await api.get<{ data: Poliza[] }>(`/polizas`);
+    return response.data.data || [];
   },
 
   getAllByCliente: async (idCliente: string) => {
-    const response = await api.get<{ data: Poliza[] }>(`/polizas/cliente/${idCliente}`);
+    const response = await api.get<{ data: Poliza[] }>(
+      `/polizas/cliente/${idCliente}`
+    );
+    return response.data.data || [];
+  },
+
+  getAllByUsuario: async (userId: string) => {
+    const response = await api.get<{ data: Poliza[] }>(
+      `/polizas/usuario/${userId}`
+    );
+    return response.data.data || [];
+  },
+
+  getAllByUsuarios: async (userIds: string[]) => {
+    const response = await api.post<{ data: Poliza[] }>(`/polizas/usuarios`, {
+      userIds,
+    });
     return response.data.data || [];
   },
 
@@ -56,6 +76,22 @@ export const polizaApi = {
       queryKey: [...POLIZAS_KEY, "cliente", idCliente],
       queryFn: () => polizaApi.getAllByCliente(idCliente),
       enabled: !!idCliente,
+    });
+  },
+
+  useGetAllByUsuario: (userId: string) => {
+    return useQuery({
+      queryKey: [...POLIZAS_KEY, "usuario", userId],
+      queryFn: () => polizaApi.getAllByUsuario(userId),
+      enabled: !!userId,
+    });
+  },
+
+  useGetAllByUsuarios: (userIds: string[]) => {
+    return useQuery({
+      queryKey: [...POLIZAS_KEY, "usuarios", userIds],
+      queryFn: () => polizaApi.getAllByUsuarios(userIds),
+      enabled: userIds.length > 0,
     });
   },
 
