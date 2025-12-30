@@ -1,38 +1,18 @@
-import { useState, useEffect, createContext, useContext } from "react";
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import { LogOut, Settings } from "lucide-react";
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
+import { LogOut, Settings, Users, Building2 } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
+import { useSidebarStore } from "@/store/sidebar.store";
 import { moduleCategories } from "@/routes/modulos";
 
-// Contexto para compartir el estado del sidebar con los componentes hijos
-interface SidebarContextType {
-  isSidebarOpen: boolean;
-  toggleSidebar: () => void;
-}
-
-const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
-
-export const useSidebar = () => {
-  const context = useContext(SidebarContext);
-  if (!context) {
-    throw new Error("useSidebar debe usarse dentro de SidebarContext.Provider");
-  }
-  return context;
-};
+// useSidebar hook moved to @/hooks/useSidebar.ts to fix HMR
 
 export const Sidebar = () => {
   const location = useLocation();
-  // Inicializar estado desde localStorage, por defecto true
-  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
-    const saved = localStorage.getItem("sidebarOpen");
-    return saved !== null ? JSON.parse(saved) : true;
-  });
   const navigate = useNavigate();
 
-  // Guardar estado en localStorage cuando cambie
-  useEffect(() => {
-    localStorage.setItem("sidebarOpen", JSON.stringify(isSidebarOpen));
-  }, [isSidebarOpen]);
+  // Usar el store global del sidebar
+  const { isSidebarOpen, viewMode, setSidebarOpen, setViewMode } =
+    useSidebarStore();
 
   // Obtener información del usuario desde el contexto de autenticación
   const { user, logout } = useAuthStore();
@@ -40,15 +20,19 @@ export const Sidebar = () => {
   // Filtrar módulos según el rol del usuario
   const userRole = user?.rol?.nombreRol || "";
 
-  // Filtrar categorías y sus módulos según el rol del usuario
+  // Filtrar categorías y sus módulos según el rol del usuario y el modo de vista
   const filteredCategories = moduleCategories
     .map((category) => ({
       ...category,
-      modules: category.modules.filter((module) =>
-        module.roles.includes(userRole)
+      modules: category.modules.filter(
+        (module) =>
+          module.roles.includes(userRole) && module.type.includes(viewMode)
       ),
     }))
     .filter((category) => category.modules.length > 0);
+
+  // Colores según el modo
+  const activeColor = viewMode === "CRM" ? "#003D5C" : "#0c4cbaff"; // Verde CRM, Azul índigo ERP
 
   // Función para cerrar sesión
   const handleLogout = () => {
@@ -61,7 +45,7 @@ export const Sidebar = () => {
     navigate(path);
     // En móviles, cerrar el sidebar después de navegar
     if (window.innerWidth < 768) {
-      setIsSidebarOpen(false);
+      setSidebarOpen(false);
     }
   };
 
@@ -73,14 +57,6 @@ export const Sidebar = () => {
           {/* Header */}
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center gap-3 mb-3">
-              {/* <div className="relative">
-                <img
-                  className="w-10 h-10 rounded-lg object-contain"
-                  src="/images/austral-logo.png"
-                  alt="Austral Logo"
-                />
-                <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border border-white"></div>
-              </div> */}
               <div className="flex flex-col min-w-0">
                 <h1 className="text-base font-bold text-gray-900 truncate">
                   Austral Corredores
@@ -93,18 +69,62 @@ export const Sidebar = () => {
             {user && (
               <div className="p-2.5 bg-gray-50 rounded-lg border border-gray-100">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-semibold text-xs shrink-0" style={{ backgroundColor: 'var(--austral-azul)' }}>
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-semibold text-xs shrink-0"
+                    style={{ backgroundColor: "var(--austral-azul)" }}
+                  >
                     {user.nombreUsuario?.charAt(0).toUpperCase() || "U"}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-gray-900 truncate">
                       {user.nombreUsuario || "Usuario"}
                     </p>
-                    <p className="text-xs" style={{ color: 'var(--austral-azul)' }}>{userRole}</p>
+                    <p
+                      className="text-xs"
+                      style={{ color: "var(--austral-azul)" }}
+                    >
+                      {userRole}
+                    </p>
                   </div>
                 </div>
               </div>
             )}
+
+            {/* Switch CRM/ERP */}
+            <div className="mt-3 p-2 bg-gray-50 rounded-lg border border-gray-100">
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setViewMode("CRM")}
+                  className={`
+                    flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md text-xs font-semibold
+                    transition-all duration-200
+                    ${
+                      viewMode === "CRM"
+                        ? "bg-(--austral-azul) text-white shadow-sm"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }
+                  `}
+                >
+                  <Users className="w-3.5 h-3.5" />
+                  CRM
+                </button>
+                <button
+                  onClick={() => setViewMode("ERP")}
+                  className={`
+                    flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-md text-xs font-semibold
+                    transition-all duration-200
+                    ${
+                      viewMode === "ERP"
+                        ? "bg-(--austral-azul-ejecutivo) text-white shadow-sm"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }
+                  `}
+                >
+                  <Building2 className="w-3.5 h-3.5" />
+                  ERP
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Navegación */}
@@ -141,14 +161,16 @@ export const Sidebar = () => {
                             onClick={() => navigateToModule(module.path)}
                             className={`
                             w-full flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium 
-                            text-sm transition-colors
+                            text-sm transition-all duration-200
                             ${
                               isActive
-                                ? "text-white"
+                                ? "text-white shadow-sm"
                                 : "text-gray-700 hover:bg-gray-100"
                             }
                           `}
-                            style={isActive ? { backgroundColor: 'var(--austral-azul)' } : {}}
+                            style={
+                              isActive ? { backgroundColor: activeColor } : {}
+                            }
                           >
                             <div
                               className={`
@@ -189,7 +211,7 @@ export const Sidebar = () => {
               className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 
                      text-white rounded-lg text-sm font-semibold
                      transition-colors hover:opacity-90"
-              style={{ backgroundColor: 'var(--austral-azul)' }}
+              style={{ backgroundColor: "var(--austral-azul)" }}
             >
               <LogOut size={16} />
               <span>Cerrar Sesión</span>
@@ -202,7 +224,7 @@ export const Sidebar = () => {
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/20 z-30 md:hidden"
-          onClick={() => setIsSidebarOpen(false)}
+          onClick={() => setSidebarOpen(false)}
         />
       )}
 
@@ -214,14 +236,7 @@ export const Sidebar = () => {
       `}
       >
         <div className="min-h-screen bg-gray-50 p-3 lg:p-4">
-          <SidebarContext.Provider
-            value={{
-              isSidebarOpen,
-              toggleSidebar: () => setIsSidebarOpen(!isSidebarOpen),
-            }}
-          >
-            <Outlet />
-          </SidebarContext.Provider>
+          <Outlet />
         </div>
       </main>
     </div>

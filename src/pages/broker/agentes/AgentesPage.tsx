@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Header, BotonRegistro } from "@/components/shared";
-import { useSidebar } from "@/components/sidebar/Sidebar";
+import { useSidebar } from "@/hooks/useSidebar";
 import { RegistrarUsuario } from "@/components/modulos/usuarios/modales/RegistrarUsuario";
 import { TablaUsuarios } from "@/components/modulos/usuarios/tablas/TablaUsuarios";
 import { useAuthStore } from "@/store/auth.store";
@@ -8,12 +8,11 @@ import { useRoles } from "@/hooks/useRol";
 import { useAgentes } from "@/hooks/useAgentes";
 
 export default function AgentesPage() {
-
-    const { isSidebarOpen, toggleSidebar } = useSidebar();
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const { user } = useAuthStore();
-    const { roles } = useRoles();
-    const { addAgente, agentes } = useAgentes();
+  const { isSidebarOpen, toggleSidebar } = useSidebar();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { user } = useAuthStore();
+  const { roles } = useRoles();
+  const { addAgente, agentes } = useAgentes();
 
   return (
     <>

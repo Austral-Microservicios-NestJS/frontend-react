@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Header, BotonRegistro } from "@/components/shared";
-import { useSidebar } from "@/components/sidebar/Sidebar";
+import { useSidebar } from "@/hooks/useSidebar";
 import { RegistrarRamo } from "@/components/modulos/ramos/modales/RegistrarRamo";
-import { RamosGrid } from "@/components/modulos/ramos/grid/RamosGrid";
+import { TablaRamos } from "@/components/modulos/ramos/tablas/TablaRamos";
 import { useRamos } from "@/hooks/useRamos";
 
 export default function RamosPage() {
@@ -30,7 +30,7 @@ export default function RamosPage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           </div>
         ) : (
-          <RamosGrid ramos={ramos} />
+          <TablaRamos ramos={ramos} />
         )}
       </>
 

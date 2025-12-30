@@ -49,22 +49,22 @@ export const TablaPolizas = ({ polizas }: TablaPolizasProps) => {
       },
     },
     {
-      accessorKey: "fechaInicio",
+      accessorKey: "vigenciaInicio",
       header: "Fecha Inicio",
       cell: ({ row }) => (
         <div className="flex items-center gap-1 text-sm text-gray-600">
           <Calendar className="w-4 h-4" />
-          {new Date(row.original.fechaInicio).toLocaleDateString("es-PE")}
+          {new Date(row.original.vigenciaInicio).toLocaleDateString("es-PE")}
         </div>
       ),
     },
     {
-      accessorKey: "fechaFin",
+      accessorKey: "vigenciaFin",
       header: "Fecha Fin",
       cell: ({ row }) => (
         <div className="flex items-center gap-1 text-sm text-gray-600">
           <Calendar className="w-4 h-4" />
-          {new Date(row.original.fechaFin).toLocaleDateString("es-PE")}
+          {new Date(row.original.vigenciaFin).toLocaleDateString("es-PE")}
         </div>
       ),
     },
@@ -78,20 +78,24 @@ export const TablaPolizas = ({ polizas }: TablaPolizasProps) => {
     {
       accessorKey: "comisionBroker",
       header: "Comisión Broker",
-      cell: ({ row }) => (
-        <div className="text-sm text-gray-900">
-          {row.original.moneda} {row.original.comisionBroker.toFixed(2)}
-        </div>
-      ),
+      cell: ({ row }) => {
+        return (
+          <div className="text-sm text-gray-900">
+            {row.original.comisionBroker} %
+          </div>
+        );
+      },
     },
     {
       accessorKey: "comisionAgente",
       header: "Comisión Agente",
-      cell: ({ row }) => (
-        <div className="text-sm text-gray-900">
-          {row.original.moneda} {row.original.comisionAgente.toFixed(2)}
-        </div>
-      ),
+      cell: ({ row }) => {
+        return (
+          <div className="text-sm text-gray-900">
+            {row.original.comisionAgente} %
+          </div>
+        );
+      },
     },
     {
       accessorKey: "tipoVigencia",

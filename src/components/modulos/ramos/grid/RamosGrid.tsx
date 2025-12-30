@@ -1,12 +1,15 @@
 import { Grid } from "@/components/shared";
 import type { Ramo } from "@/types/ramo.interface";
-import { ShieldCheck } from "lucide-react";
+import { ShieldCheck, Package } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   ramos: Ramo[];
 }
 
 export const RamosGrid = ({ ramos }: Props) => {
+  const navigate = useNavigate();
+
   return (
     <Grid
       data={ramos}
@@ -38,7 +41,7 @@ export const RamosGrid = ({ ramos }: Props) => {
           </div>
 
           {/* Estado */}
-          <div className="mt-4 pt-4 border-t border-gray-100">
+          <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
             <span
               className={`px-2 py-1 text-xs font-medium rounded-full ${
                 ramo.activo
@@ -48,6 +51,16 @@ export const RamosGrid = ({ ramos }: Props) => {
             >
               {ramo.activo ? "Activo" : "Inactivo"}
             </span>
+            
+            <button
+              onClick={() => navigate(`/dashboard/admin/maestros/ramos/${ramo.idRamo}/productos`)}
+              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white rounded-lg transition-colors hover:opacity-90"
+              style={{ backgroundColor: "var(--austral-azul)" }}
+              title="Ver productos del ramo"
+            >
+              <Package className="w-4 h-4" />
+              Productos
+            </button>
           </div>
         </div>
       )}

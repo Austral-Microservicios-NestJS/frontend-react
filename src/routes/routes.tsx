@@ -20,10 +20,15 @@ import UsuariosPage from "@/pages/admin/maestros/usuarios/UsuariosPage";
 import AgentesPage from "@/pages/broker/agentes/AgentesPage";
 import AgenteDniPage from "@/pages/shared/agentes-ia/documentos/agente-dni/AgenteDniPage";
 import RamosPage from "@/pages/admin/maestros/ramos/RamosPage";
-import ProductosPage from "@/pages/admin/maestros/productos/ProductosPage";
 import PolizasPage from "@/pages/shared/gestion-trabajo/polizas/PolizasPage";
 import LeadsPage from "@/pages/shared/gestion-trabajo/leads/LeadsPage";
 import ClientePolizasPage from "@/pages/shared/gestion-trabajo/clientes/[id]/polizas/ClientePolizasPage";
+import RamoProductosPage from "@/pages/admin/maestros/ramos/[id]/productos/RamoProductosPage";
+
+// Componentes de control y seguimiento
+import SiniestrosPage from "@/pages/shared/control-seguimiento/siniestros/SiniestrosPage";
+import ComisionesPage from "@/pages/shared/control-seguimiento/comisiones/ComisionesPage";
+import CobranzasPage from "@/pages/shared/control-seguimiento/cobranzas/CobranzasPage";
 
 // Definición de rutas
 const router = createBrowserRouter([
@@ -112,6 +117,37 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      // Seccion de Control y Seguimiento
+      {
+        path: "control-seguimiento/siniestros",
+        element: (
+          <ProtectedRoute
+            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
+          >
+            <SiniestrosPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "control-seguimiento/comisiones",
+        element: (
+          <ProtectedRoute
+            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
+          >
+            <ComisionesPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "control-seguimiento/cobranzas",
+        element: (
+          <ProtectedRoute
+            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
+          >
+            <CobranzasPage />
+          </ProtectedRoute>
+        ),
+      },
 
       // Seccion de maestros - Administrador
       {
@@ -131,10 +167,10 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "admin/maestros/productos",
+        path: "admin/maestros/ramos/:id/productos",
         element: (
           <ProtectedRoute requiredRoles={[Roles.ADMINISTRADOR]}>
-            <ProductosPage />
+            <RamoProductosPage />
           </ProtectedRoute>
         ),
       },

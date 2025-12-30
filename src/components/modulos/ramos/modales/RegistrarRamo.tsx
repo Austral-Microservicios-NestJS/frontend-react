@@ -80,15 +80,34 @@ export const RegistrarRamo = ({
                 )}
               </FormGroup>
             </FormGroupDivisor>
-
+            <FormGroupDivisor>
+              <FormGroup>
+                <Label htmlFor="abreviatura">Abreviatura</Label>
+                <Input
+                  id="abreviatura"
+                  placeholder="Ej: VEH"
+                  {...register("abreviatura")}
+                />
+              </FormGroup>
+              <FormGroup>
+                <Label htmlFor="grupo">Grupo</Label>
+                <Input
+                  id="grupo"
+                  placeholder="Ej: RRGG"
+                  {...register("grupo")}
+                />
+              </FormGroup>
+            </FormGroupDivisor>
             <FormGroup>
-              <Label htmlFor="descripcion">Descripción</Label>
-              <Textarea
-                id="descripcion"
-                placeholder="Describe el ramo de seguro..."
-                rows={4}
-                {...register("descripcion")}
-              />
+              <FormGroup>
+                <Label htmlFor="descripcion">Descripción</Label>
+                <Textarea
+                  id="descripcion"
+                  placeholder="Describe el ramo de seguro..."
+                  rows={4}
+                  {...register("descripcion")}
+                />
+              </FormGroup>
             </FormGroup>
           </ModalBody>
 

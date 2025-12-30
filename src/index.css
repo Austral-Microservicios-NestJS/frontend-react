@@ -46,9 +46,10 @@
 
 :root {
   /* Colores de Austral */
-  --austral-azul: #003D5C;
-  --austral-blanco: #FFFFFF;
-  --austral-rojo: #D71440;
+  --austral-azul: #003d5c;
+  --austral-azul-ejecutivo: #0c4cbaff;
+  --austral-blanco: #ffffff;
+  --austral-rojo: #d71440;
   --austral-negro: #000000;
 
   --radius: 0.625rem;

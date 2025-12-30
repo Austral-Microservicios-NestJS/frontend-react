@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Header, BotonRegistro } from "@/components/shared";
-import { useSidebar } from "@/components/sidebar/Sidebar";
+import { useSidebar } from "@/hooks/useSidebar";
 import { useAuthStore } from "@/store/auth.store";
 import { RegistrarCliente } from "@/components/modulos/clientes/modales/RegistrarCliente";
 import { useClientes } from "@/hooks/useCliente";

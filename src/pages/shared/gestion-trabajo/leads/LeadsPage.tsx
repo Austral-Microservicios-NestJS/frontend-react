@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Header, BotonRegistro } from "@/components/shared";
-import { useSidebar } from "@/components/sidebar/Sidebar";
+import { useSidebar } from "@/hooks/useSidebar";
 import { KanbanColumn } from "@/components/modulos/leads/kanban/KanbanColumn";
 import { RegistrarLead } from "@/components/modulos/leads/modales/RegistrarLead";
 import { useLeads } from "@/hooks/useLeads";

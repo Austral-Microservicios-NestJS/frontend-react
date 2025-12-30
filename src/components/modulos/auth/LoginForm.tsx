@@ -100,7 +100,7 @@ export default function LoginForm() {
             className="mb-6 hidden lg:block"
           >
             <img
-              src="/images/logonew.png"
+              src="/images/logo-austral.png"
               alt="Austral Seguros Logo"
               width={200}
               height={80}

@@ -108,14 +108,14 @@ export const RegistrarActividad = ({
               </FormGroup>
             </FormGroupDivisor>
 
-            <div className="flex flex-col gap-2">
+            <FormGroup>
               <Label htmlFor="fechaActividad">Fecha de actividad</Label>
               <Input
                 id="fechaActividad"
                 type="date"
                 {...register("fechaActividad", { required: true })}
               />
-            </div>
+            </FormGroup>
             <FormGroup>
               <Label htmlFor="descripcion">Descripción</Label>
               <Textarea

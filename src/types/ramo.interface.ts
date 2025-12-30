@@ -2,6 +2,8 @@ export interface Ramo {
   idRamo: string;
   codigo: string;
   nombre: string;
+  abreviatura?: string;
+  grupo?: string;
   descripcion?: string;
   activo?: boolean;
   disponible?: boolean;
@@ -12,6 +14,8 @@ export interface Ramo {
 export interface CreateRamoDto {
   codigo: string;
   nombre: string;
+  abreviatura?: string;
+  grupo?: string;
   descripcion?: string;
   activo?: boolean;
 }

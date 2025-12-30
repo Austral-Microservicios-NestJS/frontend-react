@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Header, BotonRegistro } from "@/components/shared";
-import { useSidebar } from "@/components/sidebar/Sidebar";
+import { useSidebar } from "@/hooks/useSidebar";
 import { RegistrarTarea } from "@/components/modulos/tareas/modales/RegistrarTarea";
 import { TareasGrid } from "@/components/modulos/tareas/grid/TareasGrid";
 import { useTareas } from "@/hooks/useTareas";

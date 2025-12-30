@@ -1,13 +1,21 @@
 import {
   BookUser,
   Bot,
+  Building2,
   FishingHook,
   FolderCog,
+  HandCoins,
   Handshake,
   NotebookPen,
+  ShieldAlert,
+  ShieldCheck,
   User,
+  WalletCards,
 } from "lucide-react";
 import { Roles } from "@/utils/roles";
+
+// Tipos de módulos
+export type ModuleType = "CRM" | "ERP";
 
 // Categorías de módulos
 export const moduleCategories = [
@@ -15,13 +23,13 @@ export const moduleCategories = [
     id: "gestion-trabajo",
     title: "Gestión de Trabajo",
     modules: [
-      // Módulos de gestión de trabajo pueden ser añadidos aquí
       {
         id: 51,
         name: "Actividades",
         path: "/dashboard/gestion-trabajo/actividades",
         icon: BookUser,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+        type: ["CRM"] as ModuleType[],
       },
       {
         id: 52,
@@ -29,6 +37,7 @@ export const moduleCategories = [
         path: "/dashboard/gestion-trabajo/tareas",
         icon: NotebookPen,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+        type: ["CRM"] as ModuleType[],
       },
       {
         id: 53,
@@ -36,6 +45,7 @@ export const moduleCategories = [
         path: "/dashboard/gestion-trabajo/clientes",
         icon: Handshake,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+        type: ["CRM"] as ModuleType[],
       },
       {
         id: 54,
@@ -43,6 +53,7 @@ export const moduleCategories = [
         path: "/dashboard/gestion-trabajo/leads",
         icon: FishingHook,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+        type: ["CRM"] as ModuleType[],
       },
       {
         id: 55,
@@ -50,6 +61,37 @@ export const moduleCategories = [
         path: "/dashboard/gestion-trabajo/polizas",
         icon: FolderCog,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+        type: ["CRM", "ERP"] as ModuleType[],
+      },
+    ],
+  },
+  {
+    id: "control-seguimiento",
+    title: "Control de Seguimiento",
+    modules: [
+      {
+        id: 61,
+        name: "Siniestros",
+        path: "/dashboard/control-seguimiento/siniestros",
+        icon: ShieldAlert,
+        roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+        type: ["ERP"] as ModuleType[],
+      },
+      {
+        id: 62,
+        name: "Comisiones",
+        path: "/dashboard/control-seguimiento/comisiones",
+        icon: HandCoins,
+        roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+        type: ["ERP"] as ModuleType[],
+      },
+      {
+        id: 63,
+        name: "Cobranzas",
+        path: "/dashboard/control-seguimiento/cobranzas",
+        icon: WalletCards,
+        roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+        type: ["ERP"] as ModuleType[],
       },
     ],
   },
@@ -57,13 +99,13 @@ export const moduleCategories = [
     id: "agentes-ia",
     title: "Agentes IA",
     modules: [
-      // Módulos de agentes IA pueden ser añadidos aquí
       {
         id: 61,
         name: "Agente de Facturas",
         path: "/dashboard/agentes-ia/agente-facturas",
         icon: Bot,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+        type: ["CRM"] as ModuleType[],
       },
       {
         id: 62,
@@ -71,6 +113,7 @@ export const moduleCategories = [
         path: "/dashboard/agentes-ia/agente-dni",
         icon: Bot,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+        type: ["CRM"] as ModuleType[],
       },
       {
         id: 63,
@@ -78,6 +121,7 @@ export const moduleCategories = [
         path: "/dashboard/agentes-ia/agente-polizas",
         icon: Bot,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+        type: ["CRM"] as ModuleType[],
       },
     ],
   },
@@ -89,22 +133,17 @@ export const moduleCategories = [
         id: 1,
         name: "Compañias de Seguros",
         path: "/dashboard/admin/maestros/companias",
-        icon: User,
+        icon: Building2,
         roles: [Roles.ADMINISTRADOR],
+        type: ["CRM", "ERP"] as ModuleType[],
       },
       {
         id: 2,
         name: "Ramos",
         path: "/dashboard/admin/maestros/ramos",
-        icon: User,
+        icon: ShieldCheck,
         roles: [Roles.ADMINISTRADOR],
-      },
-      {
-        id: 3,
-        name: "Productos",
-        path: "/dashboard/admin/maestros/productos",
-        icon: User,
-        roles: [Roles.ADMINISTRADOR],
+        type: ["CRM", "ERP"] as ModuleType[],
       },
       {
         id: 4,
@@ -112,6 +151,7 @@ export const moduleCategories = [
         path: "/dashboard/admin/maestros/usuarios",
         icon: User,
         roles: [Roles.ADMINISTRADOR],
+        type: ["CRM", "ERP"] as ModuleType[],
       },
     ],
   },
@@ -119,15 +159,13 @@ export const moduleCategories = [
     id: "modulos",
     title: "Módulos",
     modules: [
-      // Modulos Compartidos
-
-      // Modulos de broker
       {
         id: 201,
         name: "Mis Agentes",
         path: "/dashboard/broker/agentes",
         icon: User,
         roles: [Roles.BROKER],
+        type: ["CRM"] as ModuleType[],
       },
     ],
   },

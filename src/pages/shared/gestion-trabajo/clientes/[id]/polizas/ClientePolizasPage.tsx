@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Header, BotonRegistro } from "@/components/shared";
-import { useSidebar } from "@/components/sidebar/Sidebar";
+import { useSidebar } from "@/hooks/useSidebar";
 import { RegistrarPoliza, TablaPolizas } from "@/components/modulos/polizas";
 import { usePolizas } from "@/hooks/usePolizas";
 import { useAuthStore } from "@/store/auth.store";
@@ -110,6 +110,7 @@ export default function ClientePolizasPage() {
           addPoliza={addPoliza}
           idCliente={id}
           idUsuario={user.idUsuario}
+          cliente={cliente}
         />
       )}
     </>

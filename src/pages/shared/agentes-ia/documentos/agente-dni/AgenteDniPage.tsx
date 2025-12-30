@@ -1,11 +1,18 @@
 import { useState } from "react";
 import { Header } from "@/components/shared";
-import { useSidebar } from "@/components/sidebar/Sidebar";
+import { useSidebar } from "@/hooks/useSidebar";
 import { useAgenteDni } from "@/hooks/useAgenteDni";
 import { FormularioDni } from "@/components/modulos/agentes-ia/agente-dni/FormularioDni";
 import { VistaPreviaDni } from "@/components/modulos/agentes-ia/agente-dni/VistaPreviaDni";
 import { TablaDniRecords } from "@/components/modulos/agentes-ia/agente-dni/TablaDniRecords";
-import { UploadCloud, Loader2, FileCheck, Trash2, Save, Sparkles } from "lucide-react";
+import {
+  UploadCloud,
+  Loader2,
+  FileCheck,
+  Trash2,
+  Save,
+  Sparkles,
+} from "lucide-react";
 import type { DniRecord } from "@/types/agente-dni.interface";
 
 export default function AgenteDniPage() {
@@ -42,7 +49,10 @@ export default function AgenteDniPage() {
         {/* Sección de Upload y Procesamiento */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <Sparkles className="w-5 h-5" style={{ color: "var(--austral-azul)" }} />
+            <Sparkles
+              className="w-5 h-5"
+              style={{ color: "var(--austral-azul)" }}
+            />
             Procesar Documento
           </h2>
 
@@ -115,7 +125,9 @@ export default function AgenteDniPage() {
               <FileCheck className="w-5 h-5 text-green-600" />
               Datos Extraídos
               {editingRecordId && (
-                <span className="text-sm text-gray-500">(Editando registro)</span>
+                <span className="text-sm text-gray-500">
+                  (Editando registro)
+                </span>
               )}
             </h2>
 
@@ -185,31 +197,40 @@ export default function AgenteDniPage() {
 
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="font-semibold">DNI:</span> {viewingRecord.numeroDni}
+                  <span className="font-semibold">DNI:</span>{" "}
+                  {viewingRecord.numeroDni}
                 </div>
                 <div>
-                  <span className="font-semibold">Sexo:</span> {viewingRecord.sexo === "M" ? "Masculino" : "Femenino"}
+                  <span className="font-semibold">Sexo:</span>{" "}
+                  {viewingRecord.sexo === "M" ? "Masculino" : "Femenino"}
                 </div>
                 <div className="col-span-2">
-                  <span className="font-semibold">Nombres:</span> {viewingRecord.nombres}
+                  <span className="font-semibold">Nombres:</span>{" "}
+                  {viewingRecord.nombres}
                 </div>
                 <div>
-                  <span className="font-semibold">Apellido Paterno:</span> {viewingRecord.apellidoPaterno}
+                  <span className="font-semibold">Apellido Paterno:</span>{" "}
+                  {viewingRecord.apellidoPaterno}
                 </div>
                 <div>
-                  <span className="font-semibold">Apellido Materno:</span> {viewingRecord.apellidoMaterno}
+                  <span className="font-semibold">Apellido Materno:</span>{" "}
+                  {viewingRecord.apellidoMaterno}
                 </div>
                 <div>
-                  <span className="font-semibold">Estado Civil:</span> {viewingRecord.estadoCivil}
+                  <span className="font-semibold">Estado Civil:</span>{" "}
+                  {viewingRecord.estadoCivil}
                 </div>
                 <div>
-                  <span className="font-semibold">Fecha Nacimiento:</span> {viewingRecord.fechaNacimiento}
+                  <span className="font-semibold">Fecha Nacimiento:</span>{" "}
+                  {viewingRecord.fechaNacimiento}
                 </div>
                 <div>
-                  <span className="font-semibold">Fecha Emisión:</span> {viewingRecord.fechaEmision}
+                  <span className="font-semibold">Fecha Emisión:</span>{" "}
+                  {viewingRecord.fechaEmision}
                 </div>
                 <div>
-                  <span className="font-semibold">Fecha Caducidad:</span> {viewingRecord.fechaCaducidad}
+                  <span className="font-semibold">Fecha Caducidad:</span>{" "}
+                  {viewingRecord.fechaCaducidad}
                 </div>
               </div>
 
