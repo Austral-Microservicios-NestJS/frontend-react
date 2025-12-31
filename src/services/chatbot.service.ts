@@ -28,7 +28,9 @@ export const chatbotService = {
   query: async (request: ChatbotQueryRequest): Promise<ChatbotQueryResponse> => {
     try {
       const { data } = await api.post("/chatbot/query", request);
-      return data;
+      // El backend envía { response: { response: "...", conversationId: "..." }, timestamp: "..." }
+      // Necesitamos extraer data.response que contiene el objeto real
+      return data.response;
     } catch (error) {
       console.error("Error al consultar chatbot:", error);
       throw error;
