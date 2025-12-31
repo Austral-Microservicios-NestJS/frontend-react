@@ -2,6 +2,9 @@ import { useState } from "react";
 import { Header } from "@/components/shared";
 import { useSidebar } from "@/hooks/useSidebar";
 import { Sparkles, Send } from "lucide-react";
+import { useAuthStore } from "@/store/auth.store";
+import { chatbotService } from "@/services/chatbot.service";
+import { toast } from "sonner";
 
 interface Message {
   id: string;
@@ -12,32 +15,57 @@ interface Message {
 
 export default function AustralAIPage() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
+  const { user } = useAuthStore();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSendMessage = () => {
-    if (message.trim()) {
-      // Agregar mensaje del usuario
-      const userMessage: Message = {
-        id: Date.now().toString(),
-        text: message.trim(),
-        sender: "user",
+  const handleSendMessage = async () => {
+    if (!message.trim() || !user) return;
+
+    // Agregar mensaje del usuario
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: message.trim(),
+      sender: "user",
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    const userQuery = message.trim();
+    setMessage("");
+    setIsLoading(true);
+
+    try {
+      // Enviar consulta al chatbot
+      const response = await chatbotService.query({
+        message: userQuery,
+        userId: user.idUsuario,
+        userRole: user.rol?.nombreRol as "ADMINISTRADOR" | "BROKER" | "AGENTE",
+      });
+
+      // Agregar respuesta del chatbot
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: response.response,
+        sender: "ai",
         timestamp: new Date(),
       };
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.error("Error al consultar chatbot:", error);
+      toast.error("Error al conectar con Austral AI");
 
-      setMessages((prev) => [...prev, userMessage]);
-      setMessage("");
-
-      // Simular respuesta de IA después de 1 segundo
-      setTimeout(() => {
-        const aiMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          text: "Gracias por tu mensaje. Pronto estaré lista para ayudarte con tus consultas de seguros.",
-          sender: "ai",
-          timestamp: new Date(),
-        };
-        setMessages((prev) => [...prev, aiMessage]);
-      }, 1000);
+      // Mensaje de error
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "Lo siento, no pude procesar tu consulta en este momento. Por favor, intenta nuevamente.",
+        sender: "ai",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -80,9 +108,10 @@ export default function AustralAIPage() {
               </div>
 
               <div className="flex flex-wrap gap-2 justify-center max-w-2xl animate-[fadeIn_1s_ease-in-out]">
-                <SuggestionChip text="Buscar cliente" onClick={() => setMessage("Buscar cliente")} />
-                <SuggestionChip text="Consultar póliza" onClick={() => setMessage("Consultar póliza")} />
-                <SuggestionChip text="Generar reporte" onClick={() => setMessage("Generar reporte")} />
+                <SuggestionChip text="¿Cuántos leads tengo?" onClick={() => setMessage("¿Cuántos leads tengo?")} />
+                <SuggestionChip text="Mostrar mis clientes activos" onClick={() => setMessage("Mostrar mis clientes activos")} />
+                <SuggestionChip text="¿Qué tareas tengo pendientes?" onClick={() => setMessage("¿Qué tareas tengo pendientes?")} />
+                <SuggestionChip text="Listar leads en estado NUEVO" onClick={() => setMessage("Listar leads en estado NUEVO")} />
               </div>
             </div>
           ) : (
@@ -114,6 +143,27 @@ export default function AustralAIPage() {
                   </div>
                 </div>
               ))}
+
+              {/* Indicador de carga */}
+              {isLoading && (
+                <div className="flex gap-4">
+                  <div className="shrink-0">
+                    <div className="w-8 h-8 rounded-full aurora-bg flex items-center justify-center">
+                      <Sparkles className="w-4 h-4 text-white animate-pulse" />
+                    </div>
+                  </div>
+                  <div className="flex-1 pt-1">
+                    <div className="text-sm font-semibold text-gray-900 mb-1">
+                      Austral AI
+                    </div>
+                    <div className="flex items-center gap-1 text-gray-500">
+                      <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                      <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                      <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -133,9 +183,9 @@ export default function AustralAIPage() {
                 />
                 <button
                   onClick={handleSendMessage}
-                  disabled={!message.trim()}
+                  disabled={!message.trim() || isLoading}
                   className={`flex items-center justify-center w-10 h-10 rounded-xl transition-all active:scale-95 shrink-0 ${
-                    message.trim()
+                    message.trim() && !isLoading
                       ? "bg-[#0066CC] hover:bg-[#0052a3]"
                       : "bg-gray-300 cursor-not-allowed"
                   }`}
