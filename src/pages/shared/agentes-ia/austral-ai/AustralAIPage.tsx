@@ -218,7 +218,7 @@ export default function AustralAIPage() {
 
         {/* Input fijo en la parte inferior - Estilo ChatGPT/Gemini */}
         <div className="border-t border-gray-200 bg-white">
-          <div className="max-w-3xl mx-auto px-4 py-4">
+          <div className="max-w-3xl mx-auto px-4 py-3">
             <div className="flex items-center gap-2 bg-white rounded-3xl border border-gray-300 shadow-sm hover:border-gray-400 transition-colors focus-within:border-[#0066CC] focus-within:shadow-md">
               <input
                 type="text"
@@ -226,7 +226,7 @@ export default function AustralAIPage() {
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Envía un mensaje a Austral AI"
-                className="flex-1 px-5 py-3.5 bg-transparent border-0 text-gray-900 placeholder-gray-500 focus:outline-none text-[15px]"
+                className="flex-1 px-5 py-3 bg-transparent border-0 text-gray-900 placeholder-gray-500 focus:outline-none text-[15px]"
                 disabled={isLoading}
               />
               <button
