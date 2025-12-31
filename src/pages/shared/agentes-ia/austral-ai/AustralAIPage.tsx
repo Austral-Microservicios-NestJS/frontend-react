@@ -207,9 +207,9 @@ export default function AustralAIPage() {
           )}
         </div>
 
-        {/* Input fijo abajo con más espacio - Estilo ChatGPT */}
+        {/* Input fijo abajo - Estilo ChatGPT */}
         <div className="border-t border-gray-200 bg-white">
-          <div className="max-w-3xl mx-auto px-6 py-6 pb-8">
+          <div className="max-w-3xl mx-auto px-6 py-4">
             <div className="relative bg-white rounded-2xl shadow-lg border border-gray-200 p-2 hover:shadow-xl transition-shadow">
               <div className="flex items-center gap-3">
                 <input
