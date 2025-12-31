@@ -34,9 +34,8 @@ export const chatbotService = {
 
       console.log("🌐 Chatbot Service - Response crudo:", JSON.stringify(data, null, 2));
 
-      // El backend envía { response: { response: "...", conversationId: "..." }, timestamp: "..." }
-      // Necesitamos extraer data.response que contiene el objeto real
-      return data.response;
+      // El backend envía directamente { response: "...", conversationId: "...", timestamp: "..." }
+      return data;
     } catch (error) {
       console.error("❌ Chatbot Service - Error completo:", error);
       throw error;

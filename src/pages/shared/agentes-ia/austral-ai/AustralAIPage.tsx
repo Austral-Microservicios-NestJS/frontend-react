@@ -52,16 +52,28 @@ export default function AustralAIPage() {
         : baseRequest;
 
       console.log("🔍 Estado conversationId ANTES de enviar:", conversationId);
-      console.log("🔍 ¿Tiene conversationId el request?:", 'conversationId' in requestData);
-      console.log("📤 Request enviado al backend:", JSON.stringify(requestData, null, 2));
+      console.log(
+        "🔍 ¿Tiene conversationId el request?:",
+        "conversationId" in requestData
+      );
+      console.log(
+        "📤 Request enviado al backend:",
+        JSON.stringify(requestData, null, 2)
+      );
 
       const response = await chatbotService.query(requestData);
 
-      console.log("📥 Response recibido del backend:", JSON.stringify(response, null, 2));
+      console.log(
+        "📥 Response recibido del backend:",
+        JSON.stringify(response, null, 2)
+      );
 
       // Guardar el conversationId para la siguiente consulta
       setConversationId(response.conversationId);
-      console.log("💾 conversationId guardado para próxima consulta:", response.conversationId);
+      console.log(
+        "💾 conversationId guardado para próxima consulta:",
+        response.conversationId
+      );
 
       // Agregar respuesta del chatbot
       const aiMessage: Message = {
@@ -107,7 +119,10 @@ export default function AustralAIPage() {
       {/* Contenedor principal - Estilo ChatGPT/Gemini */}
       <div className="flex flex-col h-[calc(100vh-64px)] bg-white">
         {/* Área de mensajes con scroll */}
-        <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: '#CBD5E1 #f9fafb' }}>
+        <div
+          className="flex-1 overflow-y-auto"
+          style={{ scrollbarWidth: "thin", scrollbarColor: "#CBD5E1 #f9fafb" }}
+        >
           {messages.length === 0 ? (
             // Estado inicial - Centrado y espaciado
             <div className="flex flex-col items-center justify-center h-full px-6">
@@ -130,10 +145,22 @@ export default function AustralAIPage() {
               </div>
 
               <div className="flex flex-wrap gap-3 justify-center max-w-2xl">
-                <SuggestionChip text="¿Cuántos leads tengo?" onClick={() => setMessage("¿Cuántos leads tengo?")} />
-                <SuggestionChip text="Mostrar mis clientes activos" onClick={() => setMessage("Mostrar mis clientes activos")} />
-                <SuggestionChip text="¿Qué tareas tengo pendientes?" onClick={() => setMessage("¿Qué tareas tengo pendientes?")} />
-                <SuggestionChip text="Listar leads en estado NUEVO" onClick={() => setMessage("Listar leads en estado NUEVO")} />
+                <SuggestionChip
+                  text="¿Cuántos leads tengo?"
+                  onClick={() => setMessage("¿Cuántos leads tengo?")}
+                />
+                <SuggestionChip
+                  text="Mostrar mis clientes activos"
+                  onClick={() => setMessage("Mostrar mis clientes activos")}
+                />
+                <SuggestionChip
+                  text="¿Qué tareas tengo pendientes?"
+                  onClick={() => setMessage("¿Qué tareas tengo pendientes?")}
+                />
+                <SuggestionChip
+                  text="Listar leads en estado NUEVO"
+                  onClick={() => setMessage("Listar leads en estado NUEVO")}
+                />
               </div>
             </div>
           ) : (
@@ -142,7 +169,9 @@ export default function AustralAIPage() {
               {messages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`py-6 px-4 ${msg.sender === "ai" ? "bg-gray-50" : "bg-white"}`}
+                  className={`py-6 px-4 ${
+                    msg.sender === "ai" ? "bg-gray-50" : "bg-white"
+                  }`}
                 >
                   <div className="max-w-3xl mx-auto flex gap-6">
                     {/* Avatar */}
@@ -167,16 +196,52 @@ export default function AustralAIPage() {
                         {msg.sender === "ai" ? (
                           <ReactMarkdown
                             components={{
-                              p: ({ children }) => <p className="mb-4 last:mb-0">{children}</p>,
-                              strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
-                              ol: ({ children }) => <ol className="list-decimal list-outside ml-5 mb-4 space-y-2">{children}</ol>,
-                              ul: ({ children }) => <ul className="list-disc list-outside ml-5 mb-4 space-y-2">{children}</ul>,
-                              li: ({ children }) => <li className="leading-7">{children}</li>,
-                              h1: ({ children }) => <h1 className="text-xl font-semibold mb-3 mt-4">{children}</h1>,
-                              h2: ({ children }) => <h2 className="text-lg font-semibold mb-3 mt-4">{children}</h2>,
-                              h3: ({ children }) => <h3 className="text-base font-semibold mb-2 mt-3">{children}</h3>,
-                              code: ({ children }) => <code className="bg-gray-800 text-gray-100 px-1.5 py-0.5 rounded text-sm font-mono">{children}</code>,
-                              pre: ({ children }) => <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto mb-4">{children}</pre>,
+                              p: ({ children }) => (
+                                <p className="mb-4 last:mb-0">{children}</p>
+                              ),
+                              strong: ({ children }) => (
+                                <strong className="font-semibold text-gray-900">
+                                  {children}
+                                </strong>
+                              ),
+                              ol: ({ children }) => (
+                                <ol className="list-decimal list-outside ml-5 mb-4 space-y-2">
+                                  {children}
+                                </ol>
+                              ),
+                              ul: ({ children }) => (
+                                <ul className="list-disc list-outside ml-5 mb-4 space-y-2">
+                                  {children}
+                                </ul>
+                              ),
+                              li: ({ children }) => (
+                                <li className="leading-7">{children}</li>
+                              ),
+                              h1: ({ children }) => (
+                                <h1 className="text-xl font-semibold mb-3 mt-4">
+                                  {children}
+                                </h1>
+                              ),
+                              h2: ({ children }) => (
+                                <h2 className="text-lg font-semibold mb-3 mt-4">
+                                  {children}
+                                </h2>
+                              ),
+                              h3: ({ children }) => (
+                                <h3 className="text-base font-semibold mb-2 mt-3">
+                                  {children}
+                                </h3>
+                              ),
+                              code: ({ children }) => (
+                                <code className="bg-gray-800 text-gray-100 px-1.5 py-0.5 rounded text-sm font-mono">
+                                  {children}
+                                </code>
+                              ),
+                              pre: ({ children }) => (
+                                <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto mb-4">
+                                  {children}
+                                </pre>
+                              ),
                             }}
                           >
                             {msg.text}
@@ -204,9 +269,18 @@ export default function AustralAIPage() {
                         Austral AI
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                        <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                        <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                        <div
+                          className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"
+                          style={{ animationDelay: "0ms" }}
+                        ></div>
+                        <div
+                          className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"
+                          style={{ animationDelay: "150ms" }}
+                        ></div>
+                        <div
+                          className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"
+                          style={{ animationDelay: "300ms" }}
+                        ></div>
                       </div>
                     </div>
                   </div>
@@ -249,7 +323,13 @@ export default function AustralAIPage() {
 }
 
 // Suggestion Chip Component - Estilo ChatGPT/Gemini
-function SuggestionChip({ text, onClick }: { text: string; onClick: () => void }) {
+function SuggestionChip({
+  text,
+  onClick,
+}: {
+  text: string;
+  onClick: () => void;
+}) {
   return (
     <button
       onClick={onClick}
