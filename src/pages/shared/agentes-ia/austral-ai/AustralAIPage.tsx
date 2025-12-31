@@ -5,6 +5,7 @@ import { Sparkles, Send } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { chatbotService } from "@/services/chatbot.service";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
 
 interface Message {
   id: string;
@@ -137,8 +138,28 @@ export default function AustralAIPage() {
                     <div className="text-sm font-semibold text-gray-900 mb-1">
                       {msg.sender === "user" ? "Tú" : "Austral AI"}
                     </div>
-                    <div className="text-gray-800 leading-relaxed">
-                      {msg.text}
+                    <div className="text-gray-800 leading-relaxed prose prose-sm max-w-none">
+                      {msg.sender === "ai" ? (
+                        <ReactMarkdown
+                          components={{
+                            // Personalizar el renderizado de elementos
+                            p: ({ children }) => <p className="mb-2">{children}</p>,
+                            strong: ({ children }) => <strong className="font-bold text-gray-900">{children}</strong>,
+                            ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+                            ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+                            li: ({ children }) => <li className="ml-2">{children}</li>,
+                            h1: ({ children }) => <h1 className="text-xl font-bold mb-2 mt-3">{children}</h1>,
+                            h2: ({ children }) => <h2 className="text-lg font-bold mb-2 mt-3">{children}</h2>,
+                            h3: ({ children }) => <h3 className="text-base font-bold mb-2 mt-2">{children}</h3>,
+                            code: ({ children }) => <code className="bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono">{children}</code>,
+                            pre: ({ children }) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-2">{children}</pre>,
+                          }}
+                        >
+                          {msg.text}
+                        </ReactMarkdown>
+                      ) : (
+                        msg.text
+                      )}
                     </div>
                   </div>
                 </div>
