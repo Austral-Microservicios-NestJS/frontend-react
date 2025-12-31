@@ -40,12 +40,18 @@ export default function AustralAIPage() {
 
     try {
       // Enviar consulta al chatbot
-      const response = await chatbotService.query({
+      const requestData: any = {
         message: userQuery,
         userId: user.idUsuario,
         userRole: user.rol?.nombreRol as "ADMINISTRADOR" | "BROKER" | "AGENTE",
-        conversationId: conversationId,
-      });
+      };
+
+      // Solo incluir conversationId si existe (conversaciones subsecuentes)
+      if (conversationId) {
+        requestData.conversationId = conversationId;
+      }
+
+      const response = await chatbotService.query(requestData);
 
       // Guardar el conversationId para la siguiente consulta
       setConversationId(response.conversationId);
