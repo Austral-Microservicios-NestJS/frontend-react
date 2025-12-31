@@ -20,7 +20,7 @@ export default function AustralAIPage() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [conversationId, setConversationId] = useState<string | undefined>(undefined);
+  const [conversationId, setConversationId] = useState<string | null>(null);
 
   const handleSendMessage = async () => {
     if (!message.trim() || !user) return;
@@ -39,19 +39,20 @@ export default function AustralAIPage() {
     setIsLoading(true);
 
     try {
-      // Enviar consulta al chatbot
-      const requestData: any = {
+      // Construir request sin conversationId inicialmente
+      const baseRequest = {
         message: userQuery,
         userId: user.idUsuario,
         userRole: user.rol?.nombreRol as "ADMINISTRADOR" | "BROKER" | "AGENTE",
       };
 
-      // Solo incluir conversationId si existe (conversaciones subsecuentes)
-      if (conversationId) {
-        requestData.conversationId = conversationId;
-      }
+      // Solo agregar conversationId si existe (usando spread operator para garantizar que NO se incluya la propiedad si no existe)
+      const requestData = conversationId
+        ? { ...baseRequest, conversationId }
+        : baseRequest;
 
       console.log("🔍 Estado conversationId ANTES de enviar:", conversationId);
+      console.log("🔍 ¿Tiene conversationId el request?:", 'conversationId' in requestData);
       console.log("📤 Request enviado al backend:", JSON.stringify(requestData, null, 2));
 
       const response = await chatbotService.query(requestData);
