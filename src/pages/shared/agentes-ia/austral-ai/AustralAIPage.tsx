@@ -95,7 +95,7 @@ export default function AustralAIPage() {
   };
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-gray-50 overflow-hidden z-10">
+    <>
       <Header
         title="Austral AI"
         description="Asistente inteligente para seguros"
@@ -103,7 +103,7 @@ export default function AustralAIPage() {
         onToggleSidebar={toggleSidebar}
       />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex flex-col bg-gray-50" style={{ height: 'calc(100vh - 64px)' }}>
         {/* Área de mensajes - Con scroll */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden bg-white"
              style={{ scrollbarWidth: 'thin', scrollbarColor: '#CBD5E1 transparent' }}>
@@ -235,7 +235,7 @@ export default function AustralAIPage() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
