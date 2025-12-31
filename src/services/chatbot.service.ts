@@ -6,10 +6,13 @@ export interface ChatbotQueryRequest {
   message: string;
   userId: string;
   userRole: "ADMINISTRADOR" | "BROKER" | "AGENTE";
+  conversationId?: string;
 }
 
 export interface ChatbotQueryResponse {
   response: string;
+  conversationId: string;
+  timestamp: string;
 }
 
 export interface ChatbotHealthResponse {

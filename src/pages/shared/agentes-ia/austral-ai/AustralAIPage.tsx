@@ -20,6 +20,7 @@ export default function AustralAIPage() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [conversationId, setConversationId] = useState<string | undefined>(undefined);
 
   const handleSendMessage = async () => {
     if (!message.trim() || !user) return;
@@ -43,7 +44,11 @@ export default function AustralAIPage() {
         message: userQuery,
         userId: user.idUsuario,
         userRole: user.rol?.nombreRol as "ADMINISTRADOR" | "BROKER" | "AGENTE",
+        conversationId: conversationId,
       });
+
+      // Guardar el conversationId para la siguiente consulta
+      setConversationId(response.conversationId);
 
       // Agregar respuesta del chatbot
       const aiMessage: Message = {
