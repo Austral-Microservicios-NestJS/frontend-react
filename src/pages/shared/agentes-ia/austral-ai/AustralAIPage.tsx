@@ -104,29 +104,32 @@ export default function AustralAIPage() {
         onToggleSidebar={toggleSidebar}
       />
 
-      <div className="p-6 bg-gray-50 min-h-[calc(100vh-64px)]">
-        {/* Área de mensajes */}
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="overflow-y-auto overflow-x-hidden" style={{ maxHeight: '65vh', scrollbarWidth: 'thin', scrollbarColor: '#CBD5E1 transparent' }}>
+      {/* Contenedor principal - Estilo ChatGPT/Gemini */}
+      <div className="flex flex-col h-[calc(100vh-64px)] bg-white">
+        {/* Área de mensajes con scroll */}
+        <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: '#CBD5E1 #f9fafb' }}>
           {messages.length === 0 ? (
-            // Estado inicial - Centrado (sin scroll)
-            <div className="flex flex-col items-center justify-center px-6 py-16">
-              <div className="flex justify-center mb-8 animate-[fadeIn_0.6s_ease-in-out]">
+            // Estado inicial - Centrado y espaciado
+            <div className="flex flex-col items-center justify-center h-full px-6">
+              <div className="flex justify-center mb-8">
                 <div className="relative">
                   <div className="absolute inset-0 aurora-bg opacity-20 blur-3xl rounded-full"></div>
-                  <div className="relative inline-flex items-center justify-center w-24 h-24 rounded-full aurora-bg">
-                    <Sparkles className="w-12 h-12 text-white" />
+                  <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-full aurora-bg">
+                    <Sparkles className="w-10 h-10 text-white" />
                   </div>
                 </div>
               </div>
 
-              <div className="text-center mb-8 animate-[fadeIn_0.8s_ease-in-out]">
-                <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-semibold text-gray-800 mb-3">
                   ¿En qué puedo ayudarte hoy?
                 </h2>
+                <p className="text-gray-500 text-sm">
+                  Consulta sobre leads, clientes, pólizas y más
+                </p>
               </div>
 
-              <div className="flex flex-wrap gap-2 justify-center max-w-2xl animate-[fadeIn_1s_ease-in-out]">
+              <div className="flex flex-wrap gap-3 justify-center max-w-2xl">
                 <SuggestionChip text="¿Cuántos leads tengo?" onClick={() => setMessage("¿Cuántos leads tengo?")} />
                 <SuggestionChip text="Mostrar mis clientes activos" onClick={() => setMessage("Mostrar mis clientes activos")} />
                 <SuggestionChip text="¿Qué tareas tengo pendientes?" onClick={() => setMessage("¿Qué tareas tengo pendientes?")} />
@@ -134,50 +137,54 @@ export default function AustralAIPage() {
               </div>
             </div>
           ) : (
-            // Mensajes - Estilo ChatGPT/Gemini (con scroll)
-            <div className="max-w-3xl mx-auto px-6 py-8 space-y-6">
+            // Mensajes - Estilo ChatGPT/Gemini
+            <div className="w-full">
               {messages.map((msg) => (
-                <div key={msg.id} className="flex gap-4">
-                  {/* Avatar */}
-                  <div className="shrink-0">
-                    {msg.sender === "user" ? (
-                      <div className="w-8 h-8 rounded-full bg-[#0066CC] flex items-center justify-center text-white text-sm font-semibold">
-                        U
-                      </div>
-                    ) : (
-                      <div className="w-8 h-8 rounded-full aurora-bg flex items-center justify-center">
-                        <Sparkles className="w-4 h-4 text-white" />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Mensaje */}
-                  <div className="flex-1 pt-1">
-                    <div className="text-sm font-semibold text-gray-900 mb-1">
-                      {msg.sender === "user" ? "Tú" : "Austral AI"}
-                    </div>
-                    <div className="text-gray-800 leading-relaxed prose prose-sm max-w-none">
-                      {msg.sender === "ai" ? (
-                        <ReactMarkdown
-                          components={{
-                            // Personalizar el renderizado de elementos
-                            p: ({ children }) => <p className="mb-2">{children}</p>,
-                            strong: ({ children }) => <strong className="font-bold text-gray-900">{children}</strong>,
-                            ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
-                            ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
-                            li: ({ children }) => <li className="ml-2">{children}</li>,
-                            h1: ({ children }) => <h1 className="text-xl font-bold mb-2 mt-3">{children}</h1>,
-                            h2: ({ children }) => <h2 className="text-lg font-bold mb-2 mt-3">{children}</h2>,
-                            h3: ({ children }) => <h3 className="text-base font-bold mb-2 mt-2">{children}</h3>,
-                            code: ({ children }) => <code className="bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono">{children}</code>,
-                            pre: ({ children }) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-2">{children}</pre>,
-                          }}
-                        >
-                          {msg.text}
-                        </ReactMarkdown>
+                <div
+                  key={msg.id}
+                  className={`py-6 px-4 ${msg.sender === "ai" ? "bg-gray-50" : "bg-white"}`}
+                >
+                  <div className="max-w-3xl mx-auto flex gap-6">
+                    {/* Avatar */}
+                    <div className="shrink-0">
+                      {msg.sender === "user" ? (
+                        <div className="w-8 h-8 rounded-full bg-[#0066CC] flex items-center justify-center text-white text-sm font-semibold">
+                          U
+                        </div>
                       ) : (
-                        msg.text
+                        <div className="w-8 h-8 rounded-full aurora-bg flex items-center justify-center">
+                          <Sparkles className="w-5 h-5 text-white" />
+                        </div>
                       )}
+                    </div>
+
+                    {/* Mensaje */}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-semibold text-gray-900 mb-2">
+                        {msg.sender === "user" ? "Tú" : "Austral AI"}
+                      </div>
+                      <div className="text-gray-800 text-[15px] leading-7">
+                        {msg.sender === "ai" ? (
+                          <ReactMarkdown
+                            components={{
+                              p: ({ children }) => <p className="mb-4 last:mb-0">{children}</p>,
+                              strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
+                              ol: ({ children }) => <ol className="list-decimal list-outside ml-5 mb-4 space-y-2">{children}</ol>,
+                              ul: ({ children }) => <ul className="list-disc list-outside ml-5 mb-4 space-y-2">{children}</ul>,
+                              li: ({ children }) => <li className="leading-7">{children}</li>,
+                              h1: ({ children }) => <h1 className="text-xl font-semibold mb-3 mt-4">{children}</h1>,
+                              h2: ({ children }) => <h2 className="text-lg font-semibold mb-3 mt-4">{children}</h2>,
+                              h3: ({ children }) => <h3 className="text-base font-semibold mb-2 mt-3">{children}</h3>,
+                              code: ({ children }) => <code className="bg-gray-800 text-gray-100 px-1.5 py-0.5 rounded text-sm font-mono">{children}</code>,
+                              pre: ({ children }) => <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto mb-4">{children}</pre>,
+                            }}
+                          >
+                            {msg.text}
+                          </ReactMarkdown>
+                        ) : (
+                          <div className="whitespace-pre-wrap">{msg.text}</div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -185,52 +192,54 @@ export default function AustralAIPage() {
 
               {/* Indicador de carga */}
               {isLoading && (
-                <div className="flex gap-4">
-                  <div className="shrink-0">
-                    <div className="w-8 h-8 rounded-full aurora-bg flex items-center justify-center">
-                      <Sparkles className="w-4 h-4 text-white animate-pulse" />
+                <div className="py-6 px-4 bg-gray-50">
+                  <div className="max-w-3xl mx-auto flex gap-6">
+                    <div className="shrink-0">
+                      <div className="w-8 h-8 rounded-full aurora-bg flex items-center justify-center">
+                        <Sparkles className="w-5 h-5 text-white animate-pulse" />
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex-1 pt-1">
-                    <div className="text-sm font-semibold text-gray-900 mb-1">
-                      Austral AI
-                    </div>
-                    <div className="flex items-center gap-1 text-gray-500">
-                      <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                      <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                      <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-semibold text-gray-900 mb-2">
+                        Austral AI
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                        <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                        <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
             </div>
           )}
-          </div>
+        </div>
 
-          {/* Input área */}
-          <div className="border-t border-gray-200 bg-white p-4">
-            <div className="relative bg-white rounded-2xl shadow-md border border-gray-200 p-2 hover:shadow-lg transition-shadow">
-              <div className="flex items-center gap-3">
-                <input
-                  type="text"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Escribe tu consulta aquí..."
-                  className="flex-1 px-4 py-3 bg-transparent border-0 text-gray-900 placeholder-gray-400 focus:outline-none text-base"
-                />
-                <button
-                  onClick={handleSendMessage}
-                  disabled={!message.trim() || isLoading}
-                  className={`flex items-center justify-center w-10 h-10 rounded-xl transition-all active:scale-95 shrink-0 ${
-                    message.trim() && !isLoading
-                      ? "bg-[#0066CC] hover:bg-[#0052a3]"
-                      : "bg-gray-300 cursor-not-allowed"
-                  }`}
-                >
-                  <Send className="w-5 h-5 text-white" />
-                </button>
-              </div>
+        {/* Input fijo en la parte inferior - Estilo ChatGPT/Gemini */}
+        <div className="border-t border-gray-200 bg-white">
+          <div className="max-w-3xl mx-auto px-4 py-4">
+            <div className="flex items-center gap-2 bg-white rounded-3xl border border-gray-300 shadow-sm hover:border-gray-400 transition-colors focus-within:border-[#0066CC] focus-within:shadow-md">
+              <input
+                type="text"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Envía un mensaje a Austral AI"
+                className="flex-1 px-5 py-3.5 bg-transparent border-0 text-gray-900 placeholder-gray-500 focus:outline-none text-[15px]"
+                disabled={isLoading}
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={!message.trim() || isLoading}
+                className={`mr-2 p-2 rounded-full transition-all ${
+                  message.trim() && !isLoading
+                    ? "bg-[#0066CC] hover:bg-[#0052a3] text-white"
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                }`}
+              >
+                <Send className="w-5 h-5" />
+              </button>
             </div>
           </div>
         </div>
@@ -239,12 +248,12 @@ export default function AustralAIPage() {
   );
 }
 
-// Suggestion Chip Component
+// Suggestion Chip Component - Estilo ChatGPT/Gemini
 function SuggestionChip({ text, onClick }: { text: string; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-full transition-colors border border-gray-200"
+      className="px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-700 text-sm rounded-xl transition-all border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow"
     >
       {text}
     </button>
