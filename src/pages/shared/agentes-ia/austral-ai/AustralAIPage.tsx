@@ -104,13 +104,13 @@ export default function AustralAIPage() {
         onToggleSidebar={toggleSidebar}
       />
 
-      <div className="flex flex-col bg-gray-50" style={{ height: 'calc(100vh - 64px)' }}>
-        {/* Área de mensajes - Con scroll */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden bg-white"
-             style={{ scrollbarWidth: 'thin', scrollbarColor: '#CBD5E1 transparent' }}>
+      <div className="p-6 bg-gray-50 min-h-[calc(100vh-64px)]">
+        {/* Área de mensajes */}
+        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="overflow-y-auto overflow-x-hidden" style={{ maxHeight: '65vh', scrollbarWidth: 'thin', scrollbarColor: '#CBD5E1 transparent' }}>
           {messages.length === 0 ? (
             // Estado inicial - Centrado (sin scroll)
-            <div className="flex flex-col items-center justify-center h-full px-6">
+            <div className="flex flex-col items-center justify-center px-6 py-16">
               <div className="flex justify-center mb-8 animate-[fadeIn_0.6s_ease-in-out]">
                 <div className="relative">
                   <div className="absolute inset-0 aurora-bg opacity-20 blur-3xl rounded-full"></div>
@@ -205,12 +205,11 @@ export default function AustralAIPage() {
               )}
             </div>
           )}
-        </div>
+          </div>
 
-        {/* Input fijo abajo - Estilo ChatGPT */}
-        <div className="border-t border-gray-200 bg-white">
-          <div className="max-w-3xl mx-auto px-6 pt-4 pb-2">
-            <div className="relative bg-white rounded-2xl shadow-lg border border-gray-200 p-2 hover:shadow-xl transition-shadow">
+          {/* Input área */}
+          <div className="border-t border-gray-200 bg-white p-4">
+            <div className="relative bg-white rounded-2xl shadow-md border border-gray-200 p-2 hover:shadow-lg transition-shadow">
               <div className="flex items-center gap-3">
                 <input
                   type="text"
