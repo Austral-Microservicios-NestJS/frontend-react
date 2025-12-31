@@ -51,10 +51,16 @@ export default function AustralAIPage() {
         requestData.conversationId = conversationId;
       }
 
+      console.log("🔍 Estado conversationId ANTES de enviar:", conversationId);
+      console.log("📤 Request enviado al backend:", JSON.stringify(requestData, null, 2));
+
       const response = await chatbotService.query(requestData);
+
+      console.log("📥 Response recibido del backend:", JSON.stringify(response, null, 2));
 
       // Guardar el conversationId para la siguiente consulta
       setConversationId(response.conversationId);
+      console.log("💾 conversationId guardado para próxima consulta:", response.conversationId);
 
       // Agregar respuesta del chatbot
       const aiMessage: Message = {
