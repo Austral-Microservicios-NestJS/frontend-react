@@ -127,6 +127,15 @@
   body {
     @apply bg-background text-foreground;
   }
+  html,
+  body,
+  #root {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent scroll on body, handle in app */
+  }
 }
 
 /* Aurora background effect for AI button */

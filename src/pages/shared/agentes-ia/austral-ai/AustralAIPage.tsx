@@ -1,114 +1,135 @@
-import { useState } from "react";
 import { Header } from "@/components/shared";
 import { useSidebar } from "@/hooks/useSidebar";
-import { Sparkles, Send } from "lucide-react";
-import { useAuthStore } from "@/store/auth.store";
+import { Send, Bot, User, Mic, MicOff } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { chatbotService } from "@/services/chatbot.service";
-import { toast } from "sonner";
+import { useAuthStore } from "@/store/auth.store";
+import { useChatStore } from "@/store/chat.store";
 import ReactMarkdown from "react-markdown";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface Message {
   id: string;
-  text: string;
-  sender: "user" | "ai";
+  role: "user" | "assistant";
+  content: string;
   timestamp: Date;
+}
+
+// Definición de tipos para la API de reconocimiento de voz
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
 }
 
 export default function AustralAIPage() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
   const { user } = useAuthStore();
+  const { messages, conversationId, addMessage, setConversationId } = useChatStore();
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const handleSendMessage = async () => {
-    if (!message.trim() || !user) return;
+  useEffect(() => {
+    // Inicializar reconocimiento de voz si está disponible
+    if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = "es-ES";
 
-    // Agregar mensaje del usuario
+      recognitionRef.current.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setMessage((prev) => prev + (prev ? " " : "") + transcript);
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onerror = (event: any) => {
+        console.error("Error en reconocimiento de voz:", event.error);
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isLoading]);
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      alert("Tu navegador no soporta reconocimiento de voz.");
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+    } else {
+      recognitionRef.current.start();
+      setIsListening(true);
+    }
+  };
+
+  const handleSend = async () => {
+    if (!message.trim() || isLoading) return;
+
     const userMessage: Message = {
       id: Date.now().toString(),
-      text: message.trim(),
-      sender: "user",
+      role: "user",
+      content: message,
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
-    const userQuery = message.trim();
+    addMessage(userMessage);
     setMessage("");
     setIsLoading(true);
 
     try {
-      // Construir request sin conversationId inicialmente
-      const baseRequest = {
-        message: userQuery,
-        userId: user.idUsuario,
-        userRole: user.rol?.nombreRol as "ADMINISTRADOR" | "BROKER" | "AGENTE",
-      };
+      const response = await chatbotService.query({
+        message: message.trim(),
+        userId: user?.idUsuario || "",
+        userRole: user?.rol?.nombreRol as "ADMINISTRADOR" | "BROKER" | "AGENTE",
+        conversationId,
+      });
 
-      // Solo agregar conversationId si existe (usando spread operator para garantizar que NO se incluya la propiedad si no existe)
-      const requestData = conversationId
-        ? { ...baseRequest, conversationId }
-        : baseRequest;
-
-      console.log("🔍 Estado conversationId ANTES de enviar:", conversationId);
-      console.log(
-        "🔍 ¿Tiene conversationId el request?:",
-        "conversationId" in requestData
-      );
-      console.log(
-        "📤 Request enviado al backend:",
-        JSON.stringify(requestData, null, 2)
-      );
-
-      const response = await chatbotService.query(requestData);
-
-      console.log(
-        "📥 Response recibido del backend:",
-        JSON.stringify(response, null, 2)
-      );
-
-      // Guardar el conversationId para la siguiente consulta
-      setConversationId(response.conversationId);
-      console.log(
-        "💾 conversationId guardado para próxima consulta:",
-        response.conversationId
-      );
-
-      // Agregar respuesta del chatbot
-      const aiMessage: Message = {
+      const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: response.response,
-        sender: "ai",
+        role: "assistant",
+        content: response.response,
         timestamp: new Date(),
       };
-      setMessages((prev) => [...prev, aiMessage]);
-    } catch (error) {
-      console.error("Error al consultar chatbot:", error);
-      toast.error("Error al conectar con Austral AI");
 
-      // Mensaje de error
+      addMessage(botMessage);
+      setConversationId(response.conversationId);
+    } catch (error) {
+      console.error("Error al enviar mensaje:", error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: "Lo siento, no pude procesar tu consulta en este momento. Por favor, intenta nuevamente.",
-        sender: "ai",
+        role: "assistant",
+        content:
+          "Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta de nuevo.",
         timestamp: new Date(),
       };
-      setMessages((prev) => [...prev, errorMessage]);
+      addMessage(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
   return (
-    <>
+    <div 
+      className="relative flex flex-col h-full overflow-hidden animate-[fadeIn_0.5s_ease-out]"
+      style={{ animationFillMode: 'both' }}
+    >
       <Header
         title="Austral AI"
         description="Asistente inteligente para seguros"
@@ -116,226 +137,172 @@ export default function AustralAIPage() {
         onToggleSidebar={toggleSidebar}
       />
 
-      {/* Contenedor principal - Estilo ChatGPT/Gemini */}
-      <div className="flex flex-col h-[calc(100vh-64px)] bg-white">
-        {/* Área de mensajes con scroll */}
+      {/* Área de mensajes */}
+      <div className="flex-1 overflow-y-auto p-6 pb-32">
         <div
-          className="flex-1 overflow-y-auto"
-          style={{ scrollbarWidth: "thin", scrollbarColor: "#CBD5E1 #f9fafb" }}
+          className={`max-w-4xl mx-auto ${
+            messages.length === 0 ? "h-full" : ""
+          }`}
         >
           {messages.length === 0 ? (
-            // Estado inicial - Centrado y espaciado
-            <div className="flex flex-col items-center justify-center h-full px-6">
-              <div className="flex justify-center mb-8">
-                <div className="relative">
-                  <div className="absolute inset-0 aurora-bg opacity-20 blur-3xl rounded-full"></div>
-                  <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-full aurora-bg">
-                    <Sparkles className="w-10 h-10 text-white" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="text-center mb-12">
-                <h2 className="text-3xl font-semibold text-gray-800 mb-3">
-                  ¿En qué puedo ayudarte hoy?
-                </h2>
-                <p className="text-gray-500 text-sm">
-                  Consulta sobre leads, clientes, pólizas y más
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-3 justify-center max-w-2xl">
-                <SuggestionChip
-                  text="¿Cuántos leads tengo?"
-                  onClick={() => setMessage("¿Cuántos leads tengo?")}
-                />
-                <SuggestionChip
-                  text="Mostrar mis clientes activos"
-                  onClick={() => setMessage("Mostrar mis clientes activos")}
-                />
-                <SuggestionChip
-                  text="¿Qué tareas tengo pendientes?"
-                  onClick={() => setMessage("¿Qué tareas tengo pendientes?")}
-                />
-                <SuggestionChip
-                  text="Listar leads en estado NUEVO"
-                  onClick={() => setMessage("Listar leads en estado NUEVO")}
+            <div className="flex flex-col items-center justify-center h-full text-center animate-[fadeIn_0.8s_ease-out_0.2s_both]">
+              <div className="relative mb-6 group">
+                <div className="absolute inset-0 bg-blue-500 blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500 rounded-full"></div>
+                <img
+                  src="/images/logo-austral-main.png"
+                  alt="Austral AI"
+                  className="w-24 h-24 relative z-10 drop-shadow-sm transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
+              <h2 className="text-3xl font-bold text-gray-800 mb-3 tracking-tight">
+                ¿En qué puedo ayudarte?
+              </h2>
+              <p className="text-gray-500 text-lg font-light">
+                Soy tu asistente inteligente para seguros
+              </p>
             </div>
           ) : (
-            // Mensajes - Estilo ChatGPT/Gemini
-            <div className="w-full">
+            <div className="space-y-6 pb-4">
               {messages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`py-6 px-4 ${
-                    msg.sender === "ai" ? "bg-gray-50" : "bg-white"
-                  }`}
+                  className={`flex gap-4 ${
+                    msg.role === "user" ? "justify-end" : "justify-start"
+                  } animate-[fadeIn_0.3s_ease-out]`}
                 >
-                  <div className="max-w-3xl mx-auto flex gap-6">
-                    {/* Avatar */}
-                    <div className="shrink-0">
-                      {msg.sender === "user" ? (
-                        <div className="w-8 h-8 rounded-full bg-[#0066CC] flex items-center justify-center text-white text-sm font-semibold">
-                          U
-                        </div>
-                      ) : (
-                        <div className="w-8 h-8 rounded-full aurora-bg flex items-center justify-center">
-                          <Sparkles className="w-5 h-5 text-white" />
-                        </div>
-                      )}
+                  {msg.role === "assistant" && (
+                    <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center shrink-0">
+                      <Bot className="w-5 h-5 text-zinc-500" />
                     </div>
-
-                    {/* Mensaje */}
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-gray-900 mb-2">
-                        {msg.sender === "user" ? "Tú" : "Austral AI"}
+                  )}
+                  <div
+                    className={`max-w-[75%] rounded-2xl px-6 py-4 shadow-sm ${
+                      msg.role === "user"
+                        ? "bg-zinc-900 text-white rounded-br-none"
+                        : "bg-white border border-gray-100 text-gray-800 rounded-bl-none"
+                    }`}
+                  >
+                    {msg.role === "assistant" ? (
+                      <div className="text-[15px] leading-relaxed">
+                        <ReactMarkdown
+                          components={{
+                            p: ({ children }) => (
+                              <p className="mb-3 last:mb-0">{children}</p>
+                            ),
+                            ul: ({ children }) => (
+                              <ul className="list-disc pl-4 mb-3 space-y-1">
+                                {children}
+                              </ul>
+                            ),
+                            ol: ({ children }) => (
+                              <ol className="list-decimal pl-4 mb-3 space-y-1">
+                                {children}
+                              </ol>
+                            ),
+                            li: ({ children }) => (
+                              <li className="pl-1">{children}</li>
+                            ),
+                            strong: ({ children }) => (
+                              <strong className="font-semibold text-blue-900">
+                                {children}
+                              </strong>
+                            ),
+                          }}
+                        >
+                          {msg.content}
+                        </ReactMarkdown>
                       </div>
-                      <div className="text-gray-800 text-[15px] leading-7">
-                        {msg.sender === "ai" ? (
-                          <ReactMarkdown
-                            components={{
-                              p: ({ children }) => (
-                                <p className="mb-4 last:mb-0">{children}</p>
-                              ),
-                              strong: ({ children }) => (
-                                <strong className="font-semibold text-gray-900">
-                                  {children}
-                                </strong>
-                              ),
-                              ol: ({ children }) => (
-                                <ol className="list-decimal list-outside ml-5 mb-4 space-y-2">
-                                  {children}
-                                </ol>
-                              ),
-                              ul: ({ children }) => (
-                                <ul className="list-disc list-outside ml-5 mb-4 space-y-2">
-                                  {children}
-                                </ul>
-                              ),
-                              li: ({ children }) => (
-                                <li className="leading-7">{children}</li>
-                              ),
-                              h1: ({ children }) => (
-                                <h1 className="text-xl font-semibold mb-3 mt-4">
-                                  {children}
-                                </h1>
-                              ),
-                              h2: ({ children }) => (
-                                <h2 className="text-lg font-semibold mb-3 mt-4">
-                                  {children}
-                                </h2>
-                              ),
-                              h3: ({ children }) => (
-                                <h3 className="text-base font-semibold mb-2 mt-3">
-                                  {children}
-                                </h3>
-                              ),
-                              code: ({ children }) => (
-                                <code className="bg-gray-800 text-gray-100 px-1.5 py-0.5 rounded text-sm font-mono">
-                                  {children}
-                                </code>
-                              ),
-                              pre: ({ children }) => (
-                                <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto mb-4">
-                                  {children}
-                                </pre>
-                              ),
-                            }}
-                          >
-                            {msg.text}
-                          </ReactMarkdown>
-                        ) : (
-                          <div className="whitespace-pre-wrap">{msg.text}</div>
-                        )}
-                      </div>
-                    </div>
+                    ) : (
+                      <p className="text-[15px] leading-relaxed whitespace-pre-wrap">
+                        {msg.content}
+                      </p>
+                    )}
                   </div>
                 </div>
               ))}
 
-              {/* Indicador de carga */}
+              {/* Animación de carga */}
               {isLoading && (
-                <div className="py-6 px-4 bg-gray-50">
-                  <div className="max-w-3xl mx-auto flex gap-6">
-                    <div className="shrink-0">
-                      <div className="w-8 h-8 rounded-full aurora-bg flex items-center justify-center">
-                        <Sparkles className="w-5 h-5 text-white animate-pulse" />
-                      </div>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-gray-900 mb-2">
-                        Austral AI
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <div
-                          className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"
-                          style={{ animationDelay: "0ms" }}
-                        ></div>
-                        <div
-                          className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"
-                          style={{ animationDelay: "150ms" }}
-                        ></div>
-                        <div
-                          className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"
-                          style={{ animationDelay: "300ms" }}
-                        ></div>
-                      </div>
+                <div className="flex gap-4 justify-start animate-[fadeIn_0.3s_ease-out]">
+                  <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center shrink-0">
+                    <Bot className="w-5 h-5 text-zinc-500" />
+                  </div>
+                  <div className="bg-white border border-gray-100 rounded-2xl rounded-bl-none px-6 py-4 shadow-sm">
+                    <div className="flex gap-1.5 items-center h-6">
+                      <div
+                        className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0ms" }}
+                      ></div>
+                      <div
+                        className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "150ms" }}
+                      ></div>
+                      <div
+                        className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "300ms" }}
+                      ></div>
                     </div>
                   </div>
                 </div>
               )}
+              <div ref={messagesEndRef} />
             </div>
           )}
         </div>
+      </div>
 
-        {/* Input fijo en la parte inferior - Estilo ChatGPT/Gemini */}
-        <div className="border-t border-gray-200 bg-white">
-          <div className="max-w-3xl mx-auto px-4 py-3">
-            <div className="flex items-center gap-2 bg-white rounded-3xl border border-gray-300 shadow-sm hover:border-gray-400 transition-colors focus-within:border-[#0066CC] focus-within:shadow-md">
-              <input
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Envía un mensaje a Austral AI"
-                className="flex-1 px-5 py-3 bg-transparent border-0 text-gray-900 placeholder-gray-500 focus:outline-none text-[15px]"
-                disabled={isLoading}
-              />
-              <button
-                onClick={handleSendMessage}
-                disabled={!message.trim() || isLoading}
-                className={`mr-2 p-2 rounded-full transition-all ${
-                  message.trim() && !isLoading
-                    ? "bg-[#0066CC] hover:bg-[#0052a3] text-white"
-                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                }`}
-              >
-                <Send className="w-5 h-5" />
-              </button>
-            </div>
+      {/* Input flotante minimalista */}
+      <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-transparent z-10">
+        <div className="max-w-4xl mx-auto">
+          <div className="relative flex items-center gap-2 bg-white p-2 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 transition-shadow duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleListening}
+              className={`rounded-full w-10 h-10 transition-all duration-300 ${
+                isListening 
+                  ? "bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 animate-pulse" 
+                  : "text-gray-400 hover:text-blue-600 hover:bg-blue-50"
+              }`}
+              title={isListening ? "Detener grabación" : "Hablar"}
+            >
+              {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+            </Button>
+
+            <Input
+              type="text"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
+              placeholder={isListening ? "Escuchando..." : "Escribe tu mensaje..."}
+              className="flex-1 border-none shadow-none focus-visible:ring-0 px-2 text-base bg-transparent placeholder:text-gray-400 h-10"
+            />
+
+            <Button
+              onClick={handleSend}
+              disabled={!message.trim() || isLoading}
+              size="icon"
+              className={`rounded-full w-10 h-10 transition-all duration-300 ${
+                message.trim() 
+                  ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transform hover:scale-105" 
+                  : "bg-gray-100 text-gray-400"
+              }`}
+            >
+              <Send className="w-4 h-4 ml-0.5" />
+            </Button>
+          </div>
+          <div className="text-center mt-2">
+            <p className="text-[10px] text-gray-400 font-light">
+              Austral AI puede cometer errores. Verifica la información importante.
+            </p>
           </div>
         </div>
       </div>
-    </>
-  );
-}
-
-// Suggestion Chip Component - Estilo ChatGPT/Gemini
-function SuggestionChip({
-  text,
-  onClick,
-}: {
-  text: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className="px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-700 text-sm rounded-xl transition-all border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow"
-    >
-      {text}
-    </button>
+    </div>
   );
 }

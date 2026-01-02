@@ -273,11 +273,11 @@ export const Sidebar = () => {
       {/* Contenido principal */}
       <main
         className={`
-        flex-1 overflow-y-auto transition-all
+        flex-1 transition-all overflow-y-auto flex flex-col
         ${isSidebarOpen ? "md:ml-64" : "md:ml-0"}
       `}
       >
-        <div className="min-h-full bg-gray-50 p-3 lg:p-4">
+        <div className="bg-gray-50 p-3 lg:p-4 flex-1 flex flex-col">
           <Outlet />
         </div>
       </main>
