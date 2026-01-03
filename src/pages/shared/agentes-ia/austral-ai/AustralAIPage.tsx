@@ -1,6 +1,15 @@
 import { Header } from "@/components/shared";
 import { useSidebar } from "@/hooks/useSidebar";
-import { Send, Bot, User, Mic, MicOff, FileText, FileSpreadsheet, Download } from "lucide-react";
+import {
+  Send,
+  Bot,
+  User,
+  Mic,
+  MicOff,
+  FileText,
+  FileSpreadsheet,
+  Download,
+} from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { chatbotService } from "@/services/chatbot.service";
 import { useAuthStore } from "@/store/auth.store";
@@ -11,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 interface GeneratedFile {
-  type: 'pdf' | 'excel';
+  type: "pdf" | "excel";
   filename: string;
   filepath: string;
   metadata: any;
@@ -36,7 +45,8 @@ declare global {
 export default function AustralAIPage() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
   const { user } = useAuthStore();
-  const { messages, conversationId, addMessage, setConversationId } = useChatStore();
+  const { messages, conversationId, addMessage, setConversationId } =
+    useChatStore();
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -93,7 +103,7 @@ export default function AustralAIPage() {
       toast.info("Iniciando descarga...");
       const blob = await chatbotService.downloadFile(file.type, file.filename);
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = file.filename;
       document.body.appendChild(a);
@@ -103,7 +113,9 @@ export default function AustralAIPage() {
       toast.success("Archivo descargado correctamente");
     } catch (error) {
       console.error("Error downloading file:", error);
-      toast.error("Error al descargar el archivo. Por favor intenta nuevamente.");
+      toast.error(
+        "Error al descargar el archivo. Por favor intenta nuevamente."
+      );
     }
   };
 
@@ -155,9 +167,9 @@ export default function AustralAIPage() {
   };
 
   return (
-    <div 
+    <div
       className="relative flex flex-col h-full overflow-hidden animate-[fadeIn_0.5s_ease-out]"
-      style={{ animationFillMode: 'both' }}
+      style={{ animationFillMode: "both" }}
     >
       <Header
         title="Austral AI"
@@ -240,46 +252,54 @@ export default function AustralAIPage() {
                         >
                           {msg.content}
                         </ReactMarkdown>
-                        
-                        {msg.generatedFiles && msg.generatedFiles.length > 0 && (
-                          <div className="mt-4 space-y-2">
-                            {msg.generatedFiles.map((file, index) => (
-                              <div
-                                key={index}
-                                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
-                              >
-                                <div className="flex items-center gap-3 overflow-hidden">
-                                  <div className={`p-2 rounded-lg ${
-                                    file.type === 'pdf' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'
-                                  }`}>
-                                    {file.type === 'pdf' ? (
-                                      <FileText className="w-5 h-5" />
-                                    ) : (
-                                      <FileSpreadsheet className="w-5 h-5" />
-                                    )}
-                                  </div>
-                                  <div className="flex flex-col min-w-0">
-                                    <span className="text-sm font-medium text-gray-700 truncate max-w-[200px]" title={file.filename}>
-                                      {file.filename}
-                                    </span>
-                                    <span className="text-xs text-gray-500">
-                                      {file.type.toUpperCase()}
-                                    </span>
-                                  </div>
-                                </div>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleDownload(file)}
-                                  className="text-gray-500 hover:text-blue-600 hover:bg-blue-50"
-                                  title="Descargar"
+
+                        {msg.generatedFiles &&
+                          msg.generatedFiles.length > 0 && (
+                            <div className="mt-4 space-y-2">
+                              {msg.generatedFiles.map((file, index) => (
+                                <div
+                                  key={index}
+                                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
                                 >
-                                  <Download className="w-4 h-4" />
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                                  <div className="flex items-center gap-3 overflow-hidden">
+                                    <div
+                                      className={`p-2 rounded-lg ${
+                                        file.type === "pdf"
+                                          ? "bg-red-100 text-red-600"
+                                          : "bg-green-100 text-green-600"
+                                      }`}
+                                    >
+                                      {file.type === "pdf" ? (
+                                        <FileText className="w-5 h-5" />
+                                      ) : (
+                                        <FileSpreadsheet className="w-5 h-5" />
+                                      )}
+                                    </div>
+                                    <div className="flex flex-col min-w-0">
+                                      <span
+                                        className="text-sm font-medium text-gray-700 truncate max-w-[200px]"
+                                        title={file.filename}
+                                      >
+                                        {file.filename}
+                                      </span>
+                                      <span className="text-xs text-gray-500">
+                                        {file.type.toUpperCase()}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleDownload(file)}
+                                    className="text-gray-500 hover:text-blue-600 hover:bg-blue-50"
+                                    title="Descargar"
+                                  >
+                                    <Download className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                       </div>
                     ) : (
                       <p className="text-[15px] leading-relaxed whitespace-pre-wrap">
@@ -329,13 +349,17 @@ export default function AustralAIPage() {
               size="icon"
               onClick={toggleListening}
               className={`rounded-full w-10 h-10 transition-all duration-300 ${
-                isListening 
-                  ? "bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 animate-pulse" 
+                isListening
+                  ? "bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 animate-pulse"
                   : "text-gray-400 hover:text-blue-600 hover:bg-blue-50"
               }`}
               title={isListening ? "Detener grabación" : "Hablar"}
             >
-              {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+              {isListening ? (
+                <MicOff className="w-5 h-5" />
+              ) : (
+                <Mic className="w-5 h-5" />
+              )}
             </Button>
 
             <Input
@@ -348,7 +372,9 @@ export default function AustralAIPage() {
                   handleSend();
                 }
               }}
-              placeholder={isListening ? "Escuchando..." : "Escribe tu mensaje..."}
+              placeholder={
+                isListening ? "Escuchando..." : "Escribe tu mensaje..."
+              }
               className="flex-1 border-none shadow-none focus-visible:ring-0 px-2 text-base bg-transparent placeholder:text-gray-400 h-10"
             />
 
@@ -357,8 +383,8 @@ export default function AustralAIPage() {
               disabled={!message.trim() || isLoading}
               size="icon"
               className={`rounded-full w-10 h-10 transition-all duration-300 ${
-                message.trim() 
-                  ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transform hover:scale-105" 
+                message.trim()
+                  ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transform hover:scale-105"
                   : "bg-gray-100 text-gray-400"
               }`}
             >
@@ -367,7 +393,8 @@ export default function AustralAIPage() {
           </div>
           <div className="text-center mt-2">
             <p className="text-[10px] text-gray-400 font-light">
-              Austral AI puede cometer errores. Verifica la información importante.
+              Austral AI puede cometer errores. Verifica la información
+              importante.
             </p>
           </div>
         </div>

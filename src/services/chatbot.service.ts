@@ -10,7 +10,7 @@ export interface ChatbotQueryRequest {
 }
 
 export interface GeneratedFile {
-  type: 'pdf' | 'excel';
+  type: "pdf" | "excel";
   filename: string;
   filepath: string;
   metadata: any;
@@ -33,14 +33,25 @@ export interface ChatbotHealthResponse {
 
 export const chatbotService = {
   // Enviar consulta al chatbot
-  query: async (request: ChatbotQueryRequest): Promise<ChatbotQueryResponse> => {
+  query: async (
+    request: ChatbotQueryRequest
+  ): Promise<ChatbotQueryResponse> => {
     try {
-      console.log("🌐 Chatbot Service - Request completo:", JSON.stringify(request, null, 2));
-      console.log("🌐 Chatbot Service - Tiene conversationId?:", !!request.conversationId);
+      console.log(
+        "🌐 Chatbot Service - Request completo:",
+        JSON.stringify(request, null, 2)
+      );
+      console.log(
+        "🌐 Chatbot Service - Tiene conversationId?:",
+        !!request.conversationId
+      );
 
       const { data } = await api.post("/chatbot/query", request);
 
-      console.log("🌐 Chatbot Service - Response crudo:", JSON.stringify(data, null, 2));
+      console.log(
+        "🌐 Chatbot Service - Response crudo:",
+        JSON.stringify(data, null, 2)
+      );
 
       // El backend envía directamente { response: "...", conversationId: "...", timestamp: "..." }
       return data;
@@ -51,12 +62,15 @@ export const chatbotService = {
   },
 
   // Descargar archivo generado
-  downloadFile: async (type: 'pdf' | 'excel', filename: string): Promise<Blob> => {
+  downloadFile: async (
+    type: "pdf" | "excel",
+    filename: string
+  ): Promise<Blob> => {
     try {
       // Mapear 'pdf' a 'pdfs' según requerimiento del backend
-      const urlType = type === 'pdf' ? 'pdfs' : type;
+      const urlType = type === "pdf" ? "pdfs" : type;
       const response = await api.get(`/chatbot/files/${urlType}/${filename}`, {
-        responseType: 'blob',
+        responseType: "blob",
       });
       return response.data;
     } catch (error) {

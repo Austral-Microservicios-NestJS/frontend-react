@@ -165,7 +165,10 @@ export const Sidebar = () => {
                         // Renderizado especial para módulo Austral AI con efecto aurora
                         if (isAuroraModule) {
                           return (
-                            <div key={module.id} className="relative group/aurora">
+                            <div
+                              key={module.id}
+                              className="relative group/aurora"
+                            >
                               {/* Fondo Aurora */}
                               <span
                                 aria-hidden

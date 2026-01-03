@@ -1,8 +1,8 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 export interface GeneratedFile {
-  type: 'pdf' | 'excel';
+  type: "pdf" | "excel";
   filename: string;
   filepath: string;
   metadata: any;
@@ -37,7 +37,7 @@ export const useChatStore = create<ChatState>()(
       clearChat: () => set({ messages: [], conversationId: undefined }),
     }),
     {
-      name: 'austral-ai-chat-storage', // nombre único para localStorage
+      name: "austral-ai-chat-storage", // nombre único para localStorage
       storage: createJSONStorage(() => localStorage),
     }
   )
