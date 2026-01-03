@@ -9,9 +9,17 @@ export interface ChatbotQueryRequest {
   conversationId?: string;
 }
 
+export interface GeneratedFile {
+  type: 'pdf' | 'excel';
+  filename: string;
+  filepath: string;
+  metadata: any;
+}
+
 export interface ChatbotQueryResponse {
   response: string;
   conversationId: string;
+  generatedFiles?: GeneratedFile[];
   timestamp: string;
 }
 
@@ -38,6 +46,21 @@ export const chatbotService = {
       return data;
     } catch (error) {
       console.error("❌ Chatbot Service - Error completo:", error);
+      throw error;
+    }
+  },
+
+  // Descargar archivo generado
+  downloadFile: async (type: 'pdf' | 'excel', filename: string): Promise<Blob> => {
+    try {
+      // Mapear 'pdf' a 'pdfs' según requerimiento del backend
+      const urlType = type === 'pdf' ? 'pdfs' : type;
+      const response = await api.get(`/chatbot/files/${urlType}/${filename}`, {
+        responseType: 'blob',
+      });
+      return response.data;
+    } catch (error) {
+      console.error("❌ Chatbot Service - Error descargando archivo:", error);
       throw error;
     }
   },

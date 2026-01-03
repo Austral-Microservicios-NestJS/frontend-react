@@ -1,11 +1,19 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
+export interface GeneratedFile {
+  type: 'pdf' | 'excel';
+  filename: string;
+  filepath: string;
+  metadata: any;
+}
+
 interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
+  generatedFiles?: GeneratedFile[];
 }
 
 interface ChatState {

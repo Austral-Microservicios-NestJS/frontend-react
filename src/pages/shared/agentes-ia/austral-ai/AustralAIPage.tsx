@@ -1,6 +1,6 @@
 import { Header } from "@/components/shared";
 import { useSidebar } from "@/hooks/useSidebar";
-import { Send, Bot, User, Mic, MicOff } from "lucide-react";
+import { Send, Bot, User, Mic, MicOff, FileText, FileSpreadsheet, Download } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { chatbotService } from "@/services/chatbot.service";
 import { useAuthStore } from "@/store/auth.store";
@@ -8,12 +8,21 @@ import { useChatStore } from "@/store/chat.store";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+
+interface GeneratedFile {
+  type: 'pdf' | 'excel';
+  filename: string;
+  filepath: string;
+  metadata: any;
+}
 
 interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
+  generatedFiles?: GeneratedFile[];
 }
 
 // Definición de tipos para la API de reconocimiento de voz
@@ -79,6 +88,25 @@ export default function AustralAIPage() {
     }
   };
 
+  const handleDownload = async (file: GeneratedFile) => {
+    try {
+      toast.info("Iniciando descarga...");
+      const blob = await chatbotService.downloadFile(file.type, file.filename);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast.success("Archivo descargado correctamente");
+    } catch (error) {
+      console.error("Error downloading file:", error);
+      toast.error("Error al descargar el archivo. Por favor intenta nuevamente.");
+    }
+  };
+
   const handleSend = async () => {
     if (!message.trim() || isLoading) return;
 
@@ -106,6 +134,7 @@ export default function AustralAIPage() {
         role: "assistant",
         content: response.response,
         timestamp: new Date(),
+        generatedFiles: response.generatedFiles,
       };
 
       addMessage(botMessage);
@@ -211,6 +240,46 @@ export default function AustralAIPage() {
                         >
                           {msg.content}
                         </ReactMarkdown>
+                        
+                        {msg.generatedFiles && msg.generatedFiles.length > 0 && (
+                          <div className="mt-4 space-y-2">
+                            {msg.generatedFiles.map((file, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
+                              >
+                                <div className="flex items-center gap-3 overflow-hidden">
+                                  <div className={`p-2 rounded-lg ${
+                                    file.type === 'pdf' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'
+                                  }`}>
+                                    {file.type === 'pdf' ? (
+                                      <FileText className="w-5 h-5" />
+                                    ) : (
+                                      <FileSpreadsheet className="w-5 h-5" />
+                                    )}
+                                  </div>
+                                  <div className="flex flex-col min-w-0">
+                                    <span className="text-sm font-medium text-gray-700 truncate max-w-[200px]" title={file.filename}>
+                                      {file.filename}
+                                    </span>
+                                    <span className="text-xs text-gray-500">
+                                      {file.type.toUpperCase()}
+                                    </span>
+                                  </div>
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleDownload(file)}
+                                  className="text-gray-500 hover:text-blue-600 hover:bg-blue-50"
+                                  title="Descargar"
+                                >
+                                  <Download className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <p className="text-[15px] leading-relaxed whitespace-pre-wrap">
