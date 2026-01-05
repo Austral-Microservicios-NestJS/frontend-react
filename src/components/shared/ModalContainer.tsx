@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface ModalContainerProps {
   children: React.ReactNode;
@@ -17,6 +18,13 @@ export const ModalContainer = ({
   size = "md",
   preventBackdropClose = true,
 }: ModalContainerProps) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
   const sizeClasses = {
     sm: "max-w-md",
     md: "max-w-lg",
@@ -53,26 +61,27 @@ export const ModalContainer = ({
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/30 transition-opacity duration-300"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
         onClick={preventBackdropClose ? undefined : onClose}
       />
 
       {/* Modal Panel */}
       <div
         className={`
-          ${sizeClasses[size]} w-full bg-white rounded-lg shadow-xl
+          ${sizeClasses[size]} w-full bg-white rounded-xl shadow-2xl
           relative z-10 transition-all duration-300 ease-out
-          animate-in fade-in zoom-in-95
+          animate-in fade-in zoom-in-95 slide-in-from-bottom-4
         `}
       >
         {children}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

@@ -9,6 +9,7 @@ import {
   FileText,
   FileSpreadsheet,
   Download,
+  Trash2,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { chatbotService } from "@/services/chatbot.service";
@@ -42,14 +43,17 @@ declare global {
   }
 }
 
+import { ConfirmClearChatModal } from "@/components/modulos/agentes-ia/modales/ConfirmClearChatModal";
+
 export default function AustralAIPage() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
   const { user } = useAuthStore();
-  const { messages, conversationId, addMessage, setConversationId } =
+  const { messages, conversationId, addMessage, setConversationId, clearChat } =
     useChatStore();
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [isClearModalOpen, setIsClearModalOpen] = useState(false);
   const recognitionRef = useRef<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -347,6 +351,16 @@ export default function AustralAIPage() {
             <Button
               variant="ghost"
               size="icon"
+              onClick={() => setIsClearModalOpen(true)}
+              className="rounded-full w-10 h-10 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-300"
+              title="Limpiar conversación"
+            >
+              <Trash2 className="w-5 h-5" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={toggleListening}
               className={`rounded-full w-10 h-10 transition-all duration-300 ${
                 isListening
@@ -399,6 +413,14 @@ export default function AustralAIPage() {
           </div>
         </div>
       </div>
+      <ConfirmClearChatModal
+        isOpen={isClearModalOpen}
+        onClose={() => setIsClearModalOpen(false)}
+        onConfirm={() => {
+          clearChat();
+          toast.success("Conversación eliminada");
+        }}
+      />
     </div>
   );
 }

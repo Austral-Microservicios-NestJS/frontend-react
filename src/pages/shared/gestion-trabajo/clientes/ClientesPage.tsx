@@ -239,16 +239,16 @@ function FilterButton({ label, active, onClick, count }: any) {
   return (
     <button
       onClick={onClick}
-      className={`px-3 py-1.5 text-xs font-medium transition-all flex items-center gap-2 border ${
+      className={`px-3 py-1.5 text-xs font-medium transition-all flex items-center gap-2 border rounded-md ${
         active
-          ? "bg-gray-900 text-white border-gray-900"
+          ? "bg-(--austral-azul) text-white border-(--austral-azul)"
           : "bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
       }`}
     >
       <span>{label}</span>
       <span
-        className={`px-1.5 py-0.5 text-[10px] ${
-          active ? "bg-gray-700 text-white" : "bg-gray-100 text-gray-600"
+        className={`px-1.5 py-0.5 text-[10px] rounded-sm ${
+          active ? "bg-white/20 text-white" : "bg-gray-100 text-gray-600"
         }`}
       >
         {count}
