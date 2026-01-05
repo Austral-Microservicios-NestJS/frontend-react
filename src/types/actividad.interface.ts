@@ -1,39 +1,52 @@
+// ==================== ENUMS ====================
+
+export enum TipoActividad {
+  REUNION = "REUNION",
+  LLAMADA = "LLAMADA",
+  EMAIL = "EMAIL",
+  VISITA = "VISITA",
+  PRESENTACION = "PRESENTACION",
+  CAPACITACION = "CAPACITACION",
+  OTRO = "OTRO",
+}
+
+// ==================== INTERFACES ====================
+
 export interface Actividad {
   idActividad: string;
   creadaPor: string;
   titulo: string;
   descripcion?: string;
   tipoActividad: TipoActividad;
-  fechaActividad: Date;
+  fechaActividad: string;
   disponible: boolean;
-  fechaCreacion: Date;
-  fechaModificacion?: Date;
+  fechaCreacion: string;
+  fechaModificacion: string;
 }
 
 export interface CreateActividad {
+  creadaPor: string;
   titulo: string;
   descripcion?: string;
   tipoActividad: TipoActividad;
-  fechaActividad: Date;
-  creadaPor: string;
+  fechaActividad: string;
 }
 
-export interface UpdateActividad extends Partial<CreateActividad> {
-  disponible?: boolean;
+export interface UpdateActividad {
+  titulo?: string;
+  descripcion?: string;
+  tipoActividad?: TipoActividad;
+  fechaActividad?: string;
 }
 
-export const TipoActividad = {
-  REUNION: "REUNION",
-  LLAMADA: "LLAMADA",
-  EMAIL: "EMAIL",
-  OTRO: "OTRO",
-};
-
-export type TipoActividad = keyof typeof TipoActividad;
+// ==================== OPTIONS FOR SELECTS ====================
 
 export const tipoActividadOptions = [
   { value: TipoActividad.REUNION, label: "Reunión" },
   { value: TipoActividad.LLAMADA, label: "Llamada" },
   { value: TipoActividad.EMAIL, label: "Email" },
+  { value: TipoActividad.VISITA, label: "Visita" },
+  { value: TipoActividad.PRESENTACION, label: "Presentación" },
+  { value: TipoActividad.CAPACITACION, label: "Capacitación" },
   { value: TipoActividad.OTRO, label: "Otro" },
 ] as const;

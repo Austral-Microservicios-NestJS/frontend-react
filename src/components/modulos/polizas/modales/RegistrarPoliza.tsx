@@ -493,7 +493,7 @@ export const RegistrarPoliza = ({
                         <SelectContent>
                           {subordinados
                             .filter(
-                              (asig) => asig.subordinado.rol.nombreRol === "BROKER"
+                              (asig) => asig.subordinado.rol?.nombreRol === "BROKER"
                             )
                             .map((asig) => (
                               <SelectItem
@@ -559,7 +559,7 @@ export const RegistrarPoliza = ({
                           {isAdmin &&
                             agentesDelBroker
                               .filter(
-                                (asig) => asig.subordinado.rol.nombreRol === "AGENTE"
+                                (asig) => asig.subordinado.rol?.nombreRol === "AGENTE"
                               )
                               .map((asig) => (
                                 <SelectItem
@@ -574,7 +574,7 @@ export const RegistrarPoliza = ({
                           {isBroker &&
                             subordinados
                               .filter(
-                                (asig) => asig.subordinado.rol.nombreRol === "AGENTE"
+                                (asig) => asig.subordinado.rol?.nombreRol === "AGENTE"
                               )
                               .map((asig) => (
                                 <SelectItem

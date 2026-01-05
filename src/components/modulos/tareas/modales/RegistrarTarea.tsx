@@ -21,8 +21,11 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import {
   tipoTareaOptions,
-  prioridadOptions,
-  estadoOptions,
+  prioridadTareaOptions,
+  estadoTareaOptions,
+  TipoTarea,
+  PrioridadTarea,
+  EstadoTarea,
   type CreateTarea,
 } from "@/types/tarea.interface";
 import type { User } from "@/store/auth.store";
@@ -50,10 +53,10 @@ export const RegistrarTarea = ({
     defaultValues: {
       asunto: "",
       descripcion: "",
-      tipoTarea: "",
+      tipoTarea: TipoTarea.LLAMADA,
       fechaVencimiento: "",
-      prioridad: "",
-      estado: "PENDIENTE",
+      prioridad: PrioridadTarea.MEDIA,
+      estado: EstadoTarea.PENDIENTE,
       creadaPor: user.idUsuario,
     },
   });
@@ -150,7 +153,7 @@ export const RegistrarTarea = ({
                         <SelectValue placeholder="Selecciona" />
                       </SelectTrigger>
                       <SelectContent>
-                        {prioridadOptions.map((option) => (
+                        {prioridadTareaOptions.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
                             {option.label}
                           </SelectItem>
@@ -175,7 +178,7 @@ export const RegistrarTarea = ({
                         <SelectValue placeholder="Selecciona" />
                       </SelectTrigger>
                       <SelectContent>
-                        {estadoOptions.map((option) => (
+                        {estadoTareaOptions.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
                             {option.label}
                           </SelectItem>

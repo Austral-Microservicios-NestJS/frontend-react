@@ -2,7 +2,7 @@ import LoginForm from "@/components/modulos/auth/LoginForm";
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen w-full relative">
+    <div className="flex h-full w-full relative overflow-hidden">
       {/* Background Image for Mobile - Full Screen with Overlay */}
       <div className="absolute inset-0 lg:hidden">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center" />
@@ -34,7 +34,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side - Login Form */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 lg:bg-background relative z-10">
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 lg:bg-background relative z-10 overflow-y-auto">
         <div className="w-full max-w-md space-y-8">
           {/* Mobile Logo/Branding */}
           <div className="lg:hidden text-center mb-8">

@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   User,
   WalletCards,
+  Sparkles,
 } from "lucide-react";
 import { Roles } from "@/utils/roles";
 
@@ -114,9 +115,34 @@ export const moduleCategories = [
     title: "Agentes IA",
     modules: [
       {
-        id: 60,
-        name: "Ag. de Documentos",
-        path: "/dashboard/agentes-ia/documentos",
+        id: 70,
+        name: "Austral AI",
+        path: "/dashboard/agentes-ia/austral-ai",
+        icon: Sparkles,
+        roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+        type: ["CRM", "ERP"] as ModuleType[],
+        isAuroraModule: true, // Marcador especial para aplicar efecto aurora
+      },
+      {
+        id: 71,
+        name: "Agente de Facturas",
+        path: "/dashboard/agentes-ia/agente-facturas",
+        icon: Bot,
+        roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+        type: ["CRM"] as ModuleType[],
+      },
+      {
+        id: 72,
+        name: "Agente de DNI",
+        path: "/dashboard/agentes-ia/agente-dni",
+        icon: Bot,
+        roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+        type: ["CRM"] as ModuleType[],
+      },
+      {
+        id: 73,
+        name: "Agente de Pólizas",
+        path: "/dashboard/agentes-ia/agente-polizas",
         icon: Bot,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
         type: ["CRM", "ERP"] as ModuleType[],

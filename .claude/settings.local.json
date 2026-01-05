@@ -2,7 +2,15 @@
   "permissions": {
     "allow": [
       "Bash(wc:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(dir:*)",
+      "Bash(cat:*)",
+      "Bash(pnpm run build:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfix: Resolver errores de compilación TypeScript para Railway deployment\n\n- Eliminar ''erasableSyntaxOnly'' de tsconfig.app.json y tsconfig.node.json para permitir enums\n- Corregir tipos de enum en RegistrarLead \\(usar EstadoLead.NUEVO en lugar de \"NUEVO\"\\)\n- Arreglar estructura de Modal en RegistrarLead \\(usar ModalContainer correctamente\\)\n- Corregir tipos de parámetros en ActividadesGrid \\(string en lugar de Date\\)\n- Agregar propiedad ''rol'' opcional a interface Asignacion\n- Usar optional chaining para acceso seguro a rol.nombreRol en RegistrarPoliza\n- Remover variables no utilizadas en hooks y páginas\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push)",
+      "Bash(git commit:*)",
+      "Bash(pnpm add:*)",
+      "Bash(should not exist\".\n\nCambios:\n- Construir requestData dinámicamente\n- Solo incluir conversationId si ya existe \\(consultas subsecuentes\\)\n- Primera consulta: { message, userId, userRole }\n- Consultas siguientes: { message, userId, userRole, conversationId }\n\nEsto permite iniciar nuevas conversaciones sin error y mantener\nel contexto en consultas posteriores.\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   }
 }

@@ -2,69 +2,91 @@ import { api } from "@/config/api-client";
 import type { Cliente, CreateCliente, UpdateCliente } from "@/types/cliente.interface";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-export const CLIENTES_KEY = ["clientes"];
+const QUERY_KEY = "clientes";
 
-export const clienteApi = {
-  getAll: async () => {
-    const response = await api.get<Cliente[]>(`/clientes`);
-    return response.data || [];
+// ==================== API FUNCTIONS ====================
+
+export const clienteService = {
+  // Listar todos los clientes con paginación
+  getAll: async (params?: { page?: number; limit?: number }): Promise<{ data: Cliente[]; meta: any }> => {
+    try {
+      const response = await api.get("/clientes", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error al obtener clientes:", error);
+      return { data: [], meta: { total: 0, page: 1, lastPage: 1 } };
+    }
   },
 
-  getAllByUsuario: async (idUsuario: string) => {
-    const response = await api.get<{ data: Cliente[] }>(`/clientes/usuario/${idUsuario}`);
-    return response.data.data || [];
+  // Obtener cliente por ID
+  getById: async (id: string): Promise<Cliente> => {
+    const { data } = await api.get(`/clientes/id/${id}`);
+    return data;
   },
 
-  getById: async (id: string) => {
-    const response = await api.get<Cliente>(`/clientes/id/${id}`);
-    return response.data;
+  // Listar clientes por usuario
+  getByUsuario: async (idUsuario: string): Promise<Cliente[]> => {
+    try {
+      const { data } = await api.get(`/clientes/usuario/${idUsuario}`);
+      return Array.isArray(data) ? data : [];
+    } catch (error) {
+      console.error("Error al obtener clientes del usuario:", error);
+      return [];
+    }
   },
 
-  create: async (cliente: CreateCliente) => {
-    const response = await api.post<Cliente>("/clientes", cliente);
-    return response.data;
+  // Crear cliente
+  create: async (cliente: CreateCliente): Promise<Cliente> => {
+    const { data } = await api.post("/clientes", cliente);
+    return data;
   },
 
-  update: async (id: string, cliente: UpdateCliente) => {
-    const response = await api.patch<Cliente>(`/clientes/${id}`, cliente);
-    return response.data;
+  // Actualizar cliente
+  update: async ({ id, data: clienteData }: { id: string; data: UpdateCliente }): Promise<Cliente> => {
+    const { data } = await api.patch(`/clientes/${id}`, clienteData);
+    return data;
   },
 
-  delete: async (id: string) => {
+  // Eliminar cliente
+  delete: async (id: string): Promise<void> => {
     await api.delete(`/clientes/${id}`);
   },
 
-  // ===== Hooks de React Query =====
+  // ==================== REACT QUERY HOOKS ====================
+
+  useGetAll: (params?: { page?: number; limit?: number }) => {
+    return useQuery({
+      queryKey: [QUERY_KEY, "all", params],
+      queryFn: () => clienteService.getAll(params),
+      retry: false,
+      refetchOnWindowFocus: false,
+    });
+  },
 
   useGetById: (id: string) => {
     return useQuery({
-      queryKey: [...CLIENTES_KEY, id],
-      queryFn: () => clienteApi.getById(id),
+      queryKey: [QUERY_KEY, id],
+      queryFn: () => clienteService.getById(id),
       enabled: !!id,
     });
   },
 
-  useGetAll: () => {
+  useGetByUsuario: (idUsuario: string) => {
     return useQuery({
-      queryKey: CLIENTES_KEY,
-      queryFn: () => clienteApi.getAll(),
-    });
-  },
-
-  useGetAllByUsuario: (idUsuario: string) => {
-    return useQuery({
-      queryKey: [...CLIENTES_KEY, "usuario", idUsuario],
-      queryFn: () => clienteApi.getAllByUsuario(idUsuario),
+      queryKey: [QUERY_KEY, "usuario", idUsuario],
+      queryFn: () => clienteService.getByUsuario(idUsuario),
       enabled: !!idUsuario,
+      retry: false,
+      refetchOnWindowFocus: false,
     });
   },
 
   useCreate: () => {
     const queryClient = useQueryClient();
     return useMutation({
-      mutationFn: (data: CreateCliente) => clienteApi.create(data),
+      mutationFn: clienteService.create,
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: CLIENTES_KEY });
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
       },
     });
   },
@@ -72,10 +94,19 @@ export const clienteApi = {
   useUpdate: () => {
     const queryClient = useQueryClient();
     return useMutation({
-      mutationFn: ({ id, data }: { id: string; data: UpdateCliente }) =>
-        clienteApi.update(id, data),
+      mutationFn: clienteService.update,
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: CLIENTES_KEY });
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
+      },
+    });
+  },
+
+  useDelete: () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+      mutationFn: clienteService.delete,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
       },
     });
   },

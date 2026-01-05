@@ -5,7 +5,7 @@ import type { CreateLead, UpdateLead, EstadoLead } from "@/types/lead.interface"
 import { useAuthStore } from "@/store/auth.store";
 
 export const useLeads = () => {
-  const { user } = useAuthStore();
+  const { } = useAuthStore();
   const { data: allLeads = [], isLoading, error } = leadService.useGetAll();
   const createMutation = leadService.useCreate();
   const updateMutation = leadService.useUpdate();

@@ -5,7 +5,7 @@ import { useSidebar } from "@/hooks/useSidebar";
 import { RegistrarPoliza, TablaPolizas } from "@/components/modulos/polizas";
 import { usePolizas } from "@/hooks/usePolizas";
 import { useAuthStore } from "@/store/auth.store";
-import { clienteApi } from "@/services/cliente.service";
+import { clienteService } from "@/services/cliente.service";
 import { ArrowLeft } from "lucide-react";
 import days from "dayjs";
 
@@ -17,7 +17,7 @@ export default function ClientePolizasPage() {
   const { user } = useAuthStore();
 
   // Obtener información del cliente
-  const { data: cliente, isLoading: isLoadingCliente } = clienteApi.useGetById(
+  const { data: cliente, isLoading: isLoadingCliente } = clienteService.useGetById(
     id || ""
   );
 
