@@ -189,7 +189,7 @@ export const Sidebar = () => {
                                   }
                                 `}
                               >
-                                <div className="flex items-center justify-center w-7 h-7 rounded-md bg-white/20 text-white transition-colors shrink-0">
+                                <div className="flex items-center justify-center w-7 h-7 rounded-md text-white transition-colors shrink-0">
                                   <module.icon className="w-4 h-4" />
                                 </div>
                                 <span className="flex-1 text-left text-sm font-semibold">

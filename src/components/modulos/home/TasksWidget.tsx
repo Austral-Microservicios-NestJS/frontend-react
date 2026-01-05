@@ -50,17 +50,18 @@ export const TasksWidget = () => {
   }
 
   return (
-    <Card className="h-full border-none shadow-sm ring-1 ring-gray-200 hover:ring-gray-300 transition-all">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
-          <div className="p-1.5 bg-blue-50 text-[--austral-azul] rounded-md">
-            <CheckSquare className="w-4 h-4" />
-          </div>
+    <Card className="h-full border-none shadow-sm ring-1 ring-gray-200 hover:ring-gray-300 transition-all bg-white relative overflow-hidden">
+      {/* Decorative Background */}
+      <div className="absolute top-0 right-0 w-40 h-40 bg-orange-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-60 pointer-events-none" />
+
+      <CardHeader className="pb-2 pt-3 px-3 relative z-10">
+        <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2 ml-1">
+          <CheckSquare className="w-5 h-5 text-orange-500" />
           Tareas Pendientes
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-2">
-        <div className="space-y-3">
+      <CardContent className="pt-0 px-2 pb-2 relative z-10">
+        <div className="space-y-2 h-[220px] overflow-y-auto pr-1 custom-scrollbar">
           {pendingTasks.length > 0 ? (
             pendingTasks.map((tarea) => {
               const dueDate = dayjs(tarea.fechaVencimiento);
@@ -69,51 +70,68 @@ export const TasksWidget = () => {
               return (
                 <div
                   key={tarea.idTarea}
-                  className="group flex flex-col p-3 bg-white border border-gray-100 rounded-lg hover:border-gray-200 hover:bg-gray-50/50 transition-all"
+                  className="group flex flex-col p-2.5 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-orange-200 relative overflow-hidden"
                 >
-                  <div className="flex justify-between items-start mb-1 gap-2">
-                    <h4 className="text-sm font-medium text-gray-800 line-clamp-1 group-hover:text-[--austral-azul] transition-colors">
+                  {/* Priority Indicator Dot */}
+                  <div className="absolute top-2.5 right-2.5 flex gap-1">
+                    <span
+                      className={`w-2 h-2 rounded-full ${
+                        tarea.prioridad === "ALTA"
+                          ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]"
+                          : tarea.prioridad === "MEDIA"
+                          ? "bg-amber-500"
+                          : "bg-emerald-500"
+                      }`}
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1 mb-1 pr-4">
+                    <h4 className="text-sm font-bold text-gray-800 line-clamp-2 group-hover:text-orange-600 transition-colors leading-snug">
                       {tarea.asunto}
                     </h4>
-                    {isOverdue && (
-                      <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0" />
-                    )}
                   </div>
-                  <div className="flex justify-between items-center mt-1">
+
+                  <div className="flex justify-between items-center mt-auto pt-1 border-t border-gray-50">
                     <span
-                      className={`text-[10px] font-medium px-2 py-0.5 rounded-full border ${
+                      className={`text-xs font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider ${
                         tarea.prioridad === "ALTA"
-                          ? "bg-red-50 text-red-700 border-red-100"
+                          ? "bg-red-50 text-red-600"
                           : tarea.prioridad === "MEDIA"
-                          ? "bg-amber-50 text-amber-700 border-amber-100"
-                          : "bg-emerald-50 text-emerald-700 border-emerald-100"
+                          ? "bg-amber-50 text-amber-600"
+                          : "bg-emerald-50 text-emerald-600"
                       }`}
                     >
                       {tarea.prioridad}
                     </span>
                     <span
-                      className={`text-xs flex items-center gap-1 ${
-                        isOverdue ? "text-red-600 font-medium" : "text-gray-400"
+                      className={`text-[10px] flex items-center gap-1 font-semibold ${
+                        isOverdue
+                          ? "text-red-500 bg-red-50 px-1.5 py-0.5 rounded-full"
+                          : "text-gray-400"
                       }`}
                     >
                       <Clock className="w-3 h-3" />
-                      {dueDate.format("D MMM")}
+                      {isOverdue ? "Vencida" : dueDate.format("D MMM")}
                     </span>
                   </div>
                 </div>
               );
             })
           ) : (
-            <div className="text-center py-8">
-              <p className="text-sm text-gray-500">
-                ¡Todo al día! No hay tareas urgentes.
+            <div className="flex flex-col items-center justify-center h-full text-center p-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-green-100 to-emerald-200 text-emerald-600 rounded-full flex items-center justify-center mb-2 shadow-sm">
+                <CheckSquare className="w-6 h-6" />
+              </div>
+              <p className="text-xs font-bold text-gray-900">¡Todo al día!</p>
+              <p className="text-[10px] text-gray-500 mt-0.5">
+                No tienes tareas pendientes.
               </p>
             </div>
           )}
 
           <Link
             to="/dashboard/gestion-trabajo/tareas"
-            className="block text-center text-xs font-medium text-gray-500 hover:text-[--austral-azul] hover:underline mt-2 pt-2 border-t border-gray-50"
+            className="block text-center text-[10px] font-bold text-gray-400 hover:text-orange-500 hover:bg-orange-50 py-1.5 rounded-lg transition-all mt-1"
           >
             Ver todas las tareas
           </Link>

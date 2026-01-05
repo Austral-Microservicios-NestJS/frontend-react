@@ -9,6 +9,9 @@ import {
   PopoverClose,
 } from "@/components/ui/popover";
 import { FileText, MoreHorizontal, Pencil } from "lucide-react";
+import { ButtonIA } from "@/components/ui/ButtonIA";
+import { useState } from "react";
+import { ContextoIAModal } from "@/components/modulos/clientes/modales/ContextoIAModal";
 
 interface TablaClientesProps {
   clientes: Cliente[];
@@ -17,6 +20,8 @@ interface TablaClientesProps {
 
 export const TablaClientes = ({ clientes, onEdit }: TablaClientesProps) => {
   const navigate = useNavigate();
+  const [selectedClienteForIA, setSelectedClienteForIA] =
+    useState<Cliente | null>(null);
 
   const columns: ColumnDef<Cliente>[] = [
     {
@@ -127,6 +132,14 @@ export const TablaClientes = ({ clientes, onEdit }: TablaClientesProps) => {
           </PopoverTrigger>
           <PopoverContent className="w-48 p-1" align="end">
             <div className="flex flex-col">
+              <div className="p-1 mb-1 border-b border-gray-100">
+                <ButtonIA
+                  className="w-full"
+                  onClick={() => setSelectedClienteForIA(row.original)}
+                >
+                  Dale contexto a la IA
+                </ButtonIA>
+              </div>
               {onEdit && (
                 <PopoverClose asChild>
                   <button
@@ -159,16 +172,26 @@ export const TablaClientes = ({ clientes, onEdit }: TablaClientesProps) => {
   ];
 
   return (
-    <Table
-      data={clientes}
-      columns={columns}
-      searchPlaceholder="Buscar por nombre, documento, email..."
-      pageSize={10}
-      showSearch={true}
-      showPagination={true}
-      showColumnToggle={true}
-      emptyMessage="No hay clientes registrados"
-      tableId="tabla-clientes"
-    />
+    <>
+      <Table
+        data={clientes}
+        columns={columns}
+        searchPlaceholder="Buscar por nombre, documento, email..."
+        pageSize={10}
+        showSearch={true}
+        showPagination={true}
+        showColumnToggle={true}
+        emptyMessage="No hay clientes registrados"
+        tableId="tabla-clientes"
+      />
+
+      {selectedClienteForIA && (
+        <ContextoIAModal
+          isOpen={!!selectedClienteForIA}
+          onClose={() => setSelectedClienteForIA(null)}
+          cliente={selectedClienteForIA}
+        />
+      )}
+    </>
   );
 };

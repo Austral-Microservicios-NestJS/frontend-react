@@ -86,8 +86,12 @@ export default function AustralAIPage() {
   }, []);
 
   useEffect(() => {
+    // Scroll al final cuando hay nuevos mensajes o cambia el estado de carga
     if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
     }
   }, [messages, isLoading]);
 
@@ -345,74 +349,77 @@ export default function AustralAIPage() {
       </div>
 
       {/* Input flotante minimalista */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white/95 to-transparent z-20 pointer-events-none" style={{ height: "140px" }}>
+      <div
+        className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white/95 to-transparent z-20 pointer-events-none"
+        style={{ height: "140px" }}
+      >
         <div className="h-full flex items-end pb-6 px-6">
           <div className="max-w-4xl mx-auto w-full pointer-events-auto">
             <div className="relative flex items-center gap-2 bg-white p-2 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 transition-shadow duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsClearModalOpen(true)}
-              className="rounded-full w-10 h-10 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-300"
-              title="Limpiar conversación"
-            >
-              <Trash2 className="w-5 h-5" />
-            </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsClearModalOpen(true)}
+                className="rounded-full w-10 h-10 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-300"
+                title="Limpiar conversación"
+              >
+                <Trash2 className="w-5 h-5" />
+              </Button>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleListening}
-              className={`rounded-full w-10 h-10 transition-all duration-300 ${
-                isListening
-                  ? "bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 animate-pulse"
-                  : "text-gray-400 hover:text-blue-600 hover:bg-blue-50"
-              }`}
-              title={isListening ? "Detener grabación" : "Hablar"}
-            >
-              {isListening ? (
-                <MicOff className="w-5 h-5" />
-              ) : (
-                <Mic className="w-5 h-5" />
-              )}
-            </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleListening}
+                className={`rounded-full w-10 h-10 transition-all duration-300 ${
+                  isListening
+                    ? "bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 animate-pulse"
+                    : "text-gray-400 hover:text-blue-600 hover:bg-blue-50"
+                }`}
+                title={isListening ? "Detener grabación" : "Hablar"}
+              >
+                {isListening ? (
+                  <MicOff className="w-5 h-5" />
+                ) : (
+                  <Mic className="w-5 h-5" />
+                )}
+              </Button>
 
-            <Input
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
+              <Input
+                type="text"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+                placeholder={
+                  isListening ? "Escuchando..." : "Escribe tu mensaje..."
                 }
-              }}
-              placeholder={
-                isListening ? "Escuchando..." : "Escribe tu mensaje..."
-              }
-              className="flex-1 border-none shadow-none focus-visible:ring-0 px-2 text-base bg-transparent placeholder:text-gray-400 h-10"
-            />
+                className="flex-1 border-none shadow-none focus-visible:ring-0 px-2 text-base bg-transparent placeholder:text-gray-400 h-10"
+              />
 
-            <Button
-              onClick={handleSend}
-              disabled={!message.trim() || isLoading}
-              size="icon"
-              className={`rounded-full w-10 h-10 transition-all duration-300 ${
-                message.trim()
-                  ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transform hover:scale-105"
-                  : "bg-gray-100 text-gray-400"
-              }`}
-            >
-              <Send className="w-4 h-4 ml-0.5" />
-            </Button>
+              <Button
+                onClick={handleSend}
+                disabled={!message.trim() || isLoading}
+                size="icon"
+                className={`rounded-full w-10 h-10 transition-all duration-300 ${
+                  message.trim()
+                    ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transform hover:scale-105"
+                    : "bg-gray-100 text-gray-400"
+                }`}
+              >
+                <Send className="w-4 h-4 ml-0.5" />
+              </Button>
+            </div>
+            <div className="text-center mt-2">
+              <p className="text-[10px] text-gray-400 font-light">
+                Austral AI puede cometer errores. Verifica la información
+                importante.
+              </p>
+            </div>
           </div>
-          <div className="text-center mt-2">
-            <p className="text-[10px] text-gray-400 font-light">
-              Austral AI puede cometer errores. Verifica la información
-              importante.
-            </p>
-          </div>
-        </div>
         </div>
       </div>
       <ConfirmClearChatModal

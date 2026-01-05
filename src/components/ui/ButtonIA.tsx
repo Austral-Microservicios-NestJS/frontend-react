@@ -3,9 +3,14 @@ import { Sparkles } from "lucide-react";
 interface ButtonIAProps {
   onClick?: () => void;
   className?: string;
+  children?: React.ReactNode;
 }
 
-export const ButtonIA = ({ onClick, className = "" }: ButtonIAProps) => {
+export const ButtonIA = ({
+  onClick,
+  className = "",
+  children,
+}: ButtonIAProps) => {
   return (
     <div className={`relative group/ai ${className}`}>
       {/* Fondo Aurora - siempre visible */}
@@ -16,7 +21,7 @@ export const ButtonIA = ({ onClick, className = "" }: ButtonIAProps) => {
 
       {/* Botón principal */}
       <button
-        className="relative h-8 px-3 rounded-md bg-transparent text-white hover:bg-white/10 hover:text-white border-0 flex items-center gap-1.5 font-semibold text-xs transition-transform active:scale-95"
+        className="relative w-full h-8 px-3 rounded-md bg-transparent text-white hover:bg-white/10 hover:text-white border-0 flex items-center justify-center gap-1.5 font-semibold text-xs transition-transform active:scale-95"
         onPointerDown={(e) => e.stopPropagation()}
         onClick={(e) => {
           e.stopPropagation();
@@ -25,7 +30,7 @@ export const ButtonIA = ({ onClick, className = "" }: ButtonIAProps) => {
         }}
       >
         <Sparkles className="h-3.5 w-3.5 mr-1" />
-        IA
+        {children || "IA"}
       </button>
     </div>
   );

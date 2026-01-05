@@ -41,58 +41,63 @@ export const RecentClients = () => {
   }
 
   return (
-    <Card className="h-full border-none shadow-sm ring-1 ring-gray-200 hover:ring-gray-300 transition-all">
-      <CardHeader className="pb-2">
+    <Card className="h-full border-none shadow-sm ring-1 ring-gray-200 hover:ring-gray-300 transition-all bg-white">
+      <CardHeader className="pb-2 pt-3 px-3 border-b border-gray-100">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
-            <div className="p-1.5 bg-blue-50 text-[--austral-azul] rounded-md">
-              <User className="w-4 h-4" />
+          <CardTitle className="text-sm font-bold text-gray-900 flex items-center gap-2">
+            <div className="p-1 bg-blue-50 text-[--austral-azul] rounded-lg">
+              <User className="w-3.5 h-3.5" />
             </div>
             Clientes Recientes
           </CardTitle>
           <Link
             to="/dashboard/gestion-trabajo/clientes"
-            className="text-xs font-medium text-[--austral-azul] hover:text-[#002855] hover:underline flex items-center gap-1"
+            className="text-[10px] font-bold text-[--austral-azul] bg-blue-50 px-2 py-0.5 rounded-full hover:bg-[--austral-azul] hover:text-white transition-all flex items-center gap-1"
           >
             Ver todos
           </Link>
         </div>
       </CardHeader>
-      <CardContent className="pt-2">
-        <div className="space-y-3">
+      <CardContent className="p-2">
+        <div className="grid grid-cols-1 gap-1.5">
           {recentClients.length > 0 ? (
             recentClients.map((cliente) => (
               <div
                 key={cliente.idCliente}
-                className="flex items-center p-3 bg-white border border-gray-100 rounded-lg hover:border-gray-200 hover:bg-gray-50/50 transition-all group"
+                className="flex items-center p-2 bg-gray-50/50 rounded-lg hover:bg-white hover:shadow-sm hover:scale-[1.01] transition-all border border-transparent hover:border-gray-100 group cursor-pointer"
               >
-                <div className="w-9 h-9 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-semibold text-xs shrink-0 group-hover:bg-blue-50 group-hover:text-[--austral-azul] transition-colors">
+                <div className="w-8 h-8 rounded-full bg-white text-[--austral-azul] flex items-center justify-center font-bold text-xs shrink-0 shadow-sm ring-1 ring-gray-100 group-hover:ring-[--austral-azul] transition-all">
                   {cliente.nombres?.charAt(0) ||
                     cliente.razonSocial?.charAt(0) ||
                     "C"}
                 </div>
-                <div className="ml-3 flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
+                <div className="ml-2 flex-1 min-w-0">
+                  <p className="text-xs font-bold text-gray-900 truncate group-hover:text-[--austral-azul] transition-colors">
                     {cliente.tipoPersona === "NATURAL"
                       ? `${cliente.nombres} ${cliente.apellidos}`
                       : cliente.razonSocial}
                   </p>
-                  <p className="text-xs text-gray-500 truncate">
-                    {cliente.numeroDocumento}
-                  </p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-[10px] text-gray-500 bg-white px-1 py-0 rounded border border-gray-100">
+                      {cliente.numeroDocumento}
+                    </span>
+                  </div>
                 </div>
-                <div className="text-xs text-gray-400 flex flex-col items-end">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />
+                <div className="text-[10px] text-gray-400 flex flex-col items-end pl-2">
+                  <span className="flex items-center gap-1 font-medium bg-white px-1 py-0 rounded shadow-sm">
+                    <Calendar className="w-3 h-3 text-gray-400" />
                     {dayjs(cliente.fechaCreacion).format("DD MMM")}
                   </span>
                 </div>
               </div>
             ))
           ) : (
-            <p className="text-sm text-gray-500 text-center py-8">
-              No hay clientes registrados aún.
-            </p>
+            <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+              <User className="w-6 h-6 text-gray-300 mx-auto mb-1" />
+              <p className="text-[10px] font-medium text-gray-500">
+                No hay clientes registrados aún.
+              </p>
+            </div>
           )}
         </div>
       </CardContent>
