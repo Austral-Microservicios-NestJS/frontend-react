@@ -20,8 +20,8 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import {
   tipoTareaOptions,
-  prioridadOptions,
-  estadoOptions,
+  prioridadTareaOptions,
+  estadoTareaOptions,
   type Tarea,
   type UpdateTarea,
 } from "@/types/tarea.interface";
@@ -142,7 +142,7 @@ export const EditarTarea = ({
                         <SelectValue placeholder="Selecciona" />
                       </SelectTrigger>
                       <SelectContent>
-                        {prioridadOptions.map((option) => (
+                        {prioridadTareaOptions.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
                             {option.label}
                           </SelectItem>
@@ -167,7 +167,7 @@ export const EditarTarea = ({
                         <SelectValue placeholder="Selecciona" />
                       </SelectTrigger>
                       <SelectContent>
-                        {estadoOptions.map((option) => (
+                        {estadoTareaOptions.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
                             {option.label}
                           </SelectItem>
