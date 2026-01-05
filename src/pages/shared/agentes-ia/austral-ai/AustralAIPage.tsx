@@ -56,6 +56,7 @@ export default function AustralAIPage() {
   const [isClearModalOpen, setIsClearModalOpen] = useState(false);
   const recognitionRef = useRef<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Inicializar reconocimiento de voz si está disponible
@@ -85,7 +86,9 @@ export default function AustralAIPage() {
   }, []);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
   }, [messages, isLoading]);
 
   const toggleListening = () => {
@@ -172,18 +175,15 @@ export default function AustralAIPage() {
 
   return (
     <div
-      className="relative flex flex-col h-full overflow-hidden animate-[fadeIn_0.5s_ease-out]"
+      className="relative flex flex-col h-full overflow-hidden"
       style={{ animationFillMode: "both" }}
     >
-      <Header
-        title="Austral AI"
-        description="Asistente inteligente para seguros"
-        isSidebarOpen={isSidebarOpen}
-        onToggleSidebar={toggleSidebar}
-      />
-
       {/* Área de mensajes */}
-      <div className="flex-1 overflow-y-auto p-6 pb-32">
+      <div
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto p-6"
+        style={{ paddingBottom: "140px" }}
+      >
         <div
           className={`max-w-4xl mx-auto ${
             messages.length === 0 ? "h-full" : ""
@@ -192,7 +192,7 @@ export default function AustralAIPage() {
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center animate-[fadeIn_0.8s_ease-out_0.2s_both]">
               <div className="relative mb-6 group">
-                <div className="absolute inset-0 bg-blue-500 blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500 rounded-full"></div>
+                <div className="absolute inset-0 group-hover:opacity-30 transition-opacity duration-500 rounded-full"></div>
                 <img
                   src="/images/logo-austral-main.png"
                   alt="Austral AI"
@@ -345,9 +345,10 @@ export default function AustralAIPage() {
       </div>
 
       {/* Input flotante minimalista */}
-      <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-transparent z-10">
-        <div className="max-w-4xl mx-auto">
-          <div className="relative flex items-center gap-2 bg-white p-2 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 transition-shadow duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white/95 to-transparent z-20 pointer-events-none" style={{ height: "140px" }}>
+        <div className="h-full flex items-end pb-6 px-6">
+          <div className="max-w-4xl mx-auto w-full pointer-events-auto">
+            <div className="relative flex items-center gap-2 bg-white p-2 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 transition-shadow duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
             <Button
               variant="ghost"
               size="icon"
@@ -411,6 +412,7 @@ export default function AustralAIPage() {
               importante.
             </p>
           </div>
+        </div>
         </div>
       </div>
       <ConfirmClearChatModal

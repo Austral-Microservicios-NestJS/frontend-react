@@ -167,13 +167,14 @@ export const Sidebar = () => {
                           return (
                             <div
                               key={module.id}
-                              className="relative group/aurora"
+                              className="relative group/aurora overflow-hidden rounded-lg bg-slate-900"
                             >
-                              {/* Fondo Aurora */}
-                              <span
-                                aria-hidden
-                                className="absolute inset-0 aurora-bg pointer-events-none opacity-90 rounded-lg"
-                              />
+                              {/* Fondo Lava */}
+                              <div className="absolute inset-0 z-0 opacity-80">
+                                <div className="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-purple-600 rounded-full mix-blend-screen filter blur-[10px] opacity-70 animate-blob"></div>
+                                <div className="absolute top-[-50%] right-[-50%] w-[200%] h-[200%] bg-blue-600 rounded-full mix-blend-screen filter blur-[10px] opacity-70 animate-blob animation-delay-2000"></div>
+                                <div className="absolute bottom-[-50%] left-[20%] w-[200%] h-[200%] bg-indigo-600 rounded-full mix-blend-screen filter blur-[10px] opacity-70 animate-blob animation-delay-4000"></div>
+                              </div>
 
                               {/* Botón del módulo */}
                               <button
@@ -276,11 +277,12 @@ export const Sidebar = () => {
       {/* Contenido principal */}
       <main
         className={`
-        flex-1 transition-all overflow-y-auto flex flex-col
+        flex-1 transition-all overflow-y-scroll flex flex-col
         ${isSidebarOpen ? "md:ml-64" : "md:ml-0"}
       `}
+        style={{ scrollbarGutter: "stable" }}
       >
-        <div className="bg-gray-50 p-3 lg:p-4 flex-1 flex flex-col">
+        <div className="bg-white lg:p-4 flex-1 flex flex-col">
           <Outlet />
         </div>
       </main>

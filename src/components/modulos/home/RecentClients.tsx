@@ -41,7 +41,7 @@ export const RecentClients = () => {
   }
 
   return (
-    <Card className="border-none shadow-sm ring-1 ring-gray-200 hover:ring-gray-300 transition-all">
+    <Card className="h-full border-none shadow-sm ring-1 ring-gray-200 hover:ring-gray-300 transition-all">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
           <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">

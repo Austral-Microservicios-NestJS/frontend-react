@@ -19,12 +19,9 @@ export const ConfirmClearChatModal = ({
     <ModalContainer isOpen={isOpen} onClose={onClose} size="sm">
       <div className="bg-white rounded-lg overflow-hidden">
         <div className="px-6">
-          <ModalHeader
-            title="Limpiar conversación"
-            onClose={onClose}
-          />
+          <ModalHeader title="Limpiar conversación" onClose={onClose} />
         </div>
-        
+
         <ModalBody className="p-6">
           <div className="flex items-start gap-4">
             <div className="p-3 bg-red-50 rounded-full shrink-0">
@@ -35,7 +32,8 @@ export const ConfirmClearChatModal = ({
                 ¿Estás seguro?
               </h3>
               <p className="text-sm text-gray-500 leading-relaxed">
-                Esta acción eliminará todo el historial de mensajes de esta conversación. Esta acción no se puede deshacer.
+                Esta acción eliminará todo el historial de mensajes de esta
+                conversación. Esta acción no se puede deshacer.
               </p>
             </div>
           </div>

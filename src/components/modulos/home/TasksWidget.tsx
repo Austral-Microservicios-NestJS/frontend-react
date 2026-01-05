@@ -50,7 +50,7 @@ export const TasksWidget = () => {
   }
 
   return (
-    <Card className="border-none shadow-sm ring-1 ring-gray-200 hover:ring-gray-300 transition-all">
+    <Card className="h-full border-none shadow-sm ring-1 ring-gray-200 hover:ring-gray-300 transition-all">
       <CardHeader className="pb-2">
         <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
           <div className="p-1.5 bg-blue-50 text-[--austral-azul] rounded-md">
