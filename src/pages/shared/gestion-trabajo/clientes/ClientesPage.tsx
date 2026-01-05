@@ -3,14 +3,27 @@ import { Header, BotonRegistro } from "@/components/shared";
 import { useSidebar } from "@/hooks/useSidebar";
 import { useAuthStore } from "@/store/auth.store";
 import { RegistrarCliente } from "@/components/modulos/clientes/modales/RegistrarCliente";
+import { EditarCliente } from "@/components/modulos/clientes/modales/EditarCliente";
 import { useClientes } from "@/hooks/useCliente";
 import { TablaClientes } from "@/components/modulos/clientes/tablas/TablaClientes";
+import type { Cliente, UpdateCliente } from "@/types/cliente.interface";
 
 export default function ClientesPage() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRegistrarOpen, setIsRegistrarOpen] = useState(false);
+  const [editingCliente, setEditingCliente] = useState<Cliente | null>(null);
   const { user } = useAuthStore();
-  const { clientes, addCliente } = useClientes();
+  const { clientes, addCliente, updateCliente } = useClientes();
+
+  const handleEdit = (cliente: Cliente) => {
+    setEditingCliente(cliente);
+  };
+
+  const handleUpdate = async (data: UpdateCliente) => {
+    if (editingCliente) {
+      await updateCliente(editingCliente.idCliente, data);
+    }
+  };
 
   return (
     <>
@@ -22,19 +35,27 @@ export default function ClientesPage() {
       >
         <BotonRegistro
           label="Registrar Cliente"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => setIsRegistrarOpen(true)}
         />
       </Header>
 
-      {/* Aquí iría el contenido principal de la página de clientes */}
-      <TablaClientes clientes={clientes} />
+      <TablaClientes clientes={clientes} onEdit={handleEdit} />
 
       <RegistrarCliente
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isRegistrarOpen}
+        onClose={() => setIsRegistrarOpen(false)}
         addCliente={addCliente}
         user={user!}
       />
+
+      {editingCliente && (
+        <EditarCliente
+          isOpen={!!editingCliente}
+          onClose={() => setEditingCliente(null)}
+          onSubmit={handleUpdate}
+          cliente={editingCliente}
+        />
+      )}
     </>
   );
 }

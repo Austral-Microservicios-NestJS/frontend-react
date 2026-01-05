@@ -2,13 +2,26 @@ import { useState } from "react";
 import { Header, BotonRegistro } from "@/components/shared";
 import { useSidebar } from "@/hooks/useSidebar";
 import { RegistrarRamo } from "@/components/modulos/ramos/modales/RegistrarRamo";
+import { EditarRamo } from "@/components/modulos/ramos/modales/EditarRamo";
 import { TablaRamos } from "@/components/modulos/ramos/tablas/TablaRamos";
 import { useRamos } from "@/hooks/useRamos";
+import type { Ramo, UpdateRamoDto } from "@/types/ramo.interface";
 
 export default function RamosPage() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const { ramos, addRamo, isLoading } = useRamos();
+  const [isRegistrarOpen, setIsRegistrarOpen] = useState(false);
+  const [editingRamo, setEditingRamo] = useState<Ramo | null>(null);
+  const { ramos, addRamo, updateRamo, isLoading } = useRamos();
+
+  const handleEdit = (ramo: Ramo) => {
+    setEditingRamo(ramo);
+  };
+
+  const handleUpdate = async (data: UpdateRamoDto) => {
+    if (editingRamo) {
+      await updateRamo(editingRamo.idRamo, data);
+    }
+  };
 
   return (
     <>
@@ -20,7 +33,7 @@ export default function RamosPage() {
       >
         <BotonRegistro
           label="Registrar Ramo"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => setIsRegistrarOpen(true)}
         />
       </Header>
 
@@ -30,15 +43,24 @@ export default function RamosPage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           </div>
         ) : (
-          <TablaRamos ramos={ramos} />
+          <TablaRamos ramos={ramos} onEdit={handleEdit} />
         )}
       </>
 
       <RegistrarRamo
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isRegistrarOpen}
+        onClose={() => setIsRegistrarOpen(false)}
         addRamo={addRamo}
       />
+
+      {editingRamo && (
+        <EditarRamo
+          isOpen={!!editingRamo}
+          onClose={() => setEditingRamo(null)}
+          onSubmit={handleUpdate}
+          ramo={editingRamo}
+        />
+      )}
     </>
   );
 }

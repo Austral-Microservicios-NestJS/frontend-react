@@ -2,13 +2,20 @@ import { Table } from "@/components/shared";
 import { type ColumnDef } from "@tanstack/react-table";
 import { type Cliente } from "@/types/cliente.interface";
 import { useNavigate } from "react-router-dom";
-import { FileText } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  PopoverClose,
+} from "@/components/ui/popover";
+import { FileText, MoreHorizontal, Pencil } from "lucide-react";
 
 interface TablaClientesProps {
   clientes: Cliente[];
+  onEdit?: (cliente: Cliente) => void;
 }
 
-export const TablaClientes = ({ clientes }: TablaClientesProps) => {
+export const TablaClientes = ({ clientes, onEdit }: TablaClientesProps) => {
   const navigate = useNavigate();
 
   const columns: ColumnDef<Cliente>[] = [
@@ -75,36 +82,6 @@ export const TablaClientes = ({ clientes }: TablaClientesProps) => {
         </div>
       ),
     },
-    // {
-    //   accessorKey: "direccion",
-    //   header: "Dirección",
-    //   cell: ({ row }) => {
-    //     const cliente = row.original;
-    //     const ubicacion = [
-    //       cliente.direccion,
-    //       cliente.distrito,
-    //       cliente.provincia,
-    //       cliente.departamento
-    //     ].filter(Boolean).join(", ");
-
-    //     return (
-    //       <div className="text-sm text-gray-600 max-w-xs truncate" title={ubicacion}>
-    //         {ubicacion || "-"}
-    //       </div>
-    //     );
-    //   },
-    // },
-    // {
-    //   accessorKey: "cumpleanos",
-    //   header: "Cumpleaños",
-    //   cell: ({ row }) => (
-    //     <div className="text-sm text-gray-600">
-    //       {row.original.cumpleanos
-    //         ? new Date(row.original.cumpleanos).toLocaleDateString("es-PE")
-    //         : "-"}
-    //     </div>
-    //   ),
-    // },
     {
       accessorKey: "recibirNotificaciones",
       header: "Notificaciones",
@@ -135,28 +112,48 @@ export const TablaClientes = ({ clientes }: TablaClientesProps) => {
         </span>
       ),
     },
-    // {
-    //   accessorKey: "fechaCreacion",
-    //   header: "Fecha Creación",
-    //   cell: ({ row }) => (
-    //     <div className="text-sm text-gray-600">
-    //       {new Date(row.original.fechaCreacion).toLocaleDateString("es-PE")}
-    //     </div>
-    //   ),
-    // },
     {
       id: "acciones",
       header: "Acciones",
       cell: ({ row }) => (
-        <button
-          onClick={() => navigate(`/dashboard/gestion-trabajo/clientes/${row.original.idCliente}/polizas`)}
-          className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white rounded-lg transition-colors hover:opacity-90"
-          style={{ backgroundColor: "var(--austral-azul)" }}
-          title="Ver pólizas del cliente"
-        >
-          <FileText className="w-4 h-4" />
-          Pólizas
-        </button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              title="Acciones"
+            >
+              <MoreHorizontal className="w-5 h-5 text-gray-600" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-48 p-1" align="end">
+            <div className="flex flex-col">
+              {onEdit && (
+                <PopoverClose asChild>
+                  <button
+                    onClick={() => onEdit(row.original)}
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                  >
+                    <Pencil className="w-4 h-4" />
+                    Editar
+                  </button>
+                </PopoverClose>
+              )}
+              <PopoverClose asChild>
+                <button
+                  onClick={() =>
+                    navigate(
+                      `/dashboard/gestion-trabajo/clientes/${row.original.idCliente}/polizas`
+                    )
+                  }
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                >
+                  <FileText className="w-4 h-4" />
+                  Ver Pólizas
+                </button>
+              </PopoverClose>
+            </div>
+          </PopoverContent>
+        </Popover>
       ),
     },
   ];

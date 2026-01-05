@@ -5,3 +5,4 @@ export * from "./checkbox";
 export * from "./textarea";
 export * from "./select";
 export * from "./card";
+export * from "./popover";

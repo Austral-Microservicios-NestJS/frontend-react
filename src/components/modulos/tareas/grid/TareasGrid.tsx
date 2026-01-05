@@ -1,4 +1,4 @@
-import { Grid } from "@/components/shared";
+import { Grid, BotonEditar, BotonEliminar } from "@/components/shared";
 import type { Tarea } from "@/types/tarea.interface";
 import {
   Calendar,
@@ -11,9 +11,11 @@ import {
 
 interface Props {
   tareas: Tarea[];
+  onEdit?: (tarea: Tarea) => void;
+  onDelete?: (tarea: Tarea) => void;
 }
 
-export const TareasGrid = ({ tareas }: Props) => {
+export const TareasGrid = ({ tareas, onEdit, onDelete }: Props) => {
   const getPrioridadColor = (prioridad: string) => {
     switch (prioridad) {
       case "ALTA":
@@ -79,10 +81,18 @@ export const TareasGrid = ({ tareas }: Props) => {
         const vencida = isVencida(tarea.fechaVencimiento);
 
         return (
-          <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-5 border border-gray-200">
+          <div className="group bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-5 border border-gray-200 relative">
+            {/* Botones de acción - visibles en hover */}
+            {(onEdit || onDelete) && (
+              <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                {onEdit && <BotonEditar onClick={() => onEdit(tarea)} />}
+                {onDelete && <BotonEliminar onClick={() => onDelete(tarea)} />}
+              </div>
+            )}
+
             {/* Header con tipo y prioridad */}
             <div className="flex items-start justify-between mb-3">
-              <div className="flex-1">
+              <div className="flex-1 pr-16">
                 <h3 className="font-semibold text-lg text-gray-900 mb-1 line-clamp-2">
                   {tarea.asunto}
                 </h3>
@@ -90,7 +100,11 @@ export const TareasGrid = ({ tareas }: Props) => {
                   {getTipoTareaLabel(tarea.tipoTarea)}
                 </span>
               </div>
-              <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${getPrioridadColor(tarea.prioridad)}`}>
+              <div
+                className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${getPrioridadColor(
+                  tarea.prioridad
+                )}`}
+              >
                 <Flag className="w-3 h-3" />
                 {tarea.prioridad}
               </div>
@@ -106,8 +120,15 @@ export const TareasGrid = ({ tareas }: Props) => {
             {/* Fecha de vencimiento */}
             <div className="flex items-center gap-2 mb-3">
               <Calendar className="w-4 h-4 text-gray-500" />
-              <span className={`text-sm ${vencida && tarea.estado !== "COMPLETADA" ? "text-red-600 font-semibold" : "text-gray-600"}`}>
-                Vence: {new Date(tarea.fechaVencimiento).toLocaleDateString("es-PE")}
+              <span
+                className={`text-sm ${
+                  vencida && tarea.estado !== "COMPLETADA"
+                    ? "text-red-600 font-semibold"
+                    : "text-gray-600"
+                }`}
+              >
+                Vence:{" "}
+                {new Date(tarea.fechaVencimiento).toLocaleDateString("es-PE")}
                 {vencida && tarea.estado !== "COMPLETADA" && (
                   <span className="ml-2 text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded-full">
                     Vencida
@@ -118,11 +139,13 @@ export const TareasGrid = ({ tareas }: Props) => {
 
             {/* Estado */}
             <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${estadoConfig.color}`}>
+              <div
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${estadoConfig.color}`}
+              >
                 {estadoConfig.icon}
                 {estadoConfig.label}
               </div>
-              
+
               <div className="text-xs text-gray-400">
                 {new Date(tarea.fechaCreacion).toLocaleDateString("es-PE")}
               </div>

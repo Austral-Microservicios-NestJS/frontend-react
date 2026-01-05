@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import {
   ModalContainer,
   Modal,
@@ -10,55 +9,49 @@ import {
 } from "@/components/shared";
 import { Input, Label } from "@/components/ui";
 import { useForm } from "react-hook-form";
-import type { CreateCompaniaDto } from "@/types/compania.interface";
+import type { Compania, UpdateCompaniaDto } from "@/types/compania.interface";
 
-interface RegistrarCompaniaProps {
+interface EditarCompaniaProps {
   isOpen: boolean;
   onClose: () => void;
-  addCompania: (data: CreateCompaniaDto) => Promise<void>;
+  onSubmit: (data: UpdateCompaniaDto) => Promise<void>;
+  compania: Compania;
 }
 
-export const RegistrarCompania = ({
+export const EditarCompania = ({
   isOpen,
   onClose,
-  addCompania,
-}: RegistrarCompaniaProps) => {
+  onSubmit,
+  compania,
+}: EditarCompaniaProps) => {
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
-  } = useForm<CreateCompaniaDto>({
+  } = useForm<UpdateCompaniaDto>({
     defaultValues: {
-      ruc: "",
-      razonSocial: "",
-      nombreComercial: "",
-      direccion: "",
-      telefono: "",
-      email: "",
-      web: "",
-      logoUrl: "",
+      ruc: compania.ruc,
+      razonSocial: compania.razonSocial,
+      nombreComercial: compania.nombreComercial,
+      direccion: compania.direccion || "",
+      telefono: compania.telefono || "",
+      email: compania.email || "",
+      web: compania.web || "",
+      logoUrl: compania.logoUrl || "",
     },
   });
 
-  // Resetear formulario cuando el modal se cierra
-  useEffect(() => {
-    if (!isOpen) {
-      reset();
-    }
-  }, [isOpen, reset]);
-
-  const onSubmit = async (data: CreateCompaniaDto) => {
-    await addCompania(data);
+  const handleFormSubmit = async (data: UpdateCompaniaDto) => {
+    await onSubmit(data);
     onClose();
   };
 
   return (
     <ModalContainer isOpen={isOpen} onClose={onClose} size="lg">
       <Modal>
-        <ModalHeader title="Registrar Nueva Compañía" onClose={onClose} />
+        <ModalHeader title="Editar Compañía" onClose={onClose} />
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(handleFormSubmit)}>
           <ModalBody>
             <FormGroupDivisor>
               <FormGroup>
@@ -161,7 +154,7 @@ export const RegistrarCompania = ({
               className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
               style={{ backgroundColor: "var(--austral-azul)" }}
             >
-              Guardar
+              Actualizar
             </button>
           </ModalFooter>
         </form>

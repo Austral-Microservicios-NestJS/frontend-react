@@ -15,7 +15,9 @@ export const actividadApi = {
   },
 
   getAllByUsuario: async (idUsuario: string) => {
-    const response = await api.get<{ data: Actividad[] }>(`/actividades/usuario/${idUsuario}`);
+    const response = await api.get<{ data: Actividad[] }>(
+      `/actividades/usuario/${idUsuario}`
+    );
     return response.data.data || [];
   },
 
@@ -30,7 +32,10 @@ export const actividadApi = {
   },
 
   update: async (id: string, actividad: UpdateActividad) => {
-    const response = await api.patch<Actividad>(`/actividades/${id}`, actividad);
+    const response = await api.patch<Actividad>(
+      `/actividades/${id}`,
+      actividad
+    );
     return response.data;
   },
 
@@ -78,6 +83,16 @@ export const actividadApi = {
     return useMutation({
       mutationFn: ({ id, data }: { id: string; data: UpdateActividad }) =>
         actividadApi.update(id, data),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ACTIVIDADES_KEY });
+      },
+    });
+  },
+
+  useDelete: () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+      mutationFn: (id: string) => actividadApi.delete(id),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ACTIVIDADES_KEY });
       },

@@ -1,12 +1,13 @@
-import { Table } from "@/components/shared";
+import { Table, BotonEditar } from "@/components/shared";
 import { type ColumnDef } from "@tanstack/react-table";
 import { type Usuario } from "@/types/usuario.interface";
 
 interface TablaUsuariosProps {
   usuarios: Usuario[];
+  onEdit?: (usuario: Usuario) => void;
 }
 
-export const TablaUsuarios = ({ usuarios }: TablaUsuariosProps) => {
+export const TablaUsuarios = ({ usuarios, onEdit }: TablaUsuariosProps) => {
   const columns: ColumnDef<Usuario>[] = [
     {
       accessorKey: "nombreUsuario",
@@ -39,17 +40,17 @@ export const TablaUsuarios = ({ usuarios }: TablaUsuariosProps) => {
       accessorKey: "correo",
       header: "Correo",
       cell: ({ row }) => (
-        <div className="text-sm text-gray-600">
-          {row.original.correo}
-        </div>
+        <div className="text-sm text-gray-600">{row.original.correo}</div>
       ),
     },
     {
       accessorKey: "rol.nombreRol",
       header: "Rol",
       cell: ({ row }) => (
-        <span className="px-2 py-1 text-xs font-medium rounded-full text-white"
-          style={{ backgroundColor: 'var(--austral-azul)' }}>
+        <span
+          className="px-2 py-1 text-xs font-medium rounded-full text-white"
+          style={{ backgroundColor: "var(--austral-azul)" }}
+        >
           {row.original.rol?.nombreRol || "-"}
         </span>
       ),
@@ -73,7 +74,8 @@ export const TablaUsuarios = ({ usuarios }: TablaUsuariosProps) => {
       header: "Documento",
       cell: ({ row }) => (
         <div className="text-sm text-gray-600">
-          {row.original.persona?.tipoDocumento || "-"}: {row.original.persona?.numeroDocumento || "-"}
+          {row.original.persona?.tipoDocumento || "-"}:{" "}
+          {row.original.persona?.numeroDocumento || "-"}
         </div>
       ),
     },
@@ -107,6 +109,15 @@ export const TablaUsuarios = ({ usuarios }: TablaUsuariosProps) => {
       cell: ({ row }) => (
         <div className="text-sm text-gray-600">
           {new Date(row.original.fechaCreacion).toLocaleDateString("es-PE")}
+        </div>
+      ),
+    },
+    {
+      id: "acciones",
+      header: "Acciones",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          {onEdit && <BotonEditar onClick={() => onEdit(row.original)} />}
         </div>
       ),
     },

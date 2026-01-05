@@ -38,6 +38,7 @@ import CobranzasPage from "@/pages/shared/control-seguimiento/cobranzas/Cobranza
 
 // Componentes de informacion extra
 import CompaniasExtraPage from "@/pages/shared/informacion-extra/companias/CompaniasExtraPage";
+import AgentesDocumentosPage from "@/pages/shared/agentes-ia/documentos/AgentesDocumentosPage";
 
 // Definición de rutas
 const router = createBrowserRouter([
@@ -208,6 +209,16 @@ const router = createBrowserRouter([
       },
 
       // Agentes de IA
+      {
+        path: "agentes-ia/documentos", // Modulo principal, desde aqui se accede a los modulos de documentos especificos
+        element: (
+          <ProtectedRoute
+            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
+          >
+            <AgentesDocumentosPage />
+          </ProtectedRoute>
+        ),
+      },
       {
         path: "agentes-ia/agente-dni",
         element: (

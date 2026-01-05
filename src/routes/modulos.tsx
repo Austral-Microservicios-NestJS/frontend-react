@@ -114,25 +114,9 @@ export const moduleCategories = [
     title: "Agentes IA",
     modules: [
       {
-        id: 61,
-        name: "Agente de Facturas",
-        path: "/dashboard/agentes-ia/agente-facturas",
-        icon: Bot,
-        roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
-        type: ["CRM"] as ModuleType[],
-      },
-      {
-        id: 62,
-        name: "Agente de DNI",
-        path: "/dashboard/agentes-ia/agente-dni",
-        icon: Bot,
-        roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
-        type: ["CRM"] as ModuleType[],
-      },
-      {
-        id: 63,
-        name: "Agente de Pólizas",
-        path: "/dashboard/agentes-ia/agente-polizas",
+        id: 60,
+        name: "Ag. de Documentos",
+        path: "/dashboard/agentes-ia/documentos",
         icon: Bot,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
         type: ["CRM", "ERP"] as ModuleType[],

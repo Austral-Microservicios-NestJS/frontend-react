@@ -19,43 +19,36 @@ import {
 } from "@/components/ui";
 import { useForm, Controller } from "react-hook-form";
 import { tipoActividadOptions } from "@/types/actividad.interface";
-import type { User } from "@/store/auth.store";
-import { useEffect } from "react";
+import type { Actividad } from "@/types/actividad.interface";
+import dayjs from "dayjs";
 
-interface RegistrarActividadProps {
+interface EditarActividadProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: any) => Promise<void>;
-  user: User;
+  actividad: Actividad;
 }
 
-export const RegistrarActividad = ({
+export const EditarActividad = ({
   isOpen,
   onClose,
   onSubmit,
-  user,
-}: RegistrarActividadProps) => {
+  actividad,
+}: EditarActividadProps) => {
   const {
     register,
     handleSubmit,
     control,
-    reset,
     formState: {},
   } = useForm({
     defaultValues: {
-      titulo: "",
-      tipoActividad: "",
-      fechaActividad: "",
-      descripcion: "",
-      creadaPor: user.idUsuario,
+      titulo: actividad.titulo,
+      tipoActividad: actividad.tipoActividad,
+      fechaActividad: dayjs(actividad.fechaActividad).format("YYYY-MM-DD"),
+      descripcion: actividad.descripcion || "",
+      creadaPor: actividad.creadaPor,
     },
   });
-
-  useEffect(() => {
-    if (!isOpen) {
-      reset();
-    }
-  }, [isOpen, reset]);
 
   const handleFormSubmit = async (data: any) => {
     await onSubmit(data);
@@ -63,14 +56,9 @@ export const RegistrarActividad = ({
   };
 
   return (
-    <ModalContainer
-      isOpen={isOpen}
-      onClose={onClose}
-      size="lg"
-      onAfterClose={() => reset()}
-    >
+    <ModalContainer isOpen={isOpen} onClose={onClose} size="lg">
       <Modal>
-        <ModalHeader title="Registrar Nueva Actividad" onClose={onClose} />
+        <ModalHeader title="Editar Actividad" onClose={onClose} />
 
         <form onSubmit={handleSubmit(handleFormSubmit)}>
           <ModalBody>
@@ -138,7 +126,7 @@ export const RegistrarActividad = ({
               className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
               style={{ backgroundColor: "var(--austral-azul)" }}
             >
-              Guardar
+              Actualizar
             </button>
           </ModalFooter>
         </form>
