@@ -1,6 +1,10 @@
 import { useMemo } from "react";
 import { toast } from "sonner";
-import type { CreateActividad, UpdateActividad, TipoActividad } from "@/types/actividad.interface";
+import type {
+  CreateActividad,
+  UpdateActividad,
+  TipoActividad,
+} from "@/types/actividad.interface";
 import { actividadService } from "@/services/actividad.service";
 import { useAuthStore } from "@/store/auth.store";
 
@@ -9,7 +13,10 @@ export const useActividades = (params?: { page?: number; limit?: number }) => {
   const idUsuario = user?.idUsuario || "";
 
   // Obtener actividades del usuario actual
-  const { data, isLoading, error } = actividadService.useGetByUsuario(idUsuario, params);
+  const { data, isLoading, error } = actividadService.useGetByUsuario(
+    idUsuario,
+    params
+  );
   const actividades = data?.data || [];
   const meta = data?.meta;
 
@@ -43,7 +50,11 @@ export const useActividades = (params?: { page?: number; limit?: number }) => {
     const ahora = new Date();
     return actividades
       .filter((a) => new Date(a.fechaActividad) >= ahora)
-      .sort((a, b) => new Date(a.fechaActividad).getTime() - new Date(b.fechaActividad).getTime())
+      .sort(
+        (a, b) =>
+          new Date(a.fechaActividad).getTime() -
+          new Date(b.fechaActividad).getTime()
+      )
       .slice(0, 5);
   }, [actividades]);
 
@@ -57,7 +68,10 @@ export const useActividades = (params?: { page?: number; limit?: number }) => {
     }
   };
 
-  const updateActividad = async (id: string, actividadData: UpdateActividad) => {
+  const updateActividad = async (
+    id: string,
+    actividadData: UpdateActividad
+  ) => {
     try {
       await updateMutation.mutateAsync({ id, data: actividadData });
       toast.success("Actividad actualizada exitosamente");

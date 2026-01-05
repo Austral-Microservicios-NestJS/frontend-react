@@ -1,4 +1,4 @@
-import { Table } from "@/components/shared";
+import { Table, BotonEditar } from "@/components/shared";
 import { type ColumnDef } from "@tanstack/react-table";
 import { type Ramo } from "@/types/ramo.interface";
 import { useNavigate } from "react-router-dom";
@@ -6,9 +6,10 @@ import { Package } from "lucide-react";
 
 interface TablaRamosProps {
   ramos: Ramo[];
+  onEdit?: (ramo: Ramo) => void;
 }
 
-export const TablaRamos = ({ ramos }: TablaRamosProps) => {
+export const TablaRamos = ({ ramos, onEdit }: TablaRamosProps) => {
   const navigate = useNavigate();
 
   const columns: ColumnDef<Ramo>[] = [
@@ -89,19 +90,22 @@ export const TablaRamos = ({ ramos }: TablaRamosProps) => {
       id: "acciones",
       header: "Acciones",
       cell: ({ row }) => (
-        <button
-          onClick={() =>
-            navigate(
-              `/dashboard/admin/maestros/ramos/${row.original.idRamo}/productos`
-            )
-          }
-          className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white rounded-lg transition-colors hover:opacity-90"
-          style={{ backgroundColor: "var(--austral-azul)" }}
-          title="Ver productos del ramo"
-        >
-          <Package className="w-4 h-4" />
-          Productos
-        </button>
+        <div className="flex items-center gap-2">
+          {onEdit && <BotonEditar onClick={() => onEdit(row.original)} />}
+          <button
+            onClick={() =>
+              navigate(
+                `/dashboard/admin/maestros/ramos/${row.original.idRamo}/productos`
+              )
+            }
+            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white rounded-lg transition-colors hover:opacity-90"
+            style={{ backgroundColor: "var(--austral-azul)" }}
+            title="Ver productos del ramo"
+          >
+            <Package className="w-4 h-4" />
+            Productos
+          </button>
+        </div>
       ),
     },
   ];

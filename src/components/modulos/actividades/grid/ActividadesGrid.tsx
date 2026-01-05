@@ -1,20 +1,15 @@
-import { Grid } from "@/components/shared";
+import { Grid, BotonEditar, BotonEliminar } from "@/components/shared";
 import type { Actividad } from "@/types/actividad.interface";
-import {
-  Calendar,
-  Clock,
-  Phone,
-  Mail,
-  Users,
-  FileText,
-} from "lucide-react";
+import { Calendar, Clock, Phone, Mail, Users, FileText } from "lucide-react";
 import dayjs from "dayjs";
 
 interface Props {
   actividades: Actividad[];
+  onEdit?: (actividad: Actividad) => void;
+  onDelete?: (actividad: Actividad) => void;
 }
 
-export const ActividadesGrid = ({ actividades }: Props) => {
+export const ActividadesGrid = ({ actividades, onEdit, onDelete }: Props) => {
   const getTipoActividadConfig = (tipo: string) => {
     switch (tipo) {
       case "REUNION":
@@ -53,7 +48,9 @@ export const ActividadesGrid = ({ actividades }: Props) => {
   const isProxima = (fechaActividad: string) => {
     const fecha = new Date(fechaActividad);
     const hoy = new Date();
-    const diferenciaDias = Math.ceil((fecha.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
+    const diferenciaDias = Math.ceil(
+      (fecha.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24)
+    );
     return diferenciaDias >= 0 && diferenciaDias <= 3;
   };
 
@@ -70,15 +67,27 @@ export const ActividadesGrid = ({ actividades }: Props) => {
         const pasada = isPasada(actividad.fechaActividad);
 
         return (
-          <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-5 border border-gray-200">
+          <div className="group bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-5 border border-gray-200 relative">
+            {/* Botones de acción - visibles en hover */}
+            {(onEdit || onDelete) && (
+              <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                {onEdit && <BotonEditar onClick={() => onEdit(actividad)} />}
+                {onDelete && (
+                  <BotonEliminar onClick={() => onDelete(actividad)} />
+                )}
+              </div>
+            )}
+
             {/* Header con tipo de actividad */}
             <div className="flex items-start justify-between mb-3">
-              <div className="flex-1">
+              <div className="flex-1 pr-16">
                 <h3 className="font-semibold text-lg text-gray-900 mb-1 line-clamp-2">
                   {actividad.titulo}
                 </h3>
               </div>
-              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${tipoConfig.color}`}>
+              <div
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${tipoConfig.color}`}
+              >
                 {tipoConfig.icon}
                 {tipoConfig.label}
               </div>
@@ -95,13 +104,15 @@ export const ActividadesGrid = ({ actividades }: Props) => {
             <div className="space-y-2 mb-4">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-gray-500" />
-                <span className={`text-sm ${
-                  proxima && !pasada
-                    ? "text-orange-600 font-semibold"
-                    : pasada
-                    ? "text-gray-400"
-                    : "text-gray-600"
-                }`}>
+                <span
+                  className={`text-sm ${
+                    proxima && !pasada
+                      ? "text-orange-600 font-semibold"
+                      : pasada
+                      ? "text-gray-400"
+                      : "text-gray-600"
+                  }`}
+                >
                   {dayjs(actividad.fechaActividad).format("DD/MM/YYYY")}
                 </span>
               </div>
@@ -109,10 +120,13 @@ export const ActividadesGrid = ({ actividades }: Props) => {
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-gray-500" />
                 <span className="text-sm text-gray-600">
-                  {new Date(actividad.fechaActividad).toLocaleTimeString("es-PE", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  {new Date(actividad.fechaActividad).toLocaleTimeString(
+                    "es-PE",
+                    {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }
+                  )}
                 </span>
               </div>
             </div>
@@ -136,7 +150,7 @@ export const ActividadesGrid = ({ actividades }: Props) => {
                   </span>
                 )}
               </div>
-              
+
               <div className="text-xs text-gray-400">
                 Creada: {dayjs(actividad.fechaCreacion).format("DD/MM/YYYY")}
               </div>
@@ -150,4 +164,3 @@ export const ActividadesGrid = ({ actividades }: Props) => {
     />
   );
 };
-

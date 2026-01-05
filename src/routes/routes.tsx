@@ -19,7 +19,6 @@ import ClientesPage from "@/pages/shared/gestion-trabajo/clientes/ClientesPage";
 import AgenteDniPage from "@/pages/shared/agentes-ia/documentos/agente-dni/AgenteDniPage";
 import AgenteFacturaPage from "@/pages/shared/agentes-ia/documentos/agente-factura/AgenteFacturaPage";
 import AgentePolizaPage from "@/pages/shared/agentes-ia/documentos/agente-poliza/AgentePolizaPage";
-import AustralAIPage from "@/pages/shared/agentes-ia/austral-ai/AustralAIPage";
 
 // Componentes de maestros - Administrador
 import UsuariosPage from "@/pages/admin/maestros/usuarios/UsuariosPage";
@@ -39,6 +38,7 @@ import CobranzasPage from "@/pages/shared/control-seguimiento/cobranzas/Cobranza
 
 // Componentes de informacion extra
 import CompaniasExtraPage from "@/pages/shared/informacion-extra/companias/CompaniasExtraPage";
+import AgentesDocumentosPage from "@/pages/shared/agentes-ia/documentos/AgentesDocumentosPage";
 
 // Definición de rutas
 const router = createBrowserRouter([
@@ -210,12 +210,12 @@ const router = createBrowserRouter([
 
       // Agentes de IA
       {
-        path: "agentes-ia/austral-ai",
+        path: "agentes-ia/documentos", // Modulo principal, desde aqui se accede a los modulos de documentos especificos
         element: (
           <ProtectedRoute
             requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
           >
-            <AustralAIPage />
+            <AgentesDocumentosPage />
           </ProtectedRoute>
         ),
       },

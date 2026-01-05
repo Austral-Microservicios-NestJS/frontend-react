@@ -1,5 +1,9 @@
 import { api } from "@/config/api-client";
-import type { Actividad, CreateActividad, UpdateActividad } from "@/types/actividad.interface";
+import type {
+  Actividad,
+  CreateActividad,
+  UpdateActividad,
+} from "@/types/actividad.interface";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const QUERY_KEY = "actividades";
@@ -8,7 +12,10 @@ const QUERY_KEY = "actividades";
 
 export const actividadService = {
   // Listar todas las actividades con paginación
-  getAll: async (params?: { page?: number; limit?: number }): Promise<{ data: Actividad[]; meta: any }> => {
+  getAll: async (params?: {
+    page?: number;
+    limit?: number;
+  }): Promise<{ data: Actividad[]; meta: any }> => {
     try {
       const response = await api.get("/actividades", { params });
       return response.data;
@@ -25,9 +32,14 @@ export const actividadService = {
   },
 
   // Listar actividades por usuario
-  getByUsuario: async (idUsuario: string, params?: { page?: number; limit?: number }): Promise<{ data: Actividad[]; meta: any }> => {
+  getByUsuario: async (
+    idUsuario: string,
+    params?: { page?: number; limit?: number }
+  ): Promise<{ data: Actividad[]; meta: any }> => {
     try {
-      const response = await api.get(`/actividades/usuario/${idUsuario}`, { params });
+      const response = await api.get(`/actividades/usuario/${idUsuario}`, {
+        params,
+      });
       return response.data;
     } catch (error) {
       console.error("Error al obtener actividades del usuario:", error);
@@ -42,7 +54,13 @@ export const actividadService = {
   },
 
   // Actualizar actividad
-  update: async ({ id, data: actividadData }: { id: string; data: UpdateActividad }): Promise<Actividad> => {
+  update: async ({
+    id,
+    data: actividadData,
+  }: {
+    id: string;
+    data: UpdateActividad;
+  }): Promise<Actividad> => {
     const { data } = await api.patch(`/actividades/${id}`, actividadData);
     return data;
   },
@@ -71,7 +89,10 @@ export const actividadService = {
     });
   },
 
-  useGetByUsuario: (idUsuario: string, params?: { page?: number; limit?: number }) => {
+  useGetByUsuario: (
+    idUsuario: string,
+    params?: { page?: number; limit?: number }
+  ) => {
     return useQuery({
       queryKey: [QUERY_KEY, "usuario", idUsuario, params],
       queryFn: () => actividadService.getByUsuario(idUsuario, params),

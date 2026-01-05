@@ -1,12 +1,58 @@
 import { useState } from "react";
-import { Header, BotonRegistro } from "@/components/shared";
+import { Header, BotonRegistro, ModalConfirmacion } from "@/components/shared";
 import { useSidebar } from "@/hooks/useSidebar";
+<<<<<<< HEAD
+import { RegistrarActividad } from "@/components/modulos/actividades/modales/RegistrarActividad";
+import { EditarActividad } from "@/components/modulos/actividades/modales/EditarActividad";
+import { ActividadesGrid } from "@/components/modulos/actividades/grid/ActividadesGrid";
+=======
 import { Calendar, Activity, CheckSquare } from "lucide-react";
+>>>>>>> 8207b74c9fcf3c84d9717768838deedfd5963393
 import { useActividades } from "@/hooks/useActividades";
 import { useAuthStore } from "@/store/auth.store";
+import type { Actividad, UpdateActividad } from "@/types/actividad.interface";
 
 export default function ActividadesPage() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
+<<<<<<< HEAD
+  const [isRegistrarOpen, setIsRegistrarOpen] = useState(false);
+  const [editingActividad, setEditingActividad] = useState<Actividad | null>(
+    null
+  );
+  const [deletingActividad, setDeletingActividad] = useState<Actividad | null>(
+    null
+  );
+  const { user } = useAuthStore();
+  const { actividades, addActividad, updateActividad, deleteActividad } =
+    useActividades();
+
+  const handleEdit = (actividad: Actividad) => {
+    setEditingActividad(actividad);
+  };
+
+  const handleDeleteClick = (actividad: Actividad) => {
+    setDeletingActividad(actividad);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deletingActividad) {
+      await deleteActividad(deletingActividad.idActividad);
+      setDeletingActividad(null);
+    }
+  };
+
+  const handleUpdate = async (data: any) => {
+    if (editingActividad) {
+      const updateData: UpdateActividad = {
+        titulo: data.titulo,
+        descripcion: data.descripcion,
+        tipoActividad: data.tipoActividad,
+        fechaActividad: data.fechaActividad,
+      };
+      await updateActividad(editingActividad.idActividad, updateData);
+    }
+  };
+=======
   const [, setIsModalOpen] = useState(false);
 
   const { } = useAuthStore();
@@ -39,16 +85,58 @@ export default function ActividadesPage() {
       </>
     );
   }
+>>>>>>> 8207b74c9fcf3c84d9717768838deedfd5963393
 
   return (
     <>
       <Header
         title="Actividades"
+<<<<<<< HEAD
+        description="Gestiona tus actividades pendientes"
+=======
         description="Gestiona tus actividades y eventos"
+>>>>>>> 8207b74c9fcf3c84d9717768838deedfd5963393
         isSidebarOpen={isSidebarOpen}
         onToggleSidebar={toggleSidebar}
       >
         <BotonRegistro
+<<<<<<< HEAD
+          label="Registrar Actividad"
+          onClick={() => setIsRegistrarOpen(true)}
+        />
+      </Header>
+
+      <ActividadesGrid
+        actividades={actividades}
+        onEdit={handleEdit}
+        onDelete={handleDeleteClick}
+      />
+
+      <RegistrarActividad
+        isOpen={isRegistrarOpen}
+        onClose={() => setIsRegistrarOpen(false)}
+        onSubmit={addActividad}
+        user={user!}
+      />
+
+      {editingActividad && (
+        <EditarActividad
+          isOpen={!!editingActividad}
+          onClose={() => setEditingActividad(null)}
+          onSubmit={handleUpdate}
+          actividad={editingActividad}
+        />
+      )}
+
+      <ModalConfirmacion
+        isOpen={!!deletingActividad}
+        onClose={() => setDeletingActividad(null)}
+        onConfirm={handleConfirmDelete}
+        title="Eliminar Actividad"
+        message={`¿Estás seguro de eliminar la actividad "${deletingActividad?.titulo}"?`}
+        confirmText="Eliminar"
+      />
+=======
           label="Nueva Actividad"
           onClick={() => setIsModalOpen(true)}
         />
@@ -99,6 +187,7 @@ export default function ActividadesPage() {
           )}
         </div>
       </div>
+>>>>>>> 8207b74c9fcf3c84d9717768838deedfd5963393
     </>
   );
 }

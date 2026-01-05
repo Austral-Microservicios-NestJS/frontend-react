@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Header, BotonRegistro } from "@/components/shared";
+import { Header, BotonRegistro, ModalConfirmacion } from "@/components/shared";
 import { useSidebar } from "@/hooks/useSidebar";
 import {
   CheckCircle2,
@@ -14,6 +14,42 @@ import {
   List,
 } from "lucide-react";
 import { RegistrarTarea } from "@/components/modulos/tareas/modales/RegistrarTarea";
+<<<<<<< HEAD
+import { EditarTarea } from "@/components/modulos/tareas/modales/EditarTarea";
+import { TareasGrid } from "@/components/modulos/tareas/grid/TareasGrid";
+import { useTareas } from "@/hooks/useTareas";
+import { useAuthStore } from "@/store/auth.store";
+import type { Tarea, UpdateTarea } from "@/types/tarea.interface";
+
+export default function TareasPage() {
+  const { isSidebarOpen, toggleSidebar } = useSidebar();
+  const [isRegistrarOpen, setIsRegistrarOpen] = useState(false);
+  const [editingTarea, setEditingTarea] = useState<Tarea | null>(null);
+  const [deletingTarea, setDeletingTarea] = useState<Tarea | null>(null);
+  const { user } = useAuthStore();
+  const { tareas, addTarea, updateTarea, removeTarea, isLoading } = useTareas();
+
+  const handleEdit = (tarea: Tarea) => {
+    setEditingTarea(tarea);
+  };
+
+  const handleDeleteClick = (tarea: Tarea) => {
+    setDeletingTarea(tarea);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deletingTarea) {
+      await removeTarea(deletingTarea.idTarea);
+      setDeletingTarea(null);
+    }
+  };
+
+  const handleUpdate = async (data: UpdateTarea) => {
+    if (editingTarea) {
+      await updateTarea(editingTarea.idTarea, data);
+    }
+  };
+=======
 import { useTareas } from "@/hooks/useTareas";
 import { useAuthStore } from "@/store/auth.store";
 import { Button } from "@/components/ui/button";
@@ -40,6 +76,7 @@ export default function TareasPage() {
       </div>
     );
   }
+>>>>>>> 8207b74c9fcf3c84d9717768838deedfd5963393
 
   return (
     <div className="flex flex-col h-full bg-gray-50/50">
@@ -49,6 +86,12 @@ export default function TareasPage() {
         isSidebarOpen={isSidebarOpen}
         onToggleSidebar={toggleSidebar}
       >
+<<<<<<< HEAD
+        <BotonRegistro
+          label="Registrar Tarea"
+          onClick={() => setIsRegistrarOpen(true)}
+        />
+=======
         <div className="flex items-center gap-3">
           <div className="flex bg-white rounded-lg border border-gray-200 p-1">
             <button
@@ -77,6 +120,7 @@ export default function TareasPage() {
             onClick={() => setIsModalOpen(true)}
           />
         </div>
+>>>>>>> 8207b74c9fcf3c84d9717768838deedfd5963393
       </Header>
 
       <div className="flex-1 overflow-hidden flex flex-col p-6 space-y-6">
@@ -121,6 +165,15 @@ export default function TareasPage() {
               className="pl-9 bg-white border-gray-200 focus:border-blue-500 transition-colors h-9 text-sm rounded-md"
             />
           </div>
+<<<<<<< HEAD
+        ) : (
+          <TareasGrid
+            tareas={tareas}
+            onEdit={handleEdit}
+            onDelete={handleDeleteClick}
+          />
+        )}
+=======
           <Button
             variant="outline"
             size="sm"
@@ -160,14 +213,36 @@ export default function TareasPage() {
             />
           </div>
         </div>
+>>>>>>> 8207b74c9fcf3c84d9717768838deedfd5963393
       </div>
 
       <RegistrarTarea
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isRegistrarOpen}
+        onClose={() => setIsRegistrarOpen(false)}
         addTarea={addTarea}
         user={user!}
       />
+<<<<<<< HEAD
+
+      {editingTarea && (
+        <EditarTarea
+          isOpen={!!editingTarea}
+          onClose={() => setEditingTarea(null)}
+          onSubmit={handleUpdate}
+          tarea={editingTarea}
+        />
+      )}
+
+      <ModalConfirmacion
+        isOpen={!!deletingTarea}
+        onClose={() => setDeletingTarea(null)}
+        onConfirm={handleConfirmDelete}
+        title="Eliminar Tarea"
+        message={`¿Estás seguro de eliminar la tarea "${deletingTarea?.asunto}"?`}
+        confirmText="Eliminar"
+      />
+    </>
+=======
     </div>
   );
 }
@@ -274,5 +349,6 @@ function TareaCard({ tarea }: any) {
         </div>
       </div>
     </div>
+>>>>>>> 8207b74c9fcf3c84d9717768838deedfd5963393
   );
 }
