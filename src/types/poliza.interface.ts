@@ -1,3 +1,7 @@
+import type { Compania } from "./compania.interface";
+import type { Producto } from "./producto.interface";
+import type { Ramo } from "./ramo.interface";
+
 export interface Poliza {
   idPoliza: string;
   numeroPoliza: string;
@@ -14,10 +18,17 @@ export interface Poliza {
   vigenciaFin: string;
   estado: string;
   moneda: string;
+  sumaAsegurada?: number;
+  primaTotal?: number;
   comisionBroker: number;
   comisionAgente: number;
   tipoVigencia: TipoVigencia;
   descripcion?: string;
+  compania?: Compania;
+  producto?: Producto;
+  ramo?: Ramo;
+  createdAt?: string;
+  updatedAt?: string;
   fechaCreacion?: Date;
   fechaModificacion?: Date;
 }

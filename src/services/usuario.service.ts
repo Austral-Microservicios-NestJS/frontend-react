@@ -39,8 +39,9 @@ export const usuarioApi = {
     return response.data;
   },
 
-  desactivate: async (id: string) => {
-    await api.delete(`/usuarios/${id}`);
+  getBrokersBySupervisor: async (idSupervisor: string) => {
+    const response = await api.get<any[]>(`/usuarios/brokers/supervisor/${idSupervisor}`);
+    return response.data || [];
   },
 
   // ===== Hooks de React Query =====
@@ -57,6 +58,14 @@ export const usuarioApi = {
     return useQuery({
       queryKey: USUARIOS_KEY,
       queryFn: () => usuarioApi.getAll(),
+    });
+  },
+
+  useGetBrokersBySupervisor: (idSupervisor: string) => {
+    return useQuery({
+      queryKey: [...USUARIOS_KEY, "brokers", "supervisor", idSupervisor],
+      queryFn: () => usuarioApi.getBrokersBySupervisor(idSupervisor),
+      enabled: !!idSupervisor,
     });
   },
 

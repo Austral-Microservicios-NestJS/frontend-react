@@ -2,12 +2,23 @@ import { Table } from "@/components/shared";
 import { type ColumnDef } from "@tanstack/react-table";
 import { type Poliza } from "@/types/poliza.interface";
 import { FileText, Calendar } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  PopoverClose,
+} from "@/components/ui/popover";
+import { MoreHorizontal, Pencil } from "lucide-react";
+import { useState } from "react";
+import { DetallePolizaModal } from "../modales/DetallePolizaModal";
 
 interface TablaPolizasProps {
   polizas: Poliza[];
+  onEdit?: (poliza: Poliza) => void;
 }
 
-export const TablaPolizas = ({ polizas }: TablaPolizasProps) => {
+export const TablaPolizas = ({ polizas, onEdit }: TablaPolizasProps) => {
+  const [selectedPoliza, setSelectedPoliza] = useState<Poliza | null>(null);
   const columns: ColumnDef<Poliza>[] = [
     {
       accessorKey: "numeroPoliza",
@@ -106,9 +117,50 @@ export const TablaPolizas = ({ polizas }: TablaPolizasProps) => {
         </span>
       ),
     },
+    {
+      id: "acciones",
+      header: "Acciones",
+      cell: ({ row }) => (
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              title="Acciones"
+            >
+              <MoreHorizontal className="w-5 h-5 text-gray-600" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-48 p-1" align="end">
+            <div className="flex flex-col">
+              {onEdit && (
+                <PopoverClose asChild>
+                  <button
+                    onClick={() => onEdit(row.original)}
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                  >
+                    <Pencil className="w-4 h-4" />
+                    Editar
+                  </button>
+                </PopoverClose>
+              )}
+              <PopoverClose asChild>
+                <button
+                  onClick={() => setSelectedPoliza(row.original)}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                >
+                  <FileText className="w-4 h-4" />
+                  Ver Detalles
+                </button>
+              </PopoverClose>
+            </div>
+          </PopoverContent>
+        </Popover>
+      ),
+    },
   ];
 
   return (
+    <>
     <Table
       data={polizas}
       columns={columns}
@@ -120,6 +172,15 @@ export const TablaPolizas = ({ polizas }: TablaPolizasProps) => {
       emptyMessage="No hay pólizas registradas para este cliente"
       tableId="tabla-polizas-cliente"
     />
+
+    {selectedPoliza && (
+      <DetallePolizaModal
+        isOpen={!!selectedPoliza}
+        onClose={() => setSelectedPoliza(null)}
+        poliza={selectedPoliza}
+      />
+    )}
+    </>
   );
 };
 

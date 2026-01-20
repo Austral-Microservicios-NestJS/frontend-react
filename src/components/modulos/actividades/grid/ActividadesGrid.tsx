@@ -67,26 +67,29 @@ export const ActividadesGrid = ({ actividades, onEdit, onDelete }: Props) => {
         const pasada = isPasada(actividad.fechaActividad);
 
         return (
-          <div className="group bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-5 border border-gray-200 relative">
-            {/* Botones de acción - visibles en hover */}
-            {(onEdit || onDelete) && (
-              <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                {onEdit && <BotonEditar onClick={() => onEdit(actividad)} />}
-                {onDelete && (
-                  <BotonEliminar onClick={() => onDelete(actividad)} />
-                )}
-              </div>
-            )}
-
-            {/* Header con tipo de actividad */}
+          <div className="group bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-4 sm:p-5 border border-gray-200 relative">
+            {/* Header con título y botones */}
             <div className="flex items-start justify-between mb-3">
-              <div className="flex-1 pr-16">
+              <div className="flex-1">
                 <h3 className="font-semibold text-lg text-gray-900 mb-1 line-clamp-2">
                   {actividad.titulo}
                 </h3>
               </div>
+              {/* Botones de acción - siempre visibles */}
+              {(onEdit || onDelete) && (
+                <div className="flex gap-1 ml-2">
+                  {onEdit && <BotonEditar onClick={() => onEdit(actividad)} />}
+                  {onDelete && (
+                    <BotonEliminar onClick={() => onDelete(actividad)} />
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Badge del tipo de actividad - debajo del título */}
+            <div className="mb-3">
               <div
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${tipoConfig.color}`}
+                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${tipoConfig.color}`}
               >
                 {tipoConfig.icon}
                 {tipoConfig.label}
@@ -101,9 +104,9 @@ export const ActividadesGrid = ({ actividades, onEdit, onDelete }: Props) => {
             )}
 
             {/* Fecha y hora de la actividad */}
-            <div className="space-y-2 mb-4">
+            <div className="flex flex-col sm:flex-row sm:gap-4 gap-2 mb-4">
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-gray-500" />
+                <Calendar className="w-4 h-4 text-gray-500 flex-shrink-0" />
                 <span
                   className={`text-sm ${
                     proxima && !pasada
@@ -118,7 +121,7 @@ export const ActividadesGrid = ({ actividades, onEdit, onDelete }: Props) => {
               </div>
 
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-gray-500" />
+                <Clock className="w-4 h-4 text-gray-500 flex-shrink-0" />
                 <span className="text-sm text-gray-600">
                   {new Date(actividad.fechaActividad).toLocaleTimeString(
                     "es-PE",
@@ -132,8 +135,8 @@ export const ActividadesGrid = ({ actividades, onEdit, onDelete }: Props) => {
             </div>
 
             {/* Footer con indicadores */}
-            <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-              <div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-3 border-t border-gray-100 gap-2">
+              <div className="flex flex-wrap gap-2">
                 {proxima && !pasada && (
                   <span className="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800">
                     Próxima

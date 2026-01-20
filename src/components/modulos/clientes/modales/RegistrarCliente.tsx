@@ -25,6 +25,20 @@ import {
 } from "@/types/cliente.interface";
 import type { User } from "@/store/auth.store";
 
+// Opciones de prefijos de países
+const countryPrefixes = [
+  { code: "+51", name: "Perú" },
+  { code: "+56", name: "Chile" },
+  { code: "+54", name: "Argentina" },
+  { code: "+57", name: "Colombia" },
+  { code: "+58", name: "Venezuela" },
+  { code: "+52", name: "México" },
+  { code: "+1", name: "Estados Unidos" },
+  { code: "+34", name: "España" },
+  { code: "+593", name: "Ecuador" },
+  { code: "+595", name: "Paraguay" },
+];
+
 interface RegistrarClienteProps {
   isOpen: boolean;
   onClose: () => void;
@@ -63,6 +77,9 @@ export const RegistrarCliente = ({
       cumpleanos: "",
       tipoDocumento: "",
       numeroDocumento: "",
+      telefono1Prefix: "+51",
+      telefono2Prefix: "+51",
+      whatsappPrefix: "+51",
       asignadoA: user.idUsuario,
       registradoPor: user.idUsuario,
     },
@@ -78,9 +95,13 @@ export const RegistrarCliente = ({
   }, [isOpen, reset]);
 
   const onSubmit = async (data: any) => {
+    const { telefono1Prefix, telefono2Prefix, whatsappPrefix, ...dataWithoutPrefixes } = data;
     const dataSubmit = {
-      ...data,
+      ...dataWithoutPrefixes,
       numeroDocumento: Number(data.numeroDocumento),
+      telefono1: data.telefono1 ? `${telefono1Prefix}${data.telefono1}` : null,
+      telefono2: data.telefono2 ? `${telefono2Prefix}${data.telefono2}` : null,
+      whatsapp: data.whatsapp ? `${whatsappPrefix}${data.whatsapp}` : null,
     };
 
     await addCliente(dataSubmit);
@@ -227,33 +248,96 @@ export const RegistrarCliente = ({
                 />
               </FormGroup>
             </FormGroupDivisor>
-            <FormGroupDivisor columns={3}>
+            <FormGroupDivisor columns={1}>
               <FormGroup>
                 <Label htmlFor="telefono1">Telefono Principal</Label>
-                <Input
-                  id="telefono1"
-                  type="text"
-                  placeholder="Ej: 999888777"
-                  {...register("telefono1", { required: true })}
-                />
+                <div className="flex gap-2">
+                  <Controller
+                    name="telefono1Prefix"
+                    control={control}
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger className="w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {countryPrefixes.map((prefix) => (
+                            <SelectItem key={prefix.code} value={prefix.code}>
+                              {prefix.name} ({prefix.code})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  <Input
+                    id="telefono1"
+                    type="text"
+                    placeholder="999888777"
+                    className="flex-1"
+                    {...register("telefono1")}
+                  />
+                </div>
               </FormGroup>
               <FormGroup>
                 <Label htmlFor="telefono2">Telefono Secundario</Label>
-                <Input
-                  id="telefono2"
-                  type="text"
-                  placeholder="Ej: 999888777"
-                  {...register("telefono2", { required: true })}
-                />
+                <div className="flex gap-2">
+                  <Controller
+                    name="telefono2Prefix"
+                    control={control}
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger className="w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {countryPrefixes.map((prefix) => (
+                            <SelectItem key={prefix.code} value={prefix.code}>
+                              {prefix.name} ({prefix.code})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  <Input
+                    id="telefono2"
+                    type="text"
+                    placeholder="999888777"
+                    className="flex-1"
+                    {...register("telefono2")}
+                  />
+                </div>
               </FormGroup>
               <FormGroup>
-                <Label htmlFor="telefono3">WhatsApp</Label>
-                <Input
-                  id="whatsapp"
-                  type="text"
-                  placeholder="Ej: 999888777"
-                  {...register("whatsapp", { required: true })}
-                />
+                <Label htmlFor="whatsapp">WhatsApp</Label>
+                <div className="flex gap-2">
+                  <Controller
+                    name="whatsappPrefix"
+                    control={control}
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger className="w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {countryPrefixes.map((prefix) => (
+                            <SelectItem key={prefix.code} value={prefix.code}>
+                              {prefix.name} ({prefix.code})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  <Input
+                    id="whatsapp"
+                    type="text"
+                    placeholder="999888777"
+                    className="flex-1"
+                    {...register("whatsapp")}
+                  />
+                </div>
               </FormGroup>
             </FormGroupDivisor>
             <FormGroupDivisor>

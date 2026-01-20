@@ -81,18 +81,10 @@ export const TareasGrid = ({ tareas, onEdit, onDelete }: Props) => {
         const vencida = isVencida(tarea.fechaVencimiento);
 
         return (
-          <div className="group bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-5 border border-gray-200 relative">
-            {/* Botones de acción - visibles en hover */}
-            {(onEdit || onDelete) && (
-              <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                {onEdit && <BotonEditar onClick={() => onEdit(tarea)} />}
-                {onDelete && <BotonEliminar onClick={() => onDelete(tarea)} />}
-              </div>
-            )}
-
-            {/* Header con tipo y prioridad */}
+          <div className="group bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-4 sm:p-5 border border-gray-200 relative">
+            {/* Header con título y botones */}
             <div className="flex items-start justify-between mb-3">
-              <div className="flex-1 pr-16">
+              <div className="flex-1">
                 <h3 className="font-semibold text-lg text-gray-900 mb-1 line-clamp-2">
                   {tarea.asunto}
                 </h3>
@@ -100,8 +92,19 @@ export const TareasGrid = ({ tareas, onEdit, onDelete }: Props) => {
                   {getTipoTareaLabel(tarea.tipoTarea)}
                 </span>
               </div>
+              {/* Botones de acción - siempre visibles */}
+              {(onEdit || onDelete) && (
+                <div className="flex gap-1 ml-2">
+                  {onEdit && <BotonEditar onClick={() => onEdit(tarea)} />}
+                  {onDelete && <BotonEliminar onClick={() => onDelete(tarea)} />}
+                </div>
+              )}
+            </div>
+
+            {/* Badge de prioridad - debajo del título */}
+            <div className="mb-3">
               <div
-                className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${getPrioridadColor(
+                className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${getPrioridadColor(
                   tarea.prioridad
                 )}`}
               >
@@ -118,8 +121,8 @@ export const TareasGrid = ({ tareas, onEdit, onDelete }: Props) => {
             )}
 
             {/* Fecha de vencimiento */}
-            <div className="flex items-center gap-2 mb-3">
-              <Calendar className="w-4 h-4 text-gray-500" />
+            <div className="flex items-center gap-2 mb-4">
+              <Calendar className="w-4 h-4 text-gray-500 flex-shrink-0" />
               <span
                 className={`text-sm ${
                   vencida && tarea.estado !== "COMPLETADA"
@@ -138,7 +141,7 @@ export const TareasGrid = ({ tareas, onEdit, onDelete }: Props) => {
             </div>
 
             {/* Estado */}
-            <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-3 border-t border-gray-100 gap-2">
               <div
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${estadoConfig.color}`}
               >

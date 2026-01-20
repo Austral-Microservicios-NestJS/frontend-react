@@ -29,6 +29,7 @@ import { useCompanias } from "@/hooks/useCompanias";
 import { useRamos } from "@/hooks/useRamos";
 import { productoApi } from "@/services/producto.service";
 import { asignacionApi } from "@/services/asignacion.service";
+import { usuarioApi } from "@/services/usuario.service";
 import { useAuthStore } from "@/store/auth.store";
 import dayjs from "dayjs";
 
@@ -100,11 +101,16 @@ export const RegistrarPoliza = ({
   // Obtener productos del ramo seleccionado
   const { data: productos = [] } = productoApi.useGetByRamo(watchIdRamo || "");
 
+  // Obtener brokers para admin
+  const { data: brokers = [] } = usuarioApi.useGetBrokersBySupervisor(
+    isAdmin ? user?.idUsuario || "" : ""
+  );
+
   // Obtener subordinados según el rol
-  // ADMIN: obtiene sus brokers directos
+  // ADMIN: obtiene sus brokers directos (ya obtenido arriba)
   // BROKER: obtiene sus agentes
   const { data: subordinados = [] } = asignacionApi.useGetSubordinados(
-    isAdmin ? user?.idUsuario || "" : isBroker ? user?.idUsuario || "" : ""
+    isAdmin ? "" : isBroker ? user?.idUsuario || "" : ""
   );
 
   // Obtener agentes del broker seleccionado (solo para ADMIN)
@@ -214,43 +220,37 @@ export const RegistrarPoliza = ({
 
   // Auto-poblar comisiones cuando se selecciona broker
   useEffect(() => {
-    if (watchIdBroker) {
-      // Para ADMINISTRADOR: buscar en sus subordinados
-      if (isAdmin && subordinados.length > 0) {
-        const brokerAsignacion = subordinados.find(
-          (asig) => asig.subordinado.idUsuario === watchIdBroker
-        );
-        if (brokerAsignacion) {
-          setValue("comisionBroker", brokerAsignacion.porcentajeComision);
-        }
+    if (watchIdBroker && isAdmin) {
+      const selectedBroker = brokers.find(b => b.idUsuario === watchIdBroker);
+      if (selectedBroker) {
+        setValue("comisionBroker", selectedBroker.porcentajeComision);
       }
+    }
 
-      // Para BROKER: usar su propia asignación con el supervisor
-      // Necesitamos obtener la asignación donde el broker es subordinado
-      if (isBroker && watchIdBroker === user?.idUsuario) {
-        // Obtener supervisor del broker para obtener su comisión
-        asignacionApi.getSupervisor(user.idUsuario).then((data) => {
+    // Para BROKER: usar su propia asignación con el supervisor
+    if (isBroker && watchIdBroker === user?.idUsuario) {
+      // Obtener supervisor del broker para obtener su comisión
+      asignacionApi.getSupervisor(user.idUsuario).then((data) => {
+        if (data) {
+          setValue("comisionBroker", data.porcentajeComision);
+        }
+      });
+    }
+
+    // Para AGENTE: usar la comisión del broker desde supervisorAsignacion
+    if (isAgent && supervisorAsignacion) {
+      // El broker del agente es su supervisor
+      // Necesitamos obtener la comisión del broker (supervisor del agente)
+      // que viene de la asignación ADMIN->BROKER
+      if (supervisorAsignacion.supervisor.idUsuario === watchIdBroker) {
+        asignacionApi.getSupervisor(watchIdBroker).then((data) => {
           if (data) {
             setValue("comisionBroker", data.porcentajeComision);
           }
         });
       }
-
-      // Para AGENTE: usar la comisión del broker desde supervisorAsignacion
-      if (isAgent && supervisorAsignacion) {
-        // El broker del agente es su supervisor
-        // Necesitamos obtener la comisión del broker (supervisor del agente)
-        // que viene de la asignación ADMIN->BROKER
-        if (supervisorAsignacion.supervisor.idUsuario === watchIdBroker) {
-          asignacionApi.getSupervisor(watchIdBroker).then((data) => {
-            if (data) {
-              setValue("comisionBroker", data.porcentajeComision);
-            }
-          });
-        }
-      }
     }
-  }, [watchIdBroker, subordinados, isAdmin, isBroker, isAgent, supervisorAsignacion, user, setValue]);
+  }, [watchIdBroker, brokers, isAdmin, isBroker, isAgent, supervisorAsignacion, user, setValue]);
 
   // Auto-poblar comisión de agente cuando se selecciona
   useEffect(() => {
@@ -285,8 +285,13 @@ export const RegistrarPoliza = ({
   }, [watchIdAgente, agentesDelBroker, subordinados, isAdmin, isBroker, isAgent, supervisorAsignacion, user, setValue]);
 
   const onSubmit = async (data: CreatePolizaDto) => {
-    console.log(data);
-    await addPoliza(data);
+    const dataToSend = {
+      ...data,
+      idBroker: data.idBroker || null,
+      idAgente: data.idAgente || null,
+    };
+    console.log(dataToSend);
+    await addPoliza(dataToSend);
     onClose();
   };
 
@@ -491,19 +496,14 @@ export const RegistrarPoliza = ({
                           <SelectValue placeholder="Seleccionar broker..." />
                         </SelectTrigger>
                         <SelectContent>
-                          {subordinados
-                            .filter(
-                              (asig) => asig.subordinado.rol?.nombreRol === "BROKER"
-                            )
-                            .map((asig) => (
-                              <SelectItem
-                                key={asig.subordinado.idUsuario}
-                                value={asig.subordinado.idUsuario}
-                              >
-                                {asig.subordinado.nombreUsuario} (
-                                {asig.porcentajeComision}%)
-                              </SelectItem>
-                            ))}
+                          {brokers.map((broker) => (
+                            <SelectItem
+                              key={broker.idUsuario}
+                              value={broker.idUsuario}
+                            >
+                              {broker.nombreUsuario}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     )}

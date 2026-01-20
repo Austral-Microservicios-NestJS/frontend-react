@@ -10,29 +10,25 @@ export const POLIZAS_KEY = ["polizas"];
 
 export const polizaApi = {
   getAll: async () => {
-    const response = await api.get<{ data: Poliza[] }>(`/polizas`);
-    return response.data.data || [];
+    const response = await api.get<Poliza[]>(`/polizas`);
+    return response.data || [];
   },
 
   getAllByCliente: async (idCliente: string) => {
-    const response = await api.get<{ data: Poliza[] }>(
-      `/polizas/cliente/${idCliente}`
-    );
-    return response.data.data || [];
+    const response = await api.get<Poliza[]>(`/polizas/cliente/${idCliente}`);
+    return response.data || [];
   },
 
   getAllByUsuario: async (userId: string) => {
-    const response = await api.get<{ data: Poliza[] }>(
-      `/polizas/usuario/${userId}`
-    );
-    return response.data.data || [];
+    const response = await api.get<Poliza[]>(`/polizas/usuario/${userId}`);
+    return response.data || [];
   },
 
   getAllByUsuarios: async (userIds: string[]) => {
-    const response = await api.post<{ data: Poliza[] }>(`/polizas/usuarios`, {
+    const response = await api.post<Poliza[]>(`/polizas/usuarios`, {
       userIds,
     });
-    return response.data.data || [];
+    return response.data || [];
   },
 
   getById: async (id: string) => {
