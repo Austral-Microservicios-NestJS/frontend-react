@@ -77,7 +77,17 @@ export const RegistrarProducto = ({
   }, [isOpen, reset, idRamo]);
 
   const onSubmit = async (data: CreateProductoDto) => {
-    await addProducto(data);
+    // Normalizar/trimear campos y loguear payload para depuración en producción
+    const payload = {
+      ...data,
+      codigo: data.codigo ? String(data.codigo).trim() : data.codigo,
+      nombre: data.nombre ? String(data.nombre).trim() : data.nombre,
+      descripcion: data.descripcion ? String(data.descripcion).trim() : data.descripcion,
+    };
+
+    console.log("RegistrarProducto onSubmit payload:", payload);
+
+    await addProducto(payload);
     onClose();
   };
 
