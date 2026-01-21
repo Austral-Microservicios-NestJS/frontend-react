@@ -23,6 +23,7 @@ import { useForm, Controller } from "react-hook-form";
 import type { CreateProductoDto } from "@/types/producto.interface";
 import { useCompanias } from "@/hooks/useCompanias";
 import { useRamos } from "@/hooks/useRamos";
+import { toast } from "sonner";
 
 interface RegistrarProductoProps {
   isOpen: boolean;
@@ -45,6 +46,8 @@ export const RegistrarProducto = ({
     handleSubmit,
     reset,
     control,
+    getValues,
+    watch,
     formState: { errors },
   } = useForm<CreateProductoDto>({
     defaultValues: {
@@ -77,7 +80,7 @@ export const RegistrarProducto = ({
   }, [isOpen, reset, idRamo]);
 
   const onSubmit = async (data: CreateProductoDto) => {
-    // Normalizar/trimear campos y loguear payload para depuración en producción
+    // Normalizar/trimear campos y loguear payload + estado del form para depuración
     const payload = {
       ...data,
       codigo: data.codigo ? String(data.codigo).trim() : data.codigo,
@@ -86,6 +89,26 @@ export const RegistrarProducto = ({
     };
 
     console.log("RegistrarProducto onSubmit payload:", payload);
+
+    // Validación cliente: evitar enviar si campos obligatorios están vacíos
+    if (!payload.nombre || String(payload.nombre).trim() === "") {
+      toast.error("El nombre del producto es obligatorio");
+      return;
+    }
+    if (!payload.descripcion || String(payload.descripcion).trim() === "") {
+      toast.error("La descripción del producto es obligatoria");
+      return;
+    }
+    try {
+      console.log("RegistrarProducto getValues():", getValues());
+    } catch (e) {
+      console.log("RegistrarProducto getValues() error:", e);
+    }
+    try {
+      console.log("RegistrarProducto watch nombre, descripcion:", watch("nombre"), watch("descripcion"));
+    } catch (e) {
+      console.log("RegistrarProducto watch() error:", e);
+    }
 
     await addProducto(payload);
     onClose();
