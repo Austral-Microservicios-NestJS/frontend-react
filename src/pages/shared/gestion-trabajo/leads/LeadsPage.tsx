@@ -33,7 +33,6 @@ export default function LeadsPage() {
     leadsByEstado,
     addLead,
     updateLead,
-    deleteLead,
     cambiarEstadoLead,
     isLoading,
     error,
@@ -57,9 +56,6 @@ export default function LeadsPage() {
     }
   };
 
-  const handleDeleteLead = async (id: string) => {
-    await deleteLead(id);
-  };
 
   const handleDrop = async (leadId: string, nuevoEstado: EstadoLead) => {
     await cambiarEstadoLead(leadId, nuevoEstado);

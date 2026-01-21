@@ -1,9 +1,6 @@
-import { Header } from "@/components/shared";
-import { useSidebar } from "@/hooks/useSidebar";
 import {
   Send,
   Bot,
-  User,
   Mic,
   MicOff,
   FileText,
@@ -46,7 +43,6 @@ declare global {
 import { ConfirmClearChatModal } from "@/components/modulos/agentes-ia/modales/ConfirmClearChatModal";
 
 export default function AustralAIPage() {
-  const { isSidebarOpen, toggleSidebar } = useSidebar();
   const { user } = useAuthStore();
   const { messages, conversationId, addMessage, setConversationId, clearChat } =
     useChatStore();

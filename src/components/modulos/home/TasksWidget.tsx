@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTareas } from "@/hooks/useTareas";
-import { CheckSquare, Clock, AlertCircle } from "lucide-react";
+import { CheckSquare, Clock } from "lucide-react";
 import dayjs from "dayjs";
 import { Link } from "react-router-dom";
 import "dayjs/locale/es";

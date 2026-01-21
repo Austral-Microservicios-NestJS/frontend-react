@@ -14,7 +14,7 @@ export default function TareasPage() {
   const [editingTarea, setEditingTarea] = useState<Tarea | null>(null);
   const [deletingTarea, setDeletingTarea] = useState<Tarea | null>(null);
   const { user } = useAuthStore();
-  const { tareas, addTarea, updateTarea, removeTarea, isLoading } = useTareas();
+  const { tareas, addTarea, updateTarea, deleteTarea, isLoading } = useTareas();
 
   const handleEdit = (tarea: Tarea) => {
     setEditingTarea(tarea);
@@ -26,7 +26,7 @@ export default function TareasPage() {
 
   const handleConfirmDelete = async () => {
     if (deletingTarea) {
-      await removeTarea(deletingTarea.idTarea);
+      await deleteTarea(deletingTarea.idTarea);
       setDeletingTarea(null);
     }
   };

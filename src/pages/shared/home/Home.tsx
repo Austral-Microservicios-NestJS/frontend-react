@@ -9,7 +9,7 @@ import { Menu } from "lucide-react";
 
 const Home = () => {
   const { user } = useAuthStore();
-  const { isSidebarOpen, toggleSidebar } = useSidebar();
+  const { toggleSidebar } = useSidebar();
   const displayName = user?.nombreUsuario || "Usuario";
 
   return (
@@ -29,11 +29,13 @@ const Home = () => {
         <div className="flex items-center gap-4">
           <div className="relative shrink-0">
             <div className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-4 border-white shadow-lg ring-1 ring-gray-200">
-              <img
-                src={user?.foto || "https://github.com/shadcn.png"}
-                alt={displayName}
-                className="w-full h-full object-cover"
-              />
+                <img
+                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                    displayName
+                  )}&background=ffffff&color=0b1a2b`}
+                  alt={displayName}
+                  className="w-full h-full object-cover"
+                />
             </div>
             <div className="absolute bottom-1 right-1 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full shadow-sm"></div>
           </div>

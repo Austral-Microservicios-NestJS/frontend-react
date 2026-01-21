@@ -53,7 +53,6 @@ export const EditarTarea = ({
       fechaVencimiento: dayjs(tarea.fechaVencimiento).format("YYYY-MM-DD"),
       prioridad: tarea.prioridad,
       estado: tarea.estado,
-      creadaPor: tarea.creadaPor,
     },
   });
 

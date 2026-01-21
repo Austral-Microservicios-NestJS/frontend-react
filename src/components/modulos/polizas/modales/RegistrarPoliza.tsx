@@ -53,6 +53,7 @@ export const RegistrarPoliza = ({
   const { companias } = useCompanias();
   const { ramos } = useRamos();
   const { user } = useAuthStore();
+  const uid = user?.idUsuario;
 
   // Obtener el rol del usuario
   const userRole = user?.rol.nombreRol || "";
@@ -161,15 +162,15 @@ export const RegistrarPoliza = ({
 
   // Establecer idBroker cuando el modal está abierto y el usuario es BROKER
   useEffect(() => {
-    if (isOpen && isBroker && user?.idUsuario) {
-      setValue("idBroker", user.idUsuario, { shouldValidate: true });
+    if (isOpen && isBroker && uid) {
+      setValue("idBroker", uid, { shouldValidate: true });
     }
   }, [isOpen, isBroker, user, setValue]);
 
   // Establecer idAgente e idBroker cuando el modal está abierto y el usuario es AGENTE
   useEffect(() => {
-    if (isOpen && isAgent && user?.idUsuario) {
-      setValue("idAgente", user.idUsuario, { shouldValidate: true });
+    if (isOpen && isAgent && uid) {
+      setValue("idAgente", uid, { shouldValidate: true });
       
       // Esperar a que llegue la información del supervisor
       if (supervisorAsignacion?.supervisor?.idUsuario) {
@@ -228,9 +229,9 @@ export const RegistrarPoliza = ({
     }
 
     // Para BROKER: usar su propia asignación con el supervisor
-    if (isBroker && watchIdBroker === user?.idUsuario) {
+    if (isBroker && watchIdBroker === uid) {
       // Obtener supervisor del broker para obtener su comisión
-      asignacionApi.getSupervisor(user.idUsuario).then((data) => {
+      asignacionApi.getSupervisor(uid!).then((data) => {
         if (data) {
           setValue("comisionBroker", data.porcentajeComision);
         }
@@ -287,8 +288,8 @@ export const RegistrarPoliza = ({
   const onSubmit = async (data: CreatePolizaDto) => {
     const dataToSend = {
       ...data,
-      idBroker: data.idBroker || null,
-      idAgente: data.idAgente || null,
+      idBroker: data.idBroker || undefined,
+      idAgente: data.idAgente || undefined,
     };
     console.log(dataToSend);
     await addPoliza(dataToSend);

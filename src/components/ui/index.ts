@@ -6,3 +6,4 @@ export * from "./textarea";
 export * from "./select";
 export * from "./card";
 export * from "./popover";
+export * from "./ButtonIA";

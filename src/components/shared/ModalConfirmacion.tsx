@@ -3,7 +3,6 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
-  ModalFooter,
 } from "@/components/shared";
 
 interface ModalConfirmacionProps {

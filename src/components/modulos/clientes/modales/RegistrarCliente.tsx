@@ -95,7 +95,12 @@ export const RegistrarCliente = ({
   }, [isOpen, reset]);
 
   const onSubmit = async (data: any) => {
-    const { telefono1Prefix, telefono2Prefix, whatsappPrefix, ...dataWithoutPrefixes } = data;
+    const {
+      telefono1Prefix,
+      telefono2Prefix,
+      whatsappPrefix,
+      ...dataWithoutPrefixes
+    } = data;
     const dataSubmit = {
       ...dataWithoutPrefixes,
       numeroDocumento: Number(data.numeroDocumento),
@@ -248,7 +253,7 @@ export const RegistrarCliente = ({
                 />
               </FormGroup>
             </FormGroupDivisor>
-            <FormGroupDivisor columns={1}>
+            <FormGroupDivisor columns={3}>
               <FormGroup>
                 <Label htmlFor="telefono1">Telefono Principal</Label>
                 <div className="flex gap-2">
@@ -256,7 +261,10 @@ export const RegistrarCliente = ({
                     name="telefono1Prefix"
                     control={control}
                     render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <SelectTrigger className="w-32">
                           <SelectValue />
                         </SelectTrigger>
@@ -286,7 +294,10 @@ export const RegistrarCliente = ({
                     name="telefono2Prefix"
                     control={control}
                     render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <SelectTrigger className="w-32">
                           <SelectValue />
                         </SelectTrigger>
@@ -316,7 +327,10 @@ export const RegistrarCliente = ({
                     name="whatsappPrefix"
                     control={control}
                     render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <SelectTrigger className="w-32">
                           <SelectValue />
                         </SelectTrigger>
