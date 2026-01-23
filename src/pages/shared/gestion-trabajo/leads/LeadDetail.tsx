@@ -15,16 +15,29 @@ export default function LeadDetail() {
 
   const { data: lead, isLoading } = leadService.useGetById(id || "");
 
-  const [detalle, setDetalle] = useState<any | null>(null);
+  const [detalleVidaLey, setDetalleVidaLey] = useState<any | null>(null);
+  const [detalleAuto, setDetalleAuto] = useState<any | null>(null);
+  const [detalleSalud, setDetalleSalud] = useState<any | null>(null);
+  const [detalleSCTR, setDetalleSCTR] = useState<any | null>(null);
+  const [detalleVida, setDetalleVida] = useState<any | null>(null);
   const [leadState, setLeadState] = useState<any | null>(null);
 
   useEffect(() => {
-    if (lead && lead.detalleVidaLey) {
-      setDetalle({ ...lead.detalleVidaLey });
+    if (lead) {
+      setLeadState({ ...lead });
+      setDetalleVidaLey(lead.detalleVidaLey ? { ...lead.detalleVidaLey } : null);
+      setDetalleAuto(lead.detalleAuto ? { ...lead.detalleAuto } : null);
+      setDetalleSalud(lead.detalleSalud ? { ...lead.detalleSalud } : null);
+      setDetalleSCTR(lead.detalleSCTR ? { ...lead.detalleSCTR } : null);
+      setDetalleVida(lead.detalleVida ? { ...lead.detalleVida } : null);
     } else {
-      setDetalle(null);
+      setLeadState(null);
+      setDetalleVidaLey(null);
+      setDetalleAuto(null);
+      setDetalleSalud(null);
+      setDetalleSCTR(null);
+      setDetalleVida(null);
     }
-    if (lead) setLeadState({ ...lead });
   }, [lead]);
 
   const handleGoBack = () => {
@@ -320,8 +333,150 @@ export default function LeadDetail() {
               </div>
             </div>
 
-            {/* Detalles específicos del lead (ej. detalleVidaLey) */}
-            {detalle && (
+            {/* Detalle Auto */}
+            {detalleAuto && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <h3 className="font-semibold mb-2">Detalle Auto</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-500">Placa</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleAuto.placa ?? ""}
+                        onChange={(e) => setDetalleAuto((d: any) => ({ ...d, placa: e.target.value }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(detalleAuto.placa ?? "")}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar placa"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">Marca</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleAuto.marca ?? ""}
+                        onChange={(e) => setDetalleAuto((d: any) => ({ ...d, marca: e.target.value }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(detalleAuto.marca ?? "")}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar marca"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">Modelo</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleAuto.modelo ?? ""}
+                        onChange={(e) => setDetalleAuto((d: any) => ({ ...d, modelo: e.target.value }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(detalleAuto.modelo ?? "")}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar modelo"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">Año</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        value={detalleAuto.anio ?? ""}
+                        onChange={(e) => setDetalleAuto((d: any) => ({ ...d, anio: e.target.value ? Number(e.target.value) : undefined }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(String(detalleAuto.anio ?? ""))}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar año"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">Uso del vehículo</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleAuto.usoVehiculo ?? ""}
+                        onChange={(e) => setDetalleAuto((d: any) => ({ ...d, usoVehiculo: e.target.value }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(detalleAuto.usoVehiculo ?? "")}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar uso del vehículo"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">Valor comercial</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleAuto.valorComercial ?? ""}
+                        onChange={(e) => setDetalleAuto((d: any) => ({ ...d, valorComercial: e.target.value }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(detalleAuto.valorComercial ?? "")}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar valor comercial"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <p className="text-sm text-gray-500">Aseguradoras</p>
+                  <div className="flex items-center gap-2">
+                    <input
+                      value={detalleAuto.aseguradoras ?? ""}
+                      onChange={(e) => setDetalleAuto((d: any) => ({ ...d, aseguradoras: e.target.value }))}
+                      className="w-full border rounded px-2 py-1 text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => navigator.clipboard.writeText(detalleAuto.aseguradoras ?? "")}
+                      className="p-1 text-gray-500 hover:text-gray-800"
+                      title="Copiar aseguradoras"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Detalle Vida Ley */}
+            {detalleVidaLey && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                 <h3 className="font-semibold mb-2">Detalle Vida Ley</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -329,13 +484,13 @@ export default function LeadDetail() {
                     <p className="text-sm text-gray-500">RUC</p>
                     <div className="flex items-center gap-2">
                       <input
-                        value={detalle.rucEmpresa ?? ""}
-                        onChange={(e) => setDetalle((d: any) => ({ ...d, rucEmpresa: e.target.value }))}
+                        value={detalleVidaLey.rucEmpresa ?? ""}
+                        onChange={(e) => setDetalleVidaLey((d: any) => ({ ...d, rucEmpresa: e.target.value }))}
                         className="w-full border rounded px-2 py-1 text-sm"
                       />
                       <button
                         type="button"
-                        onClick={() => navigator.clipboard.writeText(detalle.rucEmpresa ?? "")}
+                        onClick={() => navigator.clipboard.writeText(detalleVidaLey.rucEmpresa ?? "")}
                         className="p-1 text-gray-500 hover:text-gray-800"
                         title="Copiar RUC"
                       >
@@ -348,13 +503,13 @@ export default function LeadDetail() {
                     <p className="text-sm text-gray-500">Razón social</p>
                     <div className="flex items-center gap-2">
                       <input
-                        value={detalle.razonSocial ?? ""}
-                        onChange={(e) => setDetalle((d: any) => ({ ...d, razonSocial: e.target.value }))}
+                        value={detalleVidaLey.razonSocial ?? ""}
+                        onChange={(e) => setDetalleVidaLey((d: any) => ({ ...d, razonSocial: e.target.value }))}
                         className="w-full border rounded px-2 py-1 text-sm"
                       />
                       <button
                         type="button"
-                        onClick={() => navigator.clipboard.writeText(detalle.razonSocial ?? "")}
+                        onClick={() => navigator.clipboard.writeText(detalleVidaLey.razonSocial ?? "")}
                         className="p-1 text-gray-500 hover:text-gray-800"
                         title="Copiar razón social"
                       >
@@ -368,13 +523,13 @@ export default function LeadDetail() {
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
-                        value={detalle.numeroEmpleadosPlanilla ?? ""}
-                        onChange={(e) => setDetalle((d: any) => ({ ...d, numeroEmpleadosPlanilla: e.target.value ? Number(e.target.value) : undefined }))}
+                        value={detalleVidaLey.numeroEmpleadosPlanilla ?? ""}
+                        onChange={(e) => setDetalleVidaLey((d: any) => ({ ...d, numeroEmpleadosPlanilla: e.target.value ? Number(e.target.value) : undefined }))}
                         className="w-full border rounded px-2 py-1 text-sm"
                       />
                       <button
                         type="button"
-                        onClick={() => navigator.clipboard.writeText(String(detalle.numeroEmpleadosPlanilla ?? ""))}
+                        onClick={() => navigator.clipboard.writeText(String(detalleVidaLey.numeroEmpleadosPlanilla ?? ""))}
                         className="p-1 text-gray-500 hover:text-gray-800"
                         title="Copiar número de empleados"
                       >
@@ -390,13 +545,13 @@ export default function LeadDetail() {
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
-                        value={detalle.planillaMensual ?? ""}
-                        onChange={(e) => setDetalle((d: any) => ({ ...d, planillaMensual: e.target.value }))}
+                        value={detalleVidaLey.planillaMensual ?? ""}
+                        onChange={(e) => setDetalleVidaLey((d: any) => ({ ...d, planillaMensual: e.target.value }))}
                         className="w-full border rounded px-2 py-1 text-sm"
                       />
                       <button
                         type="button"
-                        onClick={() => navigator.clipboard.writeText(String(detalle.planillaMensual ?? ""))}
+                        onClick={() => navigator.clipboard.writeText(String(detalleVidaLey.planillaMensual ?? ""))}
                         className="p-1 text-gray-500 hover:text-gray-800"
                         title="Copiar planilla mensual"
                       >
@@ -411,14 +566,14 @@ export default function LeadDetail() {
                       <label className="inline-flex items-center gap-2">
                         <input
                           type="checkbox"
-                          checked={!!detalle.disponible}
-                          onChange={(e) => setDetalle((d: any) => ({ ...d, disponible: e.target.checked }))}
+                          checked={!!detalleVidaLey.disponible}
+                          onChange={(e) => setDetalleVidaLey((d: any) => ({ ...d, disponible: e.target.checked }))}
                         />
-                        <span className="text-sm">{detalle.disponible ? "Sí" : "No"}</span>
+                        <span className="text-sm">{detalleVidaLey.disponible ? "Sí" : "No"}</span>
                       </label>
                       <button
                         type="button"
-                        onClick={() => navigator.clipboard.writeText(String(detalle.disponible ?? ""))}
+                        onClick={() => navigator.clipboard.writeText(String(detalleVidaLey.disponible ?? ""))}
                         className="p-1 text-gray-500 hover:text-gray-800"
                         title="Copiar disponible"
                       >
@@ -431,19 +586,437 @@ export default function LeadDetail() {
                     <p className="text-sm text-gray-500">ID detalle</p>
                     <div className="flex items-center gap-2">
                       <input
-                        value={detalle.idDetalleVidaLey ?? ""}
-                        onChange={(e) => setDetalle((d: any) => ({ ...d, idDetalleVidaLey: e.target.value }))}
+                        value={detalleVidaLey.idDetalleVidaLey ?? ""}
+                        onChange={(e) => setDetalleVidaLey((d: any) => ({ ...d, idDetalleVidaLey: e.target.value }))}
                         className="w-full border rounded px-2 py-1 text-sm"
                       />
                       <button
                         type="button"
-                        onClick={() => navigator.clipboard.writeText(detalle.idDetalleVidaLey ?? "")}
+                        onClick={() => navigator.clipboard.writeText(detalleVidaLey.idDetalleVidaLey ?? "")}
                         className="p-1 text-gray-500 hover:text-gray-800"
                         title="Copiar id detalle"
                       >
                         <Copy className="w-4 h-4" />
                       </button>
                     </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Detalle Salud */}
+            {detalleSalud && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <h3 className="font-semibold mb-2">Detalle Salud</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-500">Edad</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        value={detalleSalud.edad ?? ""}
+                        onChange={(e) => setDetalleSalud((d: any) => ({ ...d, edad: e.target.value ? Number(e.target.value) : undefined }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(String(detalleSalud.edad ?? ""))}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar edad"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">Género</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleSalud.genero ?? ""}
+                        onChange={(e) => setDetalleSalud((d: any) => ({ ...d, genero: e.target.value }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(detalleSalud.genero ?? "")}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar género"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">Tipo de cobertura</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleSalud.tipoCobertura ?? ""}
+                        onChange={(e) => setDetalleSalud((d: any) => ({ ...d, tipoCobertura: e.target.value }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(detalleSalud.tipoCobertura ?? "")}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar tipo de cobertura"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">Incluir familia</p>
+                    <div className="flex items-center gap-2">
+                      <label className="inline-flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={!!detalleSalud.incluirFamilia}
+                          onChange={(e) => setDetalleSalud((d: any) => ({ ...d, incluirFamilia: e.target.checked }))}
+                        />
+                        <span className="text-sm">{detalleSalud.incluirFamilia ? "Sí" : "No"}</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(detalleSalud.incluirFamilia ? "Sí" : "No")}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar incluir familia"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">Número de dependientes</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        value={detalleSalud.numeroDependientes ?? ""}
+                        onChange={(e) => setDetalleSalud((d: any) => ({ ...d, numeroDependientes: e.target.value ? Number(e.target.value) : undefined }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(String(detalleSalud.numeroDependientes ?? ""))}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar número de dependientes"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">Tuvo seguro antes</p>
+                    <div className="flex items-center gap-2">
+                      <label className="inline-flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={!!detalleSalud.tuvoSeguroAntes}
+                          onChange={(e) => setDetalleSalud((d: any) => ({ ...d, tuvoSeguroAntes: e.target.checked }))}
+                        />
+                        <span className="text-sm">{detalleSalud.tuvoSeguroAntes ? "Sí" : "No"}</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(detalleSalud.tuvoSeguroAntes ? "Sí" : "No")}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar tuvo seguro antes"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">Clínica de preferencia</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleSalud.clinicaPreferencia ?? ""}
+                        onChange={(e) => setDetalleSalud((d: any) => ({ ...d, clinicaPreferencia: e.target.value }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(detalleSalud.clinicaPreferencia ?? "")}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar clínica de preferencia"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">Cobertura geográfica</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleSalud.coberturaGeografica ?? ""}
+                        onChange={(e) => setDetalleSalud((d: any) => ({ ...d, coberturaGeografica: e.target.value }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(detalleSalud.coberturaGeografica ?? "")}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar cobertura geográfica"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">Presupuesto mensual</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleSalud.presupuestoMensual ?? ""}
+                        onChange={(e) => setDetalleSalud((d: any) => ({ ...d, presupuestoMensual: e.target.value }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(detalleSalud.presupuestoMensual ?? "")}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar presupuesto mensual"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <p className="text-sm text-gray-500">Enfermedades preexistentes</p>
+                  <div className="flex items-center gap-2">
+                    <input
+                      value={detalleSalud.enfermedadesPreexistentes ? (Array.isArray(detalleSalud.enfermedadesPreexistentes) ? detalleSalud.enfermedadesPreexistentes.join(", ") : detalleSalud.enfermedadesPreexistentes) : ""}
+                      onChange={(e) => setDetalleSalud((d: any) => ({ ...d, enfermedadesPreexistentes: e.target.value ? e.target.value.split(/,\s*/) : [] }))}
+                      className="w-full border rounded px-2 py-1 text-sm"
+                      placeholder="Separadas por coma"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => navigator.clipboard.writeText(detalleSalud.enfermedadesPreexistentes ? (Array.isArray(detalleSalud.enfermedadesPreexistentes) ? detalleSalud.enfermedadesPreexistentes.join(", ") : detalleSalud.enfermedadesPreexistentes) : "")}
+                      className="p-1 text-gray-500 hover:text-gray-800"
+                      title="Copiar enfermedades preexistentes"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Detalle SCTR */}
+            {detalleSCTR && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <h3 className="font-semibold mb-2">Detalle SCTR</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-500">RUC Empresa</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleSCTR.rucEmpresa ?? ""}
+                        onChange={(e) => setDetalleSCTR((d: any) => ({ ...d, rucEmpresa: e.target.value }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(detalleSCTR.rucEmpresa ?? "")}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar RUC empresa"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">Razón social</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleSCTR.razonSocial ?? ""}
+                        onChange={(e) => setDetalleSCTR((d: any) => ({ ...d, razonSocial: e.target.value }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(detalleSCTR.razonSocial ?? "")}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar razón social"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">Número de trabajadores</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        value={detalleSCTR.numeroTrabajadores ?? ""}
+                        onChange={(e) => setDetalleSCTR((d: any) => ({ ...d, numeroTrabajadores: e.target.value ? Number(e.target.value) : undefined }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(String(detalleSCTR.numeroTrabajadores ?? ""))}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar número de trabajadores"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">Actividad económica</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleSCTR.actividadEconomica ?? ""}
+                        onChange={(e) => setDetalleSCTR((d: any) => ({ ...d, actividadEconomica: e.target.value }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(detalleSCTR.actividadEconomica ?? "")}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar actividad económica"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">Tipo de riesgo</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleSCTR.tipoRiesgo ?? ""}
+                        onChange={(e) => setDetalleSCTR((d: any) => ({ ...d, tipoRiesgo: e.target.value }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(detalleSCTR.tipoRiesgo ?? "")}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar tipo de riesgo"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Detalle Vida */}
+            {detalleVida && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <h3 className="font-semibold mb-2">Detalle Vida</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-500">Edad</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        value={detalleVida.edad ?? ""}
+                        onChange={(e) => setDetalleVida((d: any) => ({ ...d, edad: e.target.value ? Number(e.target.value) : undefined }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(String(detalleVida.edad ?? ""))}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar edad"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">Ocupación</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleVida.ocupacion ?? ""}
+                        onChange={(e) => setDetalleVida((d: any) => ({ ...d, ocupacion: e.target.value }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(detalleVida.ocupacion ?? "")}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar ocupación"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">Suma asegurada</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleVida.sumaAsegurada ?? ""}
+                        onChange={(e) => setDetalleVida((d: any) => ({ ...d, sumaAsegurada: e.target.value }))}
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(detalleVida.sumaAsegurada ?? "")}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar suma asegurada"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">Fuma</p>
+                    <div className="flex items-center gap-2">
+                      <label className="inline-flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={!!detalleVida.fuma}
+                          onChange={(e) => setDetalleVida((d: any) => ({ ...d, fuma: e.target.checked }))}
+                        />
+                        <span className="text-sm">{detalleVida.fuma ? "Sí" : "No"}</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(detalleVida.fuma ? "Sí" : "No")}
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar fuma"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <p className="text-sm text-gray-500">Beneficiarios</p>
+                  <div className="flex items-center gap-2">
+                    <input
+                      value={detalleVida.beneficiarios ? (typeof detalleVida.beneficiarios === 'string' ? detalleVida.beneficiarios : JSON.stringify(detalleVida.beneficiarios)) : ""}
+                      onChange={(e) => setDetalleVida((d: any) => ({ ...d, beneficiarios: e.target.value }))}
+                      className="w-full border rounded px-2 py-1 text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => navigator.clipboard.writeText(detalleVida.beneficiarios ? (typeof detalleVida.beneficiarios === 'string' ? detalleVida.beneficiarios : JSON.stringify(detalleVida.beneficiarios)) : "")}
+                      className="p-1 text-gray-500 hover:text-gray-800"
+                      title="Copiar beneficiarios"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               </div>
