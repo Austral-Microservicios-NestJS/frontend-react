@@ -82,6 +82,6 @@ export const ModalContainer = ({
         {children}
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };

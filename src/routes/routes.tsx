@@ -28,6 +28,7 @@ import PolizasPage from "@/pages/shared/gestion-trabajo/polizas/PolizasPage";
 import LeadsPage from "@/pages/shared/gestion-trabajo/leads/LeadsPage";
 import LeadDetail from "@/pages/shared/gestion-trabajo/leads/LeadDetail";
 import ClientePolizasPage from "@/pages/shared/gestion-trabajo/clientes/[id]/polizas/ClientePolizasPage";
+import ClienteInversionesPage from "@/pages/shared/gestion-trabajo/clientes/[id]/inversiones/ClienteInversionesPage";
 import RamoProductosPage from "@/pages/admin/maestros/ramos/[id]/productos/RamoProductosPage";
 
 // Componentes de Broker
@@ -110,6 +111,16 @@ const router = createBrowserRouter([
             requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
           >
             <ClientePolizasPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "gestion-trabajo/clientes/:id/inversiones",
+        element: (
+          <ProtectedRoute
+            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
+          >
+            <ClienteInversionesPage />
           </ProtectedRoute>
         ),
       },
