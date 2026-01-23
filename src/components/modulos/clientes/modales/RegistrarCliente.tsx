@@ -6,6 +6,7 @@ import {
   ModalFooter,
   FormGroup,
   FormGroupDivisor,
+  LocationInput,
 } from "@/components/shared";
 import {
   Input,
@@ -60,6 +61,7 @@ export const RegistrarCliente = ({
     control,
     reset,
     watch,
+    setValue,
     formState: {},
   } = useForm({
     defaultValues: {
@@ -71,6 +73,8 @@ export const RegistrarCliente = ({
       distrito: "",
       provincia: "",
       departamento: "",
+      latitud: 0,
+      longitud: 0,
       telefono1: "",
       telefono2: "",
       whatsapp: "",
@@ -249,10 +253,34 @@ export const RegistrarCliente = ({
             {/* Ubicacion */}
             <FormGroup>
               <Label htmlFor="direccion">Dirección</Label>
-              <Input
-                id="direccion"
-                placeholder="Ej: Av. Siempre Viva 123"
-                {...register("direccion", { required: true })}
+              <Controller
+                name="direccion"
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <LocationInput
+                    value={field.value}
+                    onChange={(locationData: any) => {
+                      field.onChange(locationData.address);
+                      // Auto-fill other fields if available
+                      if (locationData.distrito) {
+                        setValue("distrito", locationData.distrito);
+                      }
+                      if (locationData.provincia) {
+                        setValue("provincia", locationData.provincia);
+                      }
+                      if (locationData.departamento) {
+                        setValue("departamento", locationData.departamento);
+                      }
+                      // Set coordinates
+                      if (locationData.lat)
+                        setValue("latitud", locationData.lat);
+                      if (locationData.lng)
+                        setValue("longitud", locationData.lng);
+                    }}
+                    placeholder="Ej: Av. Siempre Viva 123"
+                  />
+                )}
               />
             </FormGroup>
             <FormGroupDivisor columns={3}>

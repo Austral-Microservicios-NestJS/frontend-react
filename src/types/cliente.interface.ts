@@ -70,6 +70,8 @@ export interface Cliente {
   distrito?: string;
   provincia?: string;
   departamento?: string;
+  latitud?: number;
+  longitud?: number;
   telefono1: string;
   telefono2?: string;
   whatsapp?: string;

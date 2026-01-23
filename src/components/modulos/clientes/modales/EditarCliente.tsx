@@ -6,6 +6,7 @@ import {
   ModalFooter,
   FormGroup,
   FormGroupDivisor,
+  LocationInput,
 } from "@/components/shared";
 import {
   Input,
@@ -44,6 +45,7 @@ export const EditarCliente = ({
     handleSubmit,
     control,
     watch,
+    setValue,
     formState: {},
   } = useForm<UpdateCliente>({
     defaultValues: {
@@ -55,6 +57,8 @@ export const EditarCliente = ({
       distrito: cliente.distrito || "",
       provincia: cliente.provincia || "",
       departamento: cliente.departamento || "",
+      latitud: cliente.latitud || 0,
+      longitud: cliente.longitud || 0,
       telefono1: cliente.telefono1,
       telefono2: cliente.telefono2 || "",
       whatsapp: cliente.whatsapp || "",
@@ -189,10 +193,34 @@ export const EditarCliente = ({
 
             <FormGroup>
               <Label htmlFor="direccion">Dirección</Label>
-              <Input
-                id="direccion"
-                placeholder="Ej: Av. Siempre Viva 123"
-                {...register("direccion", { required: true })}
+              <Controller
+                name="direccion"
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <LocationInput
+                    value={field.value}
+                    onChange={(locationData: any) => {
+                      field.onChange(locationData.address);
+                      // Auto-fill other fields if available
+                      if (locationData.distrito) {
+                        setValue("distrito", locationData.distrito);
+                      }
+                      if (locationData.provincia) {
+                        setValue("provincia", locationData.provincia);
+                      }
+                      if (locationData.departamento) {
+                        setValue("departamento", locationData.departamento);
+                      }
+                      // Set coordinates
+                      if (locationData.lat)
+                        setValue("latitud", locationData.lat);
+                      if (locationData.lng)
+                        setValue("longitud", locationData.lng);
+                    }}
+                    placeholder="Ej: Av. Siempre Viva 123"
+                  />
+                )}
               />
             </FormGroup>
 

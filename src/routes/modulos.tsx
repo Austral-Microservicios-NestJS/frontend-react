@@ -12,6 +12,7 @@ import {
   User,
   WalletCards,
   Sparkles,
+  Map,
 } from "lucide-react";
 import { Roles } from "@/utils/roles";
 
@@ -29,6 +30,14 @@ export const moduleCategories = [
         name: "Inicio",
         path: "/dashboard/home",
         icon: Building2,
+        roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+        type: ["CRM", "ERP"] as ModuleType[],
+      },
+      {
+        id: 99,
+        name: "Mapa",
+        path: "/dashboard/general/mapa",
+        icon: Map,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
         type: ["CRM", "ERP"] as ModuleType[],
       },

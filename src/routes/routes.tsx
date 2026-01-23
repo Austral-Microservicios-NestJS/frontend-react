@@ -14,6 +14,7 @@ import CompaniasPage from "@/pages/admin/maestros/companias/CompaniasPage";
 import ActividadesPage from "@/pages/shared/gestion-trabajo/actividades/ActividadesPage";
 import TareasPage from "@/pages/shared/gestion-trabajo/tareas/TareasPage";
 import ClientesPage from "@/pages/shared/gestion-trabajo/clientes/ClientesPage";
+import MapaPage from "@/pages/shared/gestion-trabajo/mapa/MapaPage";
 
 // Componentes de agentes IA
 import AgenteDniPage from "@/pages/shared/agentes-ia/documentos/agente-dni/AgenteDniPage";
@@ -72,6 +73,16 @@ const router = createBrowserRouter([
       {
         path: "home",
         element: <Home />,
+      },
+      {
+        path: "general/mapa",
+        element: (
+          <ProtectedRoute
+            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
+          >
+            <MapaPage />
+          </ProtectedRoute>
+        ),
       },
       // Seccion de gestion de trabajo - Modulos compartidos
       {
