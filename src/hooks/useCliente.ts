@@ -8,8 +8,11 @@ export const useClientes = () => {
   const { user } = useAuthStore();
   const idUsuario = user?.idUsuario || "";
 
-  // Obtener clientes del usuario actual
-  const { data: clientes = [], isLoading, error } = clienteService.useGetByUsuario(idUsuario);
+  // Obtener clientes del usuario actual (pasar rol para filtrado en backend)
+  const { data: clientes = [], isLoading, error } = clienteService.useGetByUsuario(
+    idUsuario,
+    user?.rol?.nombreRol
+  );
 
   const createMutation = clienteService.useCreate();
   const updateMutation = clienteService.useUpdate();

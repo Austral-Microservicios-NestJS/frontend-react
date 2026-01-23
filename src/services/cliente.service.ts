@@ -24,11 +24,13 @@ export const clienteService = {
     return data;
   },
 
-  // Listar clientes por usuario
-  getByUsuario: async (idUsuario: string): Promise<Cliente[]> => {
+  // Listar clientes por usuario (opcionalmente pasando rol como query param)
+  getByUsuario: async (idUsuario: string, rol?: string): Promise<Cliente[]> => {
     try {
-      const { data } = await api.get(`/clientes/usuario/${idUsuario}`);
-      return data.data;
+      const params: Record<string, string> = {};
+      if (rol) params.rol = rol;
+      const { data } = await api.get(`/clientes/usuario/${idUsuario}`, { params });
+      return Array.isArray(data) ? data : [];
     } catch (error) {
       console.error("Error al obtener clientes del usuario:", error);
       return [];
@@ -71,10 +73,10 @@ export const clienteService = {
     });
   },
 
-  useGetByUsuario: (idUsuario: string) => {
+  useGetByUsuario: (idUsuario: string, rol?: string) => {
     return useQuery({
-      queryKey: [QUERY_KEY, "usuario", idUsuario],
-      queryFn: () => clienteService.getByUsuario(idUsuario),
+      queryKey: [QUERY_KEY, "usuario", idUsuario, rol || null],
+      queryFn: () => clienteService.getByUsuario(idUsuario, rol),
       enabled: !!idUsuario,
       retry: false,
       refetchOnWindowFocus: false,
