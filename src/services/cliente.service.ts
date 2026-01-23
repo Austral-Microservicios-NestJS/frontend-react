@@ -11,7 +11,7 @@ export const clienteService = {
   getAll: async (params?: { page?: number; limit?: number }): Promise<{ data: Cliente[]; meta: any }> => {
     try {
       const response = await api.get("/clientes", { params });
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error("Error al obtener clientes:", error);
       return { data: [], meta: { total: 0, page: 1, lastPage: 1 } };
@@ -28,7 +28,7 @@ export const clienteService = {
   getByUsuario: async (idUsuario: string): Promise<Cliente[]> => {
     try {
       const { data } = await api.get(`/clientes/usuario/${idUsuario}`);
-      return Array.isArray(data) ? data : [];
+      return data.data;
     } catch (error) {
       console.error("Error al obtener clientes del usuario:", error);
       return [];

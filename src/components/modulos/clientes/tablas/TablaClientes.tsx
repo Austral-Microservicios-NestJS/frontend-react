@@ -8,7 +8,7 @@ import {
   PopoverTrigger,
   PopoverClose,
 } from "@/components/ui/popover";
-import { FileText, MoreHorizontal, Pencil } from "lucide-react";
+import { FileText, MoreHorizontal, Pencil, DollarSign } from "lucide-react";
 import { ButtonIA } from "@/components/ui/ButtonIA";
 import { useState } from "react";
 import { ContextoIAModal } from "@/components/modulos/clientes/modales/ContextoIAModal";
@@ -155,13 +155,26 @@ export const TablaClientes = ({ clientes, onEdit }: TablaClientesProps) => {
                 <button
                   onClick={() =>
                     navigate(
-                      `/dashboard/gestion-trabajo/clientes/${row.original.idCliente}/polizas`
+                      `/dashboard/gestion-trabajo/clientes/${row.original.idCliente}/polizas`,
                     )
                   }
                   className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
                 >
                   <FileText className="w-4 h-4" />
                   Ver Pólizas
+                </button>
+              </PopoverClose>
+              <PopoverClose asChild>
+                <button
+                  onClick={() =>
+                    navigate(
+                      `/dashboard/gestion-trabajo/clientes/${row.original.idCliente}/inversiones`,
+                    )
+                  }
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                >
+                  <DollarSign className="w-4 h-4" />
+                  Ver Inversiones
                 </button>
               </PopoverClose>
             </div>
