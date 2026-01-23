@@ -1,38 +1,38 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FilePlus2, UploadCloud, ShieldAlert, Zap } from "lucide-react";
+import { FilePlus2, UserPlus, PlusCircle, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const QuickActionsWidget = () => {
   const actions = [
     {
-      label: "Nueva Cotización",
-      icon: FilePlus2,
+      label: "Crear cliente",
+      icon: UserPlus,
       className:
-        "bg-blue-50 border-blue-100 hover:bg-blue-600 hover:shadow-blue-200",
+        "bg-green-50 border-green-100 hover:bg-green-600 hover:shadow-green-200",
       iconClassName:
-        "bg-white text-blue-600 group-hover:bg-white/20 group-hover:text-white",
-      textClassName: "text-blue-700 group-hover:text-white",
-      link: "/dashboard/cotizaciones/nueva",
+        "bg-white text-green-600 group-hover:bg-white/20 group-hover:text-white",
+      textClassName: "text-green-700 group-hover:text-white",
+      link: "/dashboard/gestion-trabajo/clientes",
     },
     {
-      label: "Cargar Póliza",
-      icon: UploadCloud,
+      label: "Crear póliza",
+      icon: FilePlus2,
       className:
         "bg-indigo-50 border-indigo-100 hover:bg-indigo-600 hover:shadow-indigo-200",
       iconClassName:
         "bg-white text-indigo-600 group-hover:bg-white/20 group-hover:text-white",
       textClassName: "text-indigo-700 group-hover:text-white",
-      link: "/dashboard/polizas/carga-masiva",
+      link: "/dashboard/gestion-trabajo/polizas",
     },
     {
-      label: "Reportar Siniestro",
-      icon: ShieldAlert,
+      label: "Crear lead",
+      icon: PlusCircle,
       className:
-        "bg-rose-50 border-rose-100 hover:bg-rose-600 hover:shadow-rose-200",
+        "bg-blue-50 border-blue-100 hover:bg-blue-600 hover:shadow-blue-200",
       iconClassName:
-        "bg-white text-rose-600 group-hover:bg-white/20 group-hover:text-white",
-      textClassName: "text-rose-700 group-hover:text-white",
-      link: "/dashboard/siniestros/nuevo",
+        "bg-white text-blue-600 group-hover:bg-white/20 group-hover:text-white",
+      textClassName: "text-blue-700 group-hover:text-white",
+      link: "/dashboard/gestion-trabajo/leads",
     },
   ];
 

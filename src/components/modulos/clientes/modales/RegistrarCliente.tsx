@@ -44,6 +44,7 @@ interface RegistrarClienteProps {
   onClose: () => void;
   addCliente: (data: any) => Promise<void>;
   user: User;
+  initialValues?: Partial<any>;
 }
 
 export const RegistrarCliente = ({
@@ -51,6 +52,7 @@ export const RegistrarCliente = ({
   onClose,
   addCliente,
   user,
+  initialValues,
 }: RegistrarClienteProps) => {
   const {
     register,
@@ -91,8 +93,34 @@ export const RegistrarCliente = ({
   useEffect(() => {
     if (!isOpen) {
       reset();
+    } else if (isOpen && initialValues) {
+      // fusionar valores por defecto con initialValues
+      reset({
+        tipoPersona: "",
+        razonSocial: "",
+        nombres: "",
+        apellidos: "",
+        direccion: "",
+        distrito: "",
+        provincia: "",
+        departamento: "",
+        telefono1: "",
+        telefono2: "",
+        whatsapp: "",
+        emailNotificaciones: "",
+        recibirNotificaciones: false,
+        cumpleanos: "",
+        tipoDocumento: "",
+        numeroDocumento: "",
+        telefono1Prefix: "+51",
+        telefono2Prefix: "+51",
+        whatsappPrefix: "+51",
+        asignadoA: user.idUsuario,
+        registradoPor: user.idUsuario,
+        ...initialValues,
+      });
     }
-  }, [isOpen, reset]);
+  }, [isOpen, reset, initialValues, user]);
 
   const onSubmit = async (data: any) => {
     const {

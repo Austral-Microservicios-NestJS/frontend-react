@@ -26,6 +26,7 @@ import UsuariosPage from "@/pages/admin/maestros/usuarios/UsuariosPage";
 import RamosPage from "@/pages/admin/maestros/ramos/RamosPage";
 import PolizasPage from "@/pages/shared/gestion-trabajo/polizas/PolizasPage";
 import LeadsPage from "@/pages/shared/gestion-trabajo/leads/LeadsPage";
+import LeadDetail from "@/pages/shared/gestion-trabajo/leads/LeadDetail";
 import ClientePolizasPage from "@/pages/shared/gestion-trabajo/clientes/[id]/polizas/ClientePolizasPage";
 import RamoProductosPage from "@/pages/admin/maestros/ramos/[id]/productos/RamoProductosPage";
 
@@ -119,6 +120,16 @@ const router = createBrowserRouter([
             requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
           >
             <LeadsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "gestion-trabajo/leads/:id",
+        element: (
+          <ProtectedRoute
+            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
+          >
+            <LeadDetail />
           </ProtectedRoute>
         ),
       },
