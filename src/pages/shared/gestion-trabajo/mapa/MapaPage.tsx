@@ -58,7 +58,6 @@ const getMarkerIcon = (tipo: TipoPersona): google.maps.Icon => {
 
 export default function MapaPage() {
   const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
   const { isSidebarOpen, toggleSidebar } = useSidebar();
   const user = useAuthStore((state) => state.user);
 
@@ -91,8 +90,6 @@ export default function MapaPage() {
 
   const onLoad = useCallback(
     (map: google.maps.Map) => {
-      setMap(map);
-
       // Ajustar bounds si hay clientes con coordenadas
       if (clientesConCoordenadas.length > 0) {
         const bounds = new google.maps.LatLngBounds();
@@ -106,7 +103,7 @@ export default function MapaPage() {
   );
 
   const onUnmount = useCallback(() => {
-    setMap(null);
+    // Cleanup si es necesario
   }, []);
 
   if (!GOOGLE_MAPS_API_KEY) {

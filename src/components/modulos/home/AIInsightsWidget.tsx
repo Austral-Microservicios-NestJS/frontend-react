@@ -118,7 +118,6 @@ export const AIInsightsWidget = () => {
   }
 
   const insights = data?.insights || [];
-  const totalInsights = data?.estadisticas?.insightsGenerados || 0;
 
   return (
     <Card className="h-full border-none shadow-sm ring-1 ring-gray-200 overflow-hidden">
