@@ -167,14 +167,10 @@ export const Sidebar = () => {
                           return (
                             <div
                               key={module.id}
-                              className="relative group/aurora overflow-hidden rounded-lg bg-slate-900"
+                              className="relative group/aurora overflow-hidden rounded-lg"
                             >
-                              {/* Fondo Lava */}
-                              <div className="absolute inset-0 z-0 opacity-80">
-                                <div className="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-purple-600 rounded-full mix-blend-screen filter blur-[10px] opacity-70 animate-blob"></div>
-                                <div className="absolute top-[-50%] right-[-50%] w-[200%] h-[200%] bg-blue-600 rounded-full mix-blend-screen filter blur-[10px] opacity-70 animate-blob animation-delay-2000"></div>
-                                <div className="absolute bottom-[-50%] left-[20%] w-[200%] h-[200%] bg-indigo-600 rounded-full mix-blend-screen filter blur-[10px] opacity-70 animate-blob animation-delay-4000"></div>
-                              </div>
+                              {/* Fondo Aurora - mismo estilo que ButtonIA */}
+                              <span className="absolute inset-0 aurora-bg rounded-lg opacity-95" />
 
                               {/* Botón del módulo */}
                               <button
@@ -189,7 +185,7 @@ export const Sidebar = () => {
                                   }
                                 `}
                               >
-                                <div className="flex items-center justify-center w-7 h-7 rounded-md text-white transition-colors shrink-0">
+                                <div className="flex items-center justify-center w-7 h-7 rounded-md bg-white/20 text-white transition-colors shrink-0">
                                   <module.icon className="w-4 h-4" />
                                 </div>
                                 <span className="flex-1 text-left text-sm font-semibold">

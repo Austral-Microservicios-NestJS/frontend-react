@@ -12,6 +12,7 @@ import {
   User,
   WalletCards,
   Sparkles,
+  Zap,
 } from "lucide-react";
 import { Roles } from "@/utils/roles";
 
@@ -122,6 +123,14 @@ export const moduleCategories = [
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
         type: ["CRM", "ERP"] as ModuleType[],
         isAuroraModule: true, // Marcador especial para aplicar efecto aurora
+      },
+      {
+        id: 74,
+        name: "Insights AI",
+        path: "/dashboard/agentes-ia/insights",
+        icon: Zap,
+        roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+        type: ["CRM", "ERP"] as ModuleType[],
       },
       {
         id: 71,

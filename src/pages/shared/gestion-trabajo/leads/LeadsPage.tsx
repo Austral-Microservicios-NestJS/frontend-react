@@ -1,7 +1,5 @@
 import { useState, useRef } from "react";
-import { Header, BotonRegistro, ModalConfirmacion } from "@/components/shared";
-import { RegistrarCliente } from "@/components/modulos/clientes/modales/RegistrarCliente";
-import { clienteService } from "@/services/cliente.service";
+import { Header, BotonRegistro } from "@/components/shared";
 import { useSidebar } from "@/hooks/useSidebar";
 import { RegistrarLead } from "@/components/modulos/leads/modales/RegistrarLead";
 import { useLeads } from "@/hooks/useLeads";
@@ -25,7 +23,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
-import { useAuthStore } from "@/store/auth.store";
 
 export default function LeadsPage() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
@@ -42,14 +39,6 @@ export default function LeadsPage() {
     isLoading,
     error,
   } = useLeads();
-
-  const user = useAuthStore((s) => s.user);
-
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [leadToConfirm, setLeadToConfirm] = useState<Lead | null>(null);
-  const [registrarClienteOpen, setRegistrarClienteOpen] = useState(false);
-  const [registrarInitialValues, setRegistrarInitialValues] = useState<any | undefined>(undefined);
-  const clienteCreate = clienteService.useCreate();
 
   const handleOpenModal = () => {
     setLeadToEdit(null);
@@ -71,17 +60,6 @@ export default function LeadsPage() {
 
 
   const handleDrop = async (leadId: string, nuevoEstado: EstadoLead) => {
-    // buscar lead actual
-    const l = leads.find((x) => x.idLead === leadId);
-    if (!l) return;
-
-    // Si pasa de CONTACTADO a CERRADO, pedir confirmación
-    if (l.estado === "CONTACTADO" && nuevoEstado === "CERRADO") {
-      setLeadToConfirm(l);
-      setConfirmModalOpen(true);
-      return;
-    }
-
     await cambiarEstadoLead(leadId, nuevoEstado);
   };
 
@@ -253,59 +231,6 @@ export default function LeadsPage() {
         }}
         onSubmit={handleSubmitLead}
         leadToEdit={leadToEdit}
-      />
-
-      {/* Confirmación al cerrar lead */}
-      <ModalConfirmacion
-        isOpen={confirmModalOpen}
-        onClose={() => setConfirmModalOpen(false)}
-        onConfirm={async () => {
-          if (!leadToConfirm) return;
-          // Cambiar estado a CERRADO
-          await cambiarEstadoLead(leadToConfirm.idLead, EstadoLead.CERRADO);
-          // Abrir modal de registrar cliente con datos prellenados
-          const initial: any = {};
-          // si viene empresa, sugerimos jurídico con RUC si existe en detalleVidaLey
-          if (leadToConfirm.empresa) {
-            initial.tipoPersona = "JURIDICO";
-            initial.razonSocial = leadToConfirm.empresa;
-            if (leadToConfirm.detalleVidaLey?.rucEmpresa) {
-              initial.tipoDocumento = "RUC";
-              initial.numeroDocumento = Number(leadToConfirm.detalleVidaLey.rucEmpresa);
-            }
-          } else {
-            initial.tipoPersona = "NATURAL";
-            // separar nombre completo si es posible
-            initial.nombres = leadToConfirm.nombre;
-            if (leadToConfirm.email) initial.emailNotificaciones = leadToConfirm.email;
-            if (leadToConfirm.telefono) initial.telefono1 = leadToConfirm.telefono;
-          }
-
-          setRegistrarInitialValues(initial);
-          setRegistrarClienteOpen(true);
-          setConfirmModalOpen(false);
-          setLeadToConfirm(null);
-        }}
-        title="Lead cerrado"
-        message={leadToConfirm ? `Lead cerrado: crea un registro de cliente para ${leadToConfirm.nombre}` : "Lead cerrado"}
-        confirmText="Crear"
-        cancelText="No"
-      />
-
-      {/* Modal: Registrar Cliente (prefill desde lead) */}
-      <RegistrarCliente
-        isOpen={registrarClienteOpen}
-        onClose={() => setRegistrarClienteOpen(false)}
-        addCliente={async (data: any) => {
-          try {
-            await clienteCreate.mutateAsync(data);
-            setRegistrarClienteOpen(false);
-          } catch (e) {
-            // error manejado por hook
-          }
-        }}
-        user={user || ({ idUsuario: "" } as any)}
-        initialValues={registrarInitialValues}
       />
     </div>
   );

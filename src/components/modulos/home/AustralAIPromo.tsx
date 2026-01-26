@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Sparkles, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import ShinyText from "@/components/ui/ShinyText";
@@ -43,15 +42,15 @@ export const AustralAIPromo = () => {
           y automatización de tareas. El futuro de los seguros está aquí.
         </p>
 
-        <Link to="/dashboard/agentes-ia/austral-ai">
-          <Button
-            size="default"
-            className="bg-white text-blue-700 hover:bg-gray-200 hover:cursor-pointer border-none shadow-xl shadow-blue-900/20 font-bold text-sm px-6 py-5"
-          >
-            <Sparkles className="w-4 h-4 mr-2 text-blue-600 group-hover:text-blue-700" />
-            Probar ahora
-            <ArrowRight className="w-4 h-4 ml-2 opacity-70" />
-          </Button>
+        <Link to="/dashboard/agentes-ia/austral-ai" className="inline-block">
+          <div className="relative group/btn">
+            <span className="absolute inset-0 aurora-bg rounded-lg opacity-100" />
+            <button className="relative flex items-center gap-2 px-6 py-3 rounded-lg text-white font-bold text-sm hover:bg-white/10 transition-all shadow-xl">
+              <Sparkles className="w-4 h-4" />
+              Probar ahora
+              <ArrowRight className="w-4 h-4 opacity-70 group-hover/btn:translate-x-1 transition-transform" />
+            </button>
+          </div>
         </Link>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { api } from "@/config/api-client";
-import type { Cliente, CreateCliente, UpdateCliente } from "@/types/cliente.interface";
+import type { Cliente, CreateCliente, UpdateCliente, ClienteContexto } from "@/types/cliente.interface";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const QUERY_KEY = "clientes";
@@ -52,6 +52,29 @@ export const clienteService = {
   // Eliminar cliente
   delete: async (id: string): Promise<void> => {
     await api.delete(`/clientes/${id}`);
+  },
+
+  // Agregar contexto para IA
+  agregarContexto: async (params: {
+    idCliente: string;
+    tipoContexto: string;
+    contenido: string;
+    creadoPor: string;
+  }): Promise<any> => {
+    const { data } = await api.post("/clientes/contexto", params);
+    return data;
+  },
+
+  // Obtener contextos de un cliente
+  getContextos: async (idCliente: string): Promise<ClienteContexto[]> => {
+    try {
+      const { data } = await api.get(`/clientes/${idCliente}/contextos`);
+      // El backend retorna un array directo, no un objeto con 'value'
+      return Array.isArray(data) ? data : [];
+    } catch (error) {
+      console.error("Error al obtener contextos del cliente:", error);
+      return [];
+    }
   },
 
   // ==================== REACT QUERY HOOKS ====================
@@ -110,6 +133,26 @@ export const clienteService = {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
       },
+    });
+  },
+
+  useAgregarContexto: () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+      mutationFn: clienteService.agregarContexto,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
+      },
+    });
+  },
+
+  useGetContextos: (idCliente: string) => {
+    return useQuery({
+      queryKey: [QUERY_KEY, "contextos", idCliente],
+      queryFn: () => clienteService.getContextos(idCliente),
+      enabled: !!idCliente,
+      retry: false,
+      refetchOnWindowFocus: false,
     });
   },
 };

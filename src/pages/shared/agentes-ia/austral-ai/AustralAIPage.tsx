@@ -7,6 +7,7 @@ import {
   FileSpreadsheet,
   Download,
   Trash2,
+  Sparkles,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { chatbotService } from "@/services/chatbot.service";
@@ -16,6 +17,37 @@ import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+
+// Preguntas sugeridas basadas en las funcionalidades del agente
+const SUGGESTED_QUESTIONS = [
+  // Estadísticas de Leads
+  "¿Cuántos leads tengo?",
+  "Muéstrame estadísticas de leads",
+  "¿Cuántos leads cerrados tengo este mes?",
+  "Dame estadísticas de leads de tipo AUTO",
+  // Reporte de Clientes
+  "Dame un reporte de clientes",
+  "¿Cuántos clientes tengo?",
+  "Muéstrame clientes naturales",
+  "Lista clientes jurídicos",
+  // Estadísticas de Tareas
+  "¿Cuántas tareas pendientes tengo?",
+  "Muéstrame estadísticas de tareas",
+  "¿Tengo tareas vencidas?",
+  "Dame mi productividad en tareas",
+  // Tasa de Conversión
+  "¿Cuál es mi tasa de conversión?",
+  "¿Cuántos leads se convirtieron en clientes?",
+  // Buscar/Listar
+  "Busca leads de tipo AUTO",
+  "Muéstrame leads en estado NUEVO",
+  "Lista todos mis leads",
+  "Lista mis clientes",
+  "Lista mis tareas pendientes",
+  // Reportes
+  "Genera un reporte Excel de mis leads",
+  "Genera una cotización PDF",
+];
 
 interface GeneratedFile {
   type: "pdf" | "excel";
@@ -42,6 +74,12 @@ declare global {
 
 import { ConfirmClearChatModal } from "@/components/modulos/agentes-ia/modales/ConfirmClearChatModal";
 
+// Función para obtener N preguntas aleatorias
+const getRandomQuestions = (count: number): string[] => {
+  const shuffled = [...SUGGESTED_QUESTIONS].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+};
+
 export default function AustralAIPage() {
   const { user } = useAuthStore();
   const { messages, conversationId, addMessage, setConversationId, clearChat } =
@@ -50,9 +88,15 @@ export default function AustralAIPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isClearModalOpen, setIsClearModalOpen] = useState(false);
+  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
   const recognitionRef = useRef<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  // Inicializar preguntas sugeridas al cargar
+  useEffect(() => {
+    setSuggestedQuestions(getRandomQuestions(3));
+  }, []);
 
   useEffect(() => {
     // Inicializar reconocimiento de voz si está disponible
@@ -102,6 +146,53 @@ export default function AustralAIPage() {
     } else {
       recognitionRef.current.start();
       setIsListening(true);
+    }
+  };
+
+  // Manejar click en pregunta sugerida
+  const handleSuggestedQuestion = async (question: string) => {
+    if (isLoading) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: "user",
+      content: question,
+      timestamp: new Date(),
+    };
+
+    addMessage(userMessage);
+    setIsLoading(true);
+
+    try {
+      const response = await chatbotService.query({
+        message: question,
+        userId: user?.idUsuario || "",
+        userRole: user?.rol?.nombreRol as "ADMINISTRADOR" | "BROKER" | "AGENTE",
+        conversationId,
+      });
+
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: response.response,
+        timestamp: new Date(),
+        generatedFiles: response.generatedFiles,
+      };
+
+      addMessage(botMessage);
+      setConversationId(response.conversationId);
+    } catch (error) {
+      console.error("Error al enviar mensaje:", error);
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content:
+          "Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta de nuevo.",
+        timestamp: new Date(),
+      };
+      addMessage(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -202,9 +293,34 @@ export default function AustralAIPage() {
               <h2 className="text-3xl font-bold text-gray-800 mb-3 tracking-tight">
                 ¿En qué puedo ayudarte?
               </h2>
-              <p className="text-gray-500 text-lg font-light">
+              <p className="text-gray-500 text-lg font-light mb-8">
                 Soy tu asistente inteligente para seguros
               </p>
+
+              {/* Preguntas sugeridas */}
+              <div className="flex flex-col items-center gap-3 animate-[fadeIn_0.5s_ease-out_0.5s_both]">
+                <div className="flex items-center gap-2 text-sm text-gray-400 mb-1">
+                  <Sparkles className="w-4 h-4" />
+                  <span>Prueba preguntando:</span>
+                </div>
+                <div className="flex flex-wrap justify-center gap-2 max-w-2xl px-4">
+                  {suggestedQuestions.map((question, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleSuggestedQuestion(question)}
+                      disabled={isLoading}
+                      className="px-4 py-2.5 bg-white border border-gray-200 rounded-full text-sm text-gray-700
+                        hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700
+                        transition-all duration-200 shadow-sm hover:shadow-md
+                        disabled:opacity-50 disabled:cursor-not-allowed
+                        animate-[fadeIn_0.3s_ease-out_both]"
+                      style={{ animationDelay: `${0.6 + index * 0.1}s` }}
+                    >
+                      {question}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           ) : (
             <div className="space-y-6 pb-4">

@@ -41,6 +41,16 @@ export const tipoDocumentoArchivoOptions = [
 ] as const;
 
 
+export interface ClienteContexto {
+  idContexto: string;
+  idCliente: string;
+  tipoContexto: string;
+  contenido: string;
+  creadoPor: string;
+  fechaCreacion: string;
+  fechaActualizacion: string;
+}
+
 export interface ClienteContacto {
   idContacto?: string;
   idCliente?: string;
