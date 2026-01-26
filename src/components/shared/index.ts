@@ -10,3 +10,4 @@ export * from "./Table";
 export * from "./Grid";
 export * from "./FormGroup";
 export * from "./FormGroupDivisor";
+export * from "./LocationInput";

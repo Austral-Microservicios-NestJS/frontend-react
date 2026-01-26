@@ -83,37 +83,21 @@ export const RegistrarInversion = ({
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <ModalBody>
-            <FormGroupDivisor>
-              <FormGroup>
-                <Label htmlFor="fechaGasto">Fecha del Gasto</Label>
-                <Input
-                  id="fechaGasto"
-                  type="date"
-                  {...register("fechaGasto", { required: true })}
-                />
-                {errors.fechaGasto && (
-                  <span className="text-xs text-red-500">
-                    Este campo es requerido
-                  </span>
-                )}
-              </FormGroup>
+            <FormGroup>
+              <Label htmlFor="tipo">Tipo de Inversión</Label>
+              <Input
+                id="tipo"
+                placeholder="Ej: Reunión de Negocios, Publicidad, Regalo"
+                {...register("tipo", { required: true })}
+              />
+              {errors.tipo && (
+                <span className="text-xs text-red-500">
+                  Este campo es requerido
+                </span>
+              )}
+            </FormGroup>
 
-              <FormGroup>
-                <Label htmlFor="tipo">Tipo de Inversión</Label>
-                <Input
-                  id="tipo"
-                  placeholder="Ej: Reunión de Negocios, Publicidad, Regalo"
-                  {...register("tipo", { required: true })}
-                />
-                {errors.tipo && (
-                  <span className="text-xs text-red-500">
-                    Este campo es requerido
-                  </span>
-                )}
-              </FormGroup>
-            </FormGroupDivisor>
-
-            <FormGroupDivisor>
+            <FormGroupDivisor columns={3}>
               <FormGroup>
                 <Label htmlFor="monto">Monto</Label>
                 <Input
@@ -152,6 +136,20 @@ export const RegistrarInversion = ({
                   )}
                 />
               </FormGroup>
+
+              <FormGroup>
+                <Label htmlFor="fechaGasto">Fecha del Gasto</Label>
+                <Input
+                  id="fechaGasto"
+                  type="date"
+                  {...register("fechaGasto", { required: true })}
+                />
+                {errors.fechaGasto && (
+                  <span className="text-xs text-red-500">
+                    Este campo es requerido
+                  </span>
+                )}
+              </FormGroup>
             </FormGroupDivisor>
 
             <FormGroup>
@@ -160,6 +158,7 @@ export const RegistrarInversion = ({
                 id="descripcion"
                 placeholder="Detalles adicionales sobre la inversión"
                 {...register("descripcion")}
+                rows={5}
               />
             </FormGroup>
           </ModalBody>
