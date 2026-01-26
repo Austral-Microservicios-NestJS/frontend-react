@@ -30,7 +30,8 @@ export const clienteService = {
       const params: Record<string, string> = {};
       if (rol) params.rol = rol;
       const { data } = await api.get(`/clientes/usuario/${idUsuario}`, { params });
-      return Array.isArray(data.data) ? data.data : [];
+      // El backend retorna el array directamente
+      return Array.isArray(data) ? data : [];
     } catch (error) {
       console.error("Error al obtener clientes del usuario:", error);
       return [];
