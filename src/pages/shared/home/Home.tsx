@@ -55,7 +55,8 @@ const Home = () => {
           {/* Left: Usuario */}
           <div className="ml-2">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
-              ¡Hola, <span className="text-[#003d5c]">{displayName}</span>!
+              ¡Bienvenido, <span className="text-[#003d5c]">{displayName}</span>
+              !
             </h1>
             <p className="text-gray-500 mt-1 text-sm md:text-base font-medium">
               ¿Qué te gustaría gestionar hoy?

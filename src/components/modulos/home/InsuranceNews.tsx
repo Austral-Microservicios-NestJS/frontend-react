@@ -100,7 +100,9 @@ export const InsuranceNews = () => {
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md border border-white/10 text-white px-2.5 py-1 rounded-lg">
             <Newspaper className="w-4 h-4" />
-            <span className="font-semibold text-lg ml-1">Noticias del Sector</span>
+            <span className="font-semibold text-lg ml-1">
+              Noticias del Sector
+            </span>
           </div>
         </div>
 
