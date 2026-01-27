@@ -26,10 +26,11 @@ export const ContextoIAModal = ({
   const [contexto, setContexto] = useState("");
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
-  const { mutate: agregarContexto, isPending } = clienteService.useAgregarContexto();
-  
+  const { mutate: agregarContexto, isPending } =
+    clienteService.useAgregarContexto();
+
   // Obtener contextos existentes del cliente
-  const { data: contextosExistentes, isLoading: isLoadingContextos } = 
+  const { data: contextosExistentes, isLoading: isLoadingContextos } =
     clienteService.useGetContextos(cliente.idCliente);
 
   const handleSubmit = () => {
@@ -48,12 +49,12 @@ export const ContextoIAModal = ({
       {
         onSuccess: async () => {
           toast.success("Contexto guardado correctamente");
-          
+
           // Invalidar cache de contextos del cliente
-          queryClient.invalidateQueries({ 
-            queryKey: ["clientes", "contextos", cliente.idCliente] 
+          queryClient.invalidateQueries({
+            queryKey: ["clientes", "contextos", cliente.idCliente],
           });
-          
+
           // 🔥 Invalidar cache de insights automáticamente
           try {
             await dashboardService.invalidateCache();
@@ -61,7 +62,7 @@ export const ContextoIAModal = ({
           } catch (error) {
             console.error("Error al invalidar cache:", error);
           }
-          
+
           setContexto("");
           onClose();
         },
@@ -69,7 +70,7 @@ export const ContextoIAModal = ({
           console.error("Error al guardar contexto:", error);
           toast.error("Error al guardar el contexto");
         },
-      }
+      },
     );
   };
 
@@ -111,7 +112,9 @@ export const ContextoIAModal = ({
           {isLoadingContextos ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
-              <span className="ml-2 text-sm text-gray-500">Cargando contextos...</span>
+              <span className="ml-2 text-sm text-gray-500">
+                Cargando contextos...
+              </span>
             </div>
           ) : contextosExistentes && contextosExistentes.length > 0 ? (
             <div className="mb-6">

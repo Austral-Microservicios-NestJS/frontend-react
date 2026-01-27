@@ -1,5 +1,10 @@
 import { api } from "@/config/api-client";
-import type { Cliente, CreateCliente, UpdateCliente, ClienteContexto } from "@/types/cliente.interface";
+import type {
+  Cliente,
+  CreateCliente,
+  UpdateCliente,
+  ClienteContexto,
+} from "@/types/cliente.interface";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const QUERY_KEY = "clientes";
@@ -8,7 +13,10 @@ const QUERY_KEY = "clientes";
 
 export const clienteService = {
   // Listar todos los clientes con paginación
-  getAll: async (params?: { page?: number; limit?: number }): Promise<{ data: Cliente[]; meta: any }> => {
+  getAll: async (params?: {
+    page?: number;
+    limit?: number;
+  }): Promise<{ data: Cliente[]; meta: any }> => {
     try {
       const response = await api.get("/clientes", { params });
       return response.data.data;
@@ -29,7 +37,9 @@ export const clienteService = {
     try {
       const params: Record<string, string> = {};
       if (rol) params.rol = rol;
-      const { data } = await api.get(`/clientes/usuario/${idUsuario}`, { params });
+      const { data } = await api.get(`/clientes/usuario/${idUsuario}`, {
+        params,
+      });
       // El backend retorna el array directamente
       return Array.isArray(data) ? data : [];
     } catch (error) {
@@ -45,7 +55,13 @@ export const clienteService = {
   },
 
   // Actualizar cliente
-  update: async ({ id, data: clienteData }: { id: string; data: UpdateCliente }): Promise<Cliente> => {
+  update: async ({
+    id,
+    data: clienteData,
+  }: {
+    id: string;
+    data: UpdateCliente;
+  }): Promise<Cliente> => {
     const { data } = await api.patch(`/clientes/${id}`, clienteData);
     return data;
   },

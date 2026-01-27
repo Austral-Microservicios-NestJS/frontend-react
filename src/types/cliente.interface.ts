@@ -8,7 +8,6 @@ export const tipoPersonaOptions = [
   { value: TipoPersona.JURIDICO, label: "Jurídico" },
 ] as const;
 
-
 export enum TipoDocumento {
   DNI = "DNI",
   RUC = "RUC",
@@ -23,7 +22,6 @@ export const tipoDocumentoOptions = [
   { value: TipoDocumento.RUC, label: "RUC" },
 ] as const;
 
-
 export enum TipoDocumentoArchivo {
   DNI_FRONTAL = "DNI_FRONTAL",
   DNI_POSTERIOR = "DNI_POSTERIOR",
@@ -36,10 +34,12 @@ export const tipoDocumentoArchivoOptions = [
   { value: TipoDocumentoArchivo.DNI_FRONTAL, label: "DNI" },
   { value: TipoDocumentoArchivo.DNI_POSTERIOR, label: "DNI Posterior" },
   { value: TipoDocumentoArchivo.RUC_FICHA, label: "RUC" },
-  { value: TipoDocumentoArchivo.CONSTANCIA_SITUACION, label: "Constancia de Situación" },
+  {
+    value: TipoDocumentoArchivo.CONSTANCIA_SITUACION,
+    label: "Constancia de Situación",
+  },
   { value: TipoDocumentoArchivo.OTRO, label: "Otro" },
 ] as const;
-
 
 export interface ClienteContexto {
   idContexto: string;
@@ -98,20 +98,19 @@ export interface Cliente {
   documentos?: ClienteDocumento[];
 }
 
-export interface CreateCliente
-  extends Omit<
-    Cliente,
-    | "idCliente"
-    | "fechaCreacion"
-    | "fechaModificacion"
-    | "activo"
-    | "disponible"
-    | "contactos"
-    | "documentos"
-  > {
+export interface CreateCliente extends Omit<
+  Cliente,
+  | "idCliente"
+  | "fechaCreacion"
+  | "fechaModificacion"
+  | "activo"
+  | "disponible"
+  | "contactos"
+  | "documentos"
+> {
   activo?: boolean;
   contactos: ClienteContacto[];
   documentos: ClienteDocumento[];
 }
 
-export interface UpdateCliente extends Partial<CreateCliente> { }
+export interface UpdateCliente extends Partial<CreateCliente> {}

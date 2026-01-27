@@ -32,7 +32,10 @@ const getInsightIcon = (tipo: Insight["tipo"], size = "w-5 h-5") => {
   }
 };
 
-const getInsightColors = (tipo: Insight["tipo"], prioridad: Insight["prioridad"]) => {
+const getInsightColors = (
+  tipo: Insight["tipo"],
+  prioridad: Insight["prioridad"],
+) => {
   if (tipo === "alerta") {
     return prioridad === "alta"
       ? {
@@ -105,7 +108,7 @@ export default function InsightsPage() {
   const alertas = insights.filter((i) => i.tipo === "alerta");
   const oportunidades = insights.filter((i) => i.tipo === "oportunidad");
   const recomendaciones = insights.filter(
-    (i) => i.tipo === "recomendacion" || i.tipo === "sugerencia"
+    (i) => i.tipo === "recomendacion" || i.tipo === "sugerencia",
   );
 
   // Filtrar según tab activo
@@ -113,16 +116,36 @@ export default function InsightsPage() {
     activeTab === "todos"
       ? insights
       : activeTab === "alertas"
-      ? alertas
-      : activeTab === "oportunidades"
-      ? oportunidades
-      : recomendaciones;
+        ? alertas
+        : activeTab === "oportunidades"
+          ? oportunidades
+          : recomendaciones;
 
   const tabs = [
-    { id: "todos" as TabType, label: "Todos", count: insights.length, color: "purple" },
-    { id: "alertas" as TabType, label: "Alertas", count: alertas.length, color: "red" },
-    { id: "oportunidades" as TabType, label: "Oportunidades", count: oportunidades.length, color: "emerald" },
-    { id: "recomendaciones" as TabType, label: "Recomendaciones", count: recomendaciones.length, color: "blue" },
+    {
+      id: "todos" as TabType,
+      label: "Todos",
+      count: insights.length,
+      color: "purple",
+    },
+    {
+      id: "alertas" as TabType,
+      label: "Alertas",
+      count: alertas.length,
+      color: "red",
+    },
+    {
+      id: "oportunidades" as TabType,
+      label: "Oportunidades",
+      count: oportunidades.length,
+      color: "emerald",
+    },
+    {
+      id: "recomendaciones" as TabType,
+      label: "Recomendaciones",
+      count: recomendaciones.length,
+      color: "blue",
+    },
   ];
 
   return (
@@ -138,7 +161,9 @@ export default function InsightsPage() {
           disabled={isRefreshing || isLoading}
           className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700 transition-colors disabled:opacity-50"
         >
-          <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`} />
+          <RefreshCw
+            className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`}
+          />
           <span className="hidden sm:inline">Actualizar</span>
         </button>
       </Header>
@@ -153,7 +178,9 @@ export default function InsightsPage() {
                 <Loader2 className="w-8 h-8 text-white animate-spin" />
               </div>
             </div>
-            <p className="text-sm text-gray-500 mt-4">Analizando datos con IA...</p>
+            <p className="text-sm text-gray-500 mt-4">
+              Analizando datos con IA...
+            </p>
           </div>
         </div>
       )}
@@ -163,7 +190,9 @@ export default function InsightsPage() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <AlertTriangle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-sm text-gray-500 mb-3">Error al cargar insights</p>
+            <p className="text-sm text-gray-500 mb-3">
+              Error al cargar insights
+            </p>
             <button
               onClick={handleRefresh}
               className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
@@ -185,7 +214,7 @@ export default function InsightsPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
                   activeTab === tab.id
-                    ? "bg-gray-900 text-white shadow-lg"
+                    ? "bg-[#003d5c] text-white shadow-lg"
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
@@ -219,7 +248,9 @@ export default function InsightsPage() {
                     <Sparkles className="w-8 h-8 text-white" />
                   </div>
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">Sin insights en esta categoría</h3>
+                <h3 className="font-semibold text-gray-900 mb-1">
+                  Sin insights en esta categoría
+                </h3>
                 <p className="text-sm text-gray-500">
                   Prueba con otra categoría o actualiza los datos
                 </p>
@@ -241,7 +272,9 @@ const InsightCard = ({ insight }: { insight: Insight }) => {
       className={`group relative overflow-hidden border-none shadow-sm ring-1 ${colors.ring} hover:shadow-xl transition-all duration-300`}
     >
       {/* Gradient accent bar */}
-      <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${colors.gradient}`} />
+      <div
+        className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${colors.gradient}`}
+      />
 
       <div className="p-5">
         {/* Header */}
@@ -251,7 +284,9 @@ const InsightCard = ({ insight }: { insight: Insight }) => {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <span className={`text-xs font-semibold uppercase tracking-wide ${colors.text}`}>
+              <span
+                className={`text-xs font-semibold uppercase tracking-wide ${colors.text}`}
+              >
                 {insight.tipo}
               </span>
               {insight.prioridad === "alta" && (
@@ -277,7 +312,9 @@ const InsightCard = ({ insight }: { insight: Insight }) => {
           {insight.clienteAfectado && (
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-lg text-xs text-gray-600">
               <User className="w-3.5 h-3.5" />
-              <span className="font-medium">{insight.clienteAfectado.nombre}</span>
+              <span className="font-medium">
+                {insight.clienteAfectado.nombre}
+              </span>
             </div>
           )}
           {insight.urgencia && (
@@ -294,8 +331,12 @@ const InsightCard = ({ insight }: { insight: Insight }) => {
             <div className="flex items-start gap-2">
               <Zap className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
               <div>
-                <p className="text-xs font-semibold text-gray-700 mb-0.5">Acción sugerida</p>
-                <p className="text-sm text-gray-600 line-clamp-2">{insight.accion}</p>
+                <p className="text-xs font-semibold text-gray-700 mb-0.5">
+                  Acción sugerida
+                </p>
+                <p className="text-sm text-gray-600 line-clamp-2">
+                  {insight.accion}
+                </p>
               </div>
             </div>
           </div>
@@ -313,7 +354,9 @@ const InsightCard = ({ insight }: { insight: Insight }) => {
               <Newspaper className="w-4 h-4 text-gray-400" />
               <div>
                 <p className="text-xs text-gray-500">Fuente</p>
-                <p className="text-sm font-medium text-gray-700">{insight.noticiaRelacionada.fuente}</p>
+                <p className="text-sm font-medium text-gray-700">
+                  {insight.noticiaRelacionada.fuente}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-1 text-purple-600 text-xs font-medium">

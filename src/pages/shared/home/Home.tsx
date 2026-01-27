@@ -18,19 +18,22 @@ const Home = () => {
     {
       label: "Crear cliente",
       icon: UserPlus,
-      className: "bg-green-50 border-green-200 hover:bg-green-600 hover:border-green-600 text-green-700 hover:text-white",
+      className:
+        "bg-green-50 border-green-200 hover:bg-green-600 hover:border-green-600 text-green-700 hover:text-white",
       link: "/dashboard/gestion-trabajo/clientes",
     },
     {
       label: "Crear póliza",
       icon: FilePlus2,
-      className: "bg-indigo-50 border-indigo-200 hover:bg-indigo-600 hover:border-indigo-600 text-indigo-700 hover:text-white",
+      className:
+        "bg-indigo-50 border-indigo-200 hover:bg-indigo-600 hover:border-indigo-600 text-indigo-700 hover:text-white",
       link: "/dashboard/gestion-trabajo/polizas",
     },
     {
       label: "Crear lead",
       icon: PlusCircle,
-      className: "bg-blue-50 border-blue-200 hover:bg-blue-600 hover:border-blue-600 text-blue-700 hover:text-white",
+      className:
+        "bg-blue-50 border-blue-200 hover:bg-blue-600 hover:border-blue-600 text-blue-700 hover:text-white",
       link: "/dashboard/gestion-trabajo/leads",
     },
   ];
@@ -38,7 +41,7 @@ const Home = () => {
   return (
     <>
       {/* Custom Header */}
-      <div className="flex flex-col gap-3 mb-4 mt-4">
+      <div className="flex flex-col gap-3 mb-6 mt-4">
         {/* Mobile Toggle */}
         <div className="flex items-center lg:hidden mb-2">
           <button
@@ -51,28 +54,13 @@ const Home = () => {
 
         <div className="flex items-center justify-between gap-4">
           {/* Left: Usuario */}
-          <div className="flex items-center gap-4">
-            <div className="relative shrink-0">
-              <div className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-4 border-white shadow-lg ring-1 ring-gray-200">
-                  <img
-                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      displayName
-                    )}&background=ffffff&color=0b1a2b`}
-                    alt={displayName}
-                    className="w-full h-full object-cover"
-                  />
-              </div>
-              <div className="absolute bottom-1 right-1 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full shadow-sm"></div>
-            </div>
-            <div>
-              <h1 className="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">
-                ¡Hola,{" "}
-                <span className="text-[--austral-azul]">{displayName}</span>!
-              </h1>
-              <p className="text-gray-500 mt-0.5 text-xs md:text-sm font-medium">
-                ¿Qué te gustaría gestionar hoy?
-              </p>
-            </div>
+          <div className="ml-2">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
+              ¡Hola, <span className="text-[#003d5c]">{displayName}</span>!
+            </h1>
+            <p className="text-gray-500 mt-1 text-sm md:text-base font-medium">
+              ¿Qué te gustaría gestionar hoy?
+            </p>
           </div>
 
           {/* Right: Acciones Rápidas */}
@@ -92,22 +80,22 @@ const Home = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4">
-        {/* FILA 1: AI Insights + Austral AI */}
+        {/* FILA 1: Tareas + Resumen Leads */}
         <div className="col-span-1 md:col-span-1 lg:col-span-4 min-h-[200px]">
-          <AIInsightsWidget />
+          <TasksWidget />
         </div>
 
         <div className="col-span-1 md:col-span-1 lg:col-span-8 min-h-[200px]">
-          <AustralAIPromo />
-        </div>
-
-        {/* FILA 2: Leads (más ancho) + Tareas */}
-        <div className="col-span-1 md:col-span-1 lg:col-span-7 min-h-[200px]">
           <LeadsSummaryWidget />
         </div>
 
+        {/* FILA 2: Insights AI + Austral AI */}
+        <div className="col-span-1 md:col-span-1 lg:col-span-7 min-h-[200px]">
+          <AIInsightsWidget />
+        </div>
+
         <div className="col-span-1 md:col-span-1 lg:col-span-5 min-h-[200px]">
-          <TasksWidget />
+          <AustralAIPromo />
         </div>
 
         {/* FILA 3: Acciones (móvil) + Noticias */}

@@ -9,7 +9,7 @@ const QUERY_KEY = "leads";
 export const leadService = {
   getAll: async (): Promise<Lead[]> => {
     try {
-      const response = await api.get<{ data: Lead[] }>("/leads");
+      const response = await api.get<{ data: Lead[] }>("/leads?limit=100");
       // El backend devuelve { data: [...] }
       const leads = response.data.data;
       // Asegurar que siempre devolvemos un array

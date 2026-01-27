@@ -74,7 +74,7 @@ export const InsuranceNews = () => {
 
   return (
     <Card
-      className="h-full border-none shadow-sm ring-1 ring-gray-200 overflow-hidden relative group bg-gray-900"
+      className="h-full border-none shadow-sm ring-1 ring-[#003d5c]/10 hover:ring-[#003d5c]/20 transition-all overflow-hidden relative group bg-gray-900"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >

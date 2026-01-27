@@ -50,17 +50,14 @@ export const TasksWidget = () => {
   }
 
   return (
-    <Card className="h-full border-none shadow-sm ring-1 ring-gray-200 hover:ring-gray-300 transition-all bg-white relative overflow-hidden">
-      {/* Decorative Background */}
-      <div className="absolute top-0 right-0 w-40 h-40 bg-orange-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-60 pointer-events-none" />
-
-      <CardHeader className="pb-2 pt-3 px-3 relative z-10">
-        <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2 ml-1">
-          <CheckSquare className="w-5 h-5 text-orange-500" />
+    <Card className="h-full border-none shadow-sm ring-1 ring-[#003d5c]/10 hover:ring-[#003d5c]/20 transition-all bg-white relative overflow-hidden">
+      <CardHeader className="pb-2 pt-4 px-4 relative z-10">
+        <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-2.5">
+          <CheckSquare className="w-5 h-5 text-[#003d5c]" />
           Tareas Pendientes
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-0 px-2 pb-2 relative z-10">
+      <CardContent className="pt-0 px-3 pb-3 relative z-10">
         <div className="space-y-2 h-[220px] overflow-y-auto pr-1 custom-scrollbar">
           {pendingTasks.length > 0 ? (
             pendingTasks.map((tarea) => {
@@ -70,35 +67,38 @@ export const TasksWidget = () => {
               return (
                 <div
                   key={tarea.idTarea}
-                  className="group flex flex-col p-2.5 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 hover:border-orange-200 relative overflow-hidden"
+                  className="group flex flex-col p-3 bg-white/80 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-lg transition-all border border-[#003d5c]/10 hover:border-[#003d5c]/30 relative overflow-hidden hover:-translate-y-0.5"
                 >
+                  {/* Subtle gradient overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-50/0 via-blue-50/50 to-blue-50/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
                   {/* Priority Indicator Dot */}
-                  <div className="absolute top-2.5 right-2.5 flex gap-1">
+                  <div className="absolute top-3 right-3 flex gap-1 z-10">
                     <span
                       className={`w-2 h-2 rounded-full ${
                         tarea.prioridad === "ALTA"
-                          ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]"
+                          ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)] animate-pulse"
                           : tarea.prioridad === "MEDIA"
-                          ? "bg-amber-500"
-                          : "bg-emerald-500"
+                            ? "bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.4)]"
+                            : "bg-emerald-500"
                       }`}
                     />
                   </div>
 
-                  <div className="flex flex-col gap-1 mb-1 pr-4">
-                    <h4 className="text-sm font-bold text-gray-800 line-clamp-2 group-hover:text-orange-600 transition-colors leading-snug">
+                  <div className="flex flex-col gap-1 mb-2 pr-4 relative z-10">
+                    <h4 className="text-sm font-bold text-gray-800 line-clamp-2 group-hover:text-[#003d5c] transition-colors leading-snug">
                       {tarea.asunto}
                     </h4>
                   </div>
 
-                  <div className="flex justify-between items-center mt-auto pt-1 border-t border-gray-50">
+                  <div className="flex justify-between items-center mt-auto pt-2 border-t border-[#003d5c]/10 relative z-10">
                     <span
-                      className={`text-xs font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider ${
+                      className={`text-xs font-bold px-2 py-1 rounded-lg uppercase tracking-wider ${
                         tarea.prioridad === "ALTA"
-                          ? "bg-red-50 text-red-600"
+                          ? "bg-gradient-to-r from-red-50 to-red-100 text-red-600"
                           : tarea.prioridad === "MEDIA"
-                          ? "bg-amber-50 text-amber-600"
-                          : "bg-emerald-50 text-emerald-600"
+                            ? "bg-gradient-to-r from-amber-50 to-amber-100 text-amber-600"
+                            : "bg-gradient-to-r from-emerald-50 to-emerald-100 text-emerald-600"
                       }`}
                     >
                       {tarea.prioridad}
@@ -106,8 +106,8 @@ export const TasksWidget = () => {
                     <span
                       className={`text-[10px] flex items-center gap-1 font-semibold ${
                         isOverdue
-                          ? "text-red-500 bg-red-50 px-1.5 py-0.5 rounded-full"
-                          : "text-gray-400"
+                          ? "text-red-600 bg-red-100 px-2 py-1 rounded-full"
+                          : "text-gray-500"
                       }`}
                     >
                       <Clock className="w-3 h-3" />
@@ -118,12 +118,12 @@ export const TasksWidget = () => {
               );
             })
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-center p-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-100 to-emerald-200 text-emerald-600 rounded-full flex items-center justify-center mb-2 shadow-sm">
-                <CheckSquare className="w-6 h-6" />
+            <div className="flex flex-col items-center justify-center h-full text-center p-4">
+              <div className="w-14 h-14 bg-gradient-to-br from-green-100 via-emerald-200 to-teal-100 text-emerald-600 rounded-full flex items-center justify-center mb-3 shadow-lg">
+                <CheckSquare className="w-7 h-7" />
               </div>
-              <p className="text-xs font-bold text-gray-900">¡Todo al día!</p>
-              <p className="text-[10px] text-gray-500 mt-0.5">
+              <p className="text-sm font-bold text-gray-900">¡Todo al día!</p>
+              <p className="text-xs text-gray-500 mt-1">
                 No tienes tareas pendientes.
               </p>
             </div>
@@ -131,9 +131,9 @@ export const TasksWidget = () => {
 
           <Link
             to="/dashboard/gestion-trabajo/tareas"
-            className="block text-center text-[10px] font-bold text-gray-400 hover:text-orange-500 hover:bg-orange-50 py-1.5 rounded-lg transition-all mt-1"
+            className="block text-center text-xs font-bold text-[#003d5c] hover:text-[#003d5c]/80 hover:bg-blue-50 py-2 rounded-lg transition-all mt-2"
           >
-            Ver todas las tareas
+            Ver todas las tareas →
           </Link>
         </div>
       </CardContent>

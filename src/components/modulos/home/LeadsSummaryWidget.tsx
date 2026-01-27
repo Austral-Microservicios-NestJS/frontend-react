@@ -26,6 +26,12 @@ export const LeadsSummaryWidget = () => {
     { name: "Perdidos", value: leadsByEstado.PERDIDO.length, color: "#f43f5e" }, // rose-500
   ];
 
+  const totalLeads = data.reduce((acc, item) => acc + item.value, 0);
+  const tasaConversion =
+    totalLeads > 0
+      ? ((leadsByEstado.CERRADO.length / totalLeads) * 100).toFixed(1)
+      : "0.0";
+
   if (isLoading) {
     return (
       <Card className="h-full border-none shadow-sm ring-1 ring-gray-200">
@@ -42,14 +48,14 @@ export const LeadsSummaryWidget = () => {
   }
 
   return (
-    <Card className="h-full border-none shadow-sm ring-1 ring-gray-200 hover:ring-gray-300 transition-all bg-white group relative overflow-hidden flex flex-col">
+    <Card className="h-full border-none shadow-sm ring-1 ring-[#003d5c]/10 hover:ring-[#003d5c]/20 transition-all bg-white group relative overflow-hidden flex flex-col">
       {/* Decorative Background Elements */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full blur-3xl -mr-16 -mt-16 opacity-50 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-50 rounded-full blur-2xl -ml-12 -mb-12 opacity-50 pointer-events-none" />
 
-      <CardHeader className="pb-2 pt-3 px-3 border-b border-gray-50 relative z-10 shrink-0">
+      <CardHeader className="pb-0 pt-4 px-3 border-b border-gray-50 relative z-10 shrink-0">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2 ml-3">
+          <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-2.5 ml-3">
             <Users className="w-5 h-5 text-indigo-600" />
             Resumen de Leads
           </CardTitle>
@@ -63,8 +69,41 @@ export const LeadsSummaryWidget = () => {
         </div>
       </CardHeader>
 
-      <CardContent className="p-4 relative z-10 flex-1 min-h-0">
-        <div className="h-full w-full min-h-[200px] relative">
+      <CardContent className="px-4 pb-4 pt-0 relative z-10 flex-1 min-h-0">
+        {/* Estadísticas Rápidas */}
+        <div className="grid grid-cols-4 gap-3 mb-3 -mt-1">
+          <div className="bg-white rounded-lg p-3 border border-gray-200">
+            <p className="text-xs text-gray-500 font-semibold mb-1.5">Total</p>
+            <p className="text-3xl font-bold text-gray-900">{totalLeads}</p>
+          </div>
+          <div className="bg-white rounded-lg p-3 border border-gray-200">
+            <p className="text-xs text-gray-500 font-semibold mb-1.5">
+              Contactados
+            </p>
+            <p className="text-3xl font-bold text-gray-900">
+              {leadsByEstado.CONTACTADO.length}
+            </p>
+          </div>
+          <div className="bg-white rounded-lg p-3 border border-gray-200">
+            <p className="text-xs text-gray-500 font-semibold mb-1.5">
+              Cerrados
+            </p>
+            <p className="text-3xl font-bold text-gray-900">
+              {leadsByEstado.CERRADO.length}
+            </p>
+          </div>
+          <div className="bg-white rounded-lg p-3 border border-gray-200">
+            <p className="text-xs text-gray-500 font-semibold mb-1.5">
+              Conversión
+            </p>
+            <p className="text-3xl font-bold text-gray-900">
+              {tasaConversion}%
+            </p>
+          </div>
+        </div>
+
+        {/* Gráfico de Barras */}
+        <div className="h-[180px] w-full relative">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={data}

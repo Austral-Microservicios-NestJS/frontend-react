@@ -58,7 +58,7 @@ export const AIInsightsWidget = () => {
   // Estado de carga
   if (isLoading) {
     return (
-      <Card className="h-full border-none shadow-sm ring-1 ring-gray-200 overflow-hidden">
+      <Card className="h-full border-none shadow-sm ring-1 ring-[#003d5c]/10 hover:ring-[#003d5c]/20 transition-all overflow-hidden">
         <div className="p-4 h-full flex flex-col">
           <div className="flex items-center gap-2 mb-3">
             <div className="relative">
@@ -86,7 +86,7 @@ export const AIInsightsWidget = () => {
   // Estado de error
   if (error) {
     return (
-      <Card className="h-full border-none shadow-sm ring-1 ring-gray-200 overflow-hidden">
+      <Card className="h-full border-none shadow-sm ring-1 ring-[#003d5c]/10 hover:ring-[#003d5c]/20 transition-all overflow-hidden">
         <div className="p-4 h-full flex flex-col">
           <div className="flex items-center gap-2 mb-3">
             <div className="relative">
@@ -120,7 +120,7 @@ export const AIInsightsWidget = () => {
   const insights = data?.insights || [];
 
   return (
-    <Card className="h-full border-none shadow-sm ring-1 ring-gray-200 overflow-hidden">
+    <Card className="h-full border-none shadow-sm ring-1 ring-[#003d5c]/10 hover:ring-[#003d5c]/20 transition-all overflow-hidden">
       <div className="p-4 h-full flex flex-col">
         {/* Header con Aurora Badge */}
         <div className="flex items-center justify-between mb-3">
