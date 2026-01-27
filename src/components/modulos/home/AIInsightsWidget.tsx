@@ -68,10 +68,10 @@ export const AIInsightsWidget = () => {
               </div>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-sm">
+              <h3 className="font-semibold text-gray-900 text-lg ml-2">
                 Insights AI
               </h3>
-              <p className="text-[10px] text-gray-400">Powered by Austral AI</p>
+              <p className="text-[10px] text-gray-400 ml-2">Powered by Austral AI</p>
             </div>
           </div>
           <div className="flex-1 flex flex-col items-center justify-center gap-2">
@@ -96,10 +96,10 @@ export const AIInsightsWidget = () => {
               </div>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-sm">
+              <h3 className="font-semibold text-gray-900 text-lg ml-2">
                 Insights AI
               </h3>
-              <p className="text-[10px] text-gray-400">Powered by Austral AI</p>
+              <p className="text-[10px] text-gray-400 ml-2">Powered by Austral AI</p>
             </div>
           </div>
           <div className="flex-1 flex flex-col items-center justify-center gap-2">
@@ -132,10 +132,10 @@ export const AIInsightsWidget = () => {
               </div>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-sm">
+              <h3 className="font-semibold text-gray-900 text-lg ml-2">
                 Insights AI
               </h3>
-              <p className="text-[10px] text-gray-400">Powered by Austral AI</p>
+              <p className="text-[10px] text-gray-400 ml-2">Powered by Austral AI</p>
             </div>
           </div>
           <button

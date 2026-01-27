@@ -1,7 +1,6 @@
 import { LeadsSummaryWidget } from "@/components/modulos/home/LeadsSummaryWidget";
 import { QuickActionsWidget } from "@/components/modulos/home/QuickActionsWidget";
 import { TasksWidget } from "@/components/modulos/home/TasksWidget";
-import { InsuranceNews } from "@/components/modulos/home/InsuranceNews";
 import { AustralAIPromo } from "@/components/modulos/home/AustralAIPromo";
 import { AIInsightsWidget } from "@/components/modulos/home/AIInsightsWidget";
 import { useAuthStore } from "@/store/auth.store";
@@ -98,13 +97,9 @@ const Home = () => {
           <AustralAIPromo />
         </div>
 
-        {/* FILA 3: Acciones (móvil) + Noticias */}
+        {/* FILA 3: Acciones (móvil) */}
         <div className="col-span-1 md:col-span-1 lg:hidden min-h-[200px]">
           <QuickActionsWidget />
-        </div>
-
-        <div className="col-span-1 md:col-span-2 lg:col-span-12 min-h-[200px]">
-          <InsuranceNews />
         </div>
       </div>
     </>

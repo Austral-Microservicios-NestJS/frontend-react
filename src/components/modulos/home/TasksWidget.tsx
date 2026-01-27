@@ -51,16 +51,23 @@ export const TasksWidget = () => {
 
   return (
     <Card className="h-full border-none shadow-sm ring-1 ring-[#003d5c]/10 hover:ring-[#003d5c]/20 transition-all bg-white relative overflow-hidden">
-      <CardHeader className="pb-2 pt-4 px-4 relative z-10">
-        <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-2.5">
-          <CheckSquare className="w-5 h-5 text-[#003d5c]" />
-          Tareas Pendientes
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-0 px-3 pb-3 relative z-10">
-        <div className="space-y-2 h-[220px] overflow-y-auto pr-1 custom-scrollbar">
-          {pendingTasks.length > 0 ? (
-            pendingTasks.map((tarea) => {
+      <div className="p-4 h-full flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <div className="bg-[#003d5c] p-1.5 rounded-lg">
+              <CheckSquare className="w-4 h-4 text-white" />
+            </div>
+            <h3 className="font-semibold text-gray-900 text-lg ml-2">
+              Tareas Pendientes
+            </h3>
+          </div>
+        </div>
+        {/* Lista de Tareas */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="space-y-2">
+            {pendingTasks.length > 0 ? (
+              pendingTasks.map((tarea) => {
               const dueDate = dayjs(tarea.fechaVencimiento);
               const isOverdue = dueDate.isBefore(today, "day");
 
@@ -135,8 +142,9 @@ export const TasksWidget = () => {
           >
             Ver todas las tareas →
           </Link>
+          </div>
         </div>
-      </CardContent>
+      </div>
     </Card>
   );
 };

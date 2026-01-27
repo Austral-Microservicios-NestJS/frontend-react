@@ -53,25 +53,28 @@ export const LeadsSummaryWidget = () => {
       <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full blur-3xl -mr-16 -mt-16 opacity-50 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-50 rounded-full blur-2xl -ml-12 -mb-12 opacity-50 pointer-events-none" />
 
-      <CardHeader className="pb-0 pt-4 px-3 border-b border-gray-50 relative z-10 shrink-0">
-        <div className="flex justify-between items-center">
-          <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-2.5 ml-3">
-            <Users className="w-5 h-5 text-indigo-600" />
-            Resumen de Leads
-          </CardTitle>
+      <div className="p-4 h-full flex flex-col relative z-10">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <div className="bg-[#003d5c] p-1.5 rounded-lg">
+              <Users className="w-4 h-4 text-white" />
+            </div>
+            <h3 className="font-semibold text-gray-900 text-lg ml-2">
+              Resumen de Leads
+            </h3>
+          </div>
           <Link
             to="/dashboard/gestion-trabajo/leads"
-            className="text-xs font-bold text-white bg-(--austral-azul) px-3 py-1.5 rounded-md hover:bg-indigo-700 shadow-sm hover:shadow transition-all flex items-center gap-1.5 group/link"
+            className="text-xs font-bold text-white bg-[#003d5c] px-3 py-1.5 rounded-md hover:opacity-90 shadow-sm hover:shadow transition-all flex items-center gap-1.5 group/link"
           >
             Ver tablero
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/link:translate-x-0.5" />
           </Link>
         </div>
-      </CardHeader>
 
-      <CardContent className="px-4 pb-4 pt-0 relative z-10 flex-1 min-h-0">
         {/* Estadísticas Rápidas */}
-        <div className="grid grid-cols-4 gap-3 mb-3 -mt-1">
+        <div className="grid grid-cols-4 gap-3 mb-3">
           <div className="bg-white rounded-lg p-3 border border-gray-200">
             <p className="text-xs text-gray-500 font-semibold mb-1.5">Total</p>
             <p className="text-3xl font-bold text-gray-900">{totalLeads}</p>
@@ -137,7 +140,7 @@ export const LeadsSummaryWidget = () => {
             </BarChart>
           </ResponsiveContainer>
         </div>
-      </CardContent>
+      </div>
     </Card>
   );
 };

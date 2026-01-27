@@ -98,9 +98,9 @@ export const InsuranceNews = () => {
       >
         {/* Header Badge */}
         <div className="flex justify-between items-start">
-          <div className="bg-white/20 backdrop-blur-md border border-white/10 text-white px-2.5 py-1 rounded-full flex items-center gap-1.5 text-xs font-bold shadow-lg">
-            <Newspaper className="w-3.5 h-3.5" />
-            <span>Noticias</span>
+          <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md border border-white/10 text-white px-2.5 py-1 rounded-lg">
+            <Newspaper className="w-4 h-4" />
+            <span className="font-semibold text-lg ml-1">Noticias del Sector</span>
           </div>
         </div>
 
