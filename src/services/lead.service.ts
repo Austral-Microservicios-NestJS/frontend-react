@@ -2,6 +2,50 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/config/api-client";
 import type { Lead, CreateLead, UpdateLead } from "@/types/lead.interface";
 
+// Interfaz para la respuesta de consulta de placa AI
+export interface ConsultaPlacaResponse {
+  placa: string;
+  marca: string;
+  modelo: string;
+  color: string;
+  estado: string;
+  nroSerie?: string;
+  nroVin?: string;
+  nroMotor?: string;
+  anio?: string;
+  clase?: string;
+  uso?: string;
+  sede?: string;
+  departamentoSede?: string;
+  anotaciones?: string | null;
+  soat?: {
+    estado?: string;
+    numeroPoliza?: string;
+    inicio?: string;
+    fin?: string;
+    compania?: string;
+    codigoSbsAseguradora?: string;
+    claseVehiculo?: string;
+    usoVehiculo?: string;
+    tipo?: string;
+  };
+  propietarios?: Array<{
+    tipoDocumento?: number;
+    nroDocumento?: string;
+    apellidoPaterno?: string;
+    apellidoMaterno?: string;
+    nombres?: string;
+    razonSocial?: string;
+    direccion?: string;
+    nacimiento?: string;
+    ubigeo?: string;
+    departamento?: string;
+    provincia?: string;
+    distrito?: string;
+    sexo?: string;
+  }>;
+}
+
 const QUERY_KEY = "leads";
 
 // ==================== API FUNCTIONS ====================
@@ -38,6 +82,12 @@ export const leadService = {
 
   delete: async (id: string): Promise<void> => {
     await api.delete(`/leads/${id}`);
+  },
+
+  // Consulta AI de placa vehicular
+  consultarPlacaAI: async (placa: string): Promise<ConsultaPlacaResponse> => {
+    const { data } = await api.get<ConsultaPlacaResponse>(`/vehiculos/placa/${placa}`);
+    return data;
   },
 
   // ==================== REACT QUERY HOOKS ====================
@@ -90,6 +140,17 @@ export const leadService = {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
       },
+    });
+  },
+
+  // Hook para consulta AI de placa
+  useConsultarPlacaAI: (placa: string | undefined) => {
+    return useQuery({
+      queryKey: ["consulta-placa", placa],
+      queryFn: () => leadService.consultarPlacaAI(placa!),
+      enabled: !!placa && placa.length >= 6,
+      retry: 1,
+      staleTime: 1000 * 60 * 10, // 10 minutos de cache
     });
   },
 };
