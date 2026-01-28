@@ -85,7 +85,9 @@ export const RegistrarProducto = ({
       ...data,
       codigo: data.codigo ? String(data.codigo).trim() : data.codigo,
       nombre: data.nombre ? String(data.nombre).trim() : data.nombre,
-      descripcion: data.descripcion ? String(data.descripcion).trim() : data.descripcion,
+      descripcion: data.descripcion
+        ? String(data.descripcion).trim()
+        : data.descripcion,
     };
 
     console.log("RegistrarProducto onSubmit payload:", payload);
@@ -105,7 +107,11 @@ export const RegistrarProducto = ({
       console.log("RegistrarProducto getValues() error:", e);
     }
     try {
-      console.log("RegistrarProducto watch nombre, descripcion:", watch("nombre"), watch("descripcion"));
+      console.log(
+        "RegistrarProducto watch nombre, descripcion:",
+        watch("nombre"),
+        watch("descripcion"),
+      );
     } catch (e) {
       console.log("RegistrarProducto watch() error:", e);
     }
@@ -219,10 +225,7 @@ export const RegistrarProducto = ({
             <FormGroupDivisor>
               <FormGroup>
                 <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="esObligatorio"
-                    {...register("esObligatorio")}
-                  />
+                  <Checkbox id="esObligatorio" {...register("esObligatorio")} />
                   <Label
                     htmlFor="esObligatorio"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"

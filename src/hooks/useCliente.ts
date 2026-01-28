@@ -9,10 +9,11 @@ export const useClientes = () => {
   const idUsuario = user?.idUsuario || "";
 
   // Obtener clientes del usuario actual (pasar rol para filtrado en backend)
-  const { data: clientes = [], isLoading, error } = clienteService.useGetByUsuario(
-    idUsuario,
-    user?.rol?.nombreRol
-  );
+  const {
+    data: clientes = [],
+    isLoading,
+    error,
+  } = clienteService.useGetByUsuario(idUsuario, user?.rol?.nombreRol);
 
   const createMutation = clienteService.useCreate();
   const updateMutation = clienteService.useUpdate();
@@ -74,7 +75,9 @@ export const useClientes = () => {
   const toggleActivo = async (id: string, activo: boolean) => {
     try {
       await updateMutation.mutateAsync({ id, data: { activo } });
-      toast.success(`Cliente ${activo ? "activado" : "desactivado"} exitosamente`);
+      toast.success(
+        `Cliente ${activo ? "activado" : "desactivado"} exitosamente`,
+      );
     } catch (error) {
       toast.error("Error al cambiar el estado del cliente");
       throw error;

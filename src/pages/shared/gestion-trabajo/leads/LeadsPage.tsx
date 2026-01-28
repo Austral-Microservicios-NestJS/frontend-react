@@ -58,7 +58,6 @@ export default function LeadsPage() {
     }
   };
 
-
   const handleDrop = async (leadId: string, nuevoEstado: EstadoLead) => {
     await cambiarEstadoLead(leadId, nuevoEstado);
   };
@@ -378,7 +377,7 @@ function LeadCard({
         <div className="flex gap-1 flex-wrap">
           <span
             className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${getPriorityStyles(
-              lead.prioridad
+              lead.prioridad,
             )}`}
           >
             {lead.prioridad}

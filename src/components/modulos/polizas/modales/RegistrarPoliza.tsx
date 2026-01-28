@@ -104,24 +104,24 @@ export const RegistrarPoliza = ({
 
   // Obtener brokers para admin
   const { data: brokers = [] } = usuarioApi.useGetBrokersBySupervisor(
-    isAdmin ? user?.idUsuario || "" : ""
+    isAdmin ? user?.idUsuario || "" : "",
   );
 
   // Obtener subordinados según el rol
   // ADMIN: obtiene sus brokers directos (ya obtenido arriba)
   // BROKER: obtiene sus agentes
   const { data: subordinados = [] } = asignacionApi.useGetSubordinados(
-    isAdmin ? "" : isBroker ? user?.idUsuario || "" : ""
+    isAdmin ? "" : isBroker ? user?.idUsuario || "" : "",
   );
 
   // Obtener agentes del broker seleccionado (solo para ADMIN)
   const { data: agentesDelBroker = [] } = asignacionApi.useGetSubordinados(
-    isAdmin && watchIdBroker ? watchIdBroker : ""
+    isAdmin && watchIdBroker ? watchIdBroker : "",
   );
 
   // Obtener supervisor (para agentes) para pre-llenar broker
   const { data: supervisorAsignacion } = asignacionApi.useGetSupervisor(
-    isAgent ? user?.idUsuario || "" : ""
+    isAgent ? user?.idUsuario || "" : "",
   );
 
   // Resetear formulario cuando el modal se cierra o abre
@@ -171,10 +171,12 @@ export const RegistrarPoliza = ({
   useEffect(() => {
     if (isOpen && isAgent && uid) {
       setValue("idAgente", uid, { shouldValidate: true });
-      
+
       // Esperar a que llegue la información del supervisor
       if (supervisorAsignacion?.supervisor?.idUsuario) {
-        setValue("idBroker", supervisorAsignacion.supervisor.idUsuario, { shouldValidate: true });
+        setValue("idBroker", supervisorAsignacion.supervisor.idUsuario, {
+          shouldValidate: true,
+        });
       }
     }
   }, [isOpen, isAgent, user, supervisorAsignacion, setValue]);
@@ -188,12 +190,15 @@ export const RegistrarPoliza = ({
 
   // Calcular fechas automáticamente según tipoVigencia
   useEffect(() => {
-    if (watchTipoVigencia === TipoVigencia.ANUAL || watchTipoVigencia === TipoVigencia.DECLARACION_MENSUAL) {
+    if (
+      watchTipoVigencia === TipoVigencia.ANUAL ||
+      watchTipoVigencia === TipoVigencia.DECLARACION_MENSUAL
+    ) {
       // Si no hay vigenciaInicio, establecer hoy
       if (!watchVigenciaInicio) {
         const hoy = dayjs().format("YYYY-MM-DD");
         setValue("vigenciaInicio", hoy);
-        
+
         // Calcular vigenciaFin
         if (watchTipoVigencia === TipoVigencia.ANUAL) {
           const vigenciaFin = dayjs().add(1, "year").format("YYYY-MM-DD");
@@ -208,12 +213,20 @@ export const RegistrarPoliza = ({
 
   // Actualizar vigenciaFin cuando cambia vigenciaInicio manualmente
   useEffect(() => {
-    if (watchVigenciaInicio && (watchTipoVigencia === TipoVigencia.ANUAL || watchTipoVigencia === TipoVigencia.DECLARACION_MENSUAL)) {
+    if (
+      watchVigenciaInicio &&
+      (watchTipoVigencia === TipoVigencia.ANUAL ||
+        watchTipoVigencia === TipoVigencia.DECLARACION_MENSUAL)
+    ) {
       if (watchTipoVigencia === TipoVigencia.ANUAL) {
-        const vigenciaFin = dayjs(watchVigenciaInicio).add(1, "year").format("YYYY-MM-DD");
+        const vigenciaFin = dayjs(watchVigenciaInicio)
+          .add(1, "year")
+          .format("YYYY-MM-DD");
         setValue("vigenciaFin", vigenciaFin);
       } else if (watchTipoVigencia === TipoVigencia.DECLARACION_MENSUAL) {
-        const vigenciaFin = dayjs(watchVigenciaInicio).add(1, "month").format("YYYY-MM-DD");
+        const vigenciaFin = dayjs(watchVigenciaInicio)
+          .add(1, "month")
+          .format("YYYY-MM-DD");
         setValue("vigenciaFin", vigenciaFin);
       }
     }
@@ -222,7 +235,7 @@ export const RegistrarPoliza = ({
   // Auto-poblar comisiones cuando se selecciona broker
   useEffect(() => {
     if (watchIdBroker && isAdmin) {
-      const selectedBroker = brokers.find(b => b.idUsuario === watchIdBroker);
+      const selectedBroker = brokers.find((b) => b.idUsuario === watchIdBroker);
       if (selectedBroker) {
         setValue("comisionBroker", selectedBroker.porcentajeComision);
       }
@@ -251,7 +264,16 @@ export const RegistrarPoliza = ({
         });
       }
     }
-  }, [watchIdBroker, brokers, isAdmin, isBroker, isAgent, supervisorAsignacion, user, setValue]);
+  }, [
+    watchIdBroker,
+    brokers,
+    isAdmin,
+    isBroker,
+    isAgent,
+    supervisorAsignacion,
+    user,
+    setValue,
+  ]);
 
   // Auto-poblar comisión de agente cuando se selecciona
   useEffect(() => {
@@ -259,9 +281,9 @@ export const RegistrarPoliza = ({
       // Para ADMINISTRADOR: buscar asignación del agente en agentesDelBroker
       if (isAdmin && agentesDelBroker.length > 0) {
         const agenteAsignacion = agentesDelBroker.find(
-          (asig) => asig.subordinado.idUsuario === watchIdAgente
+          (asig) => asig.subordinado.idUsuario === watchIdAgente,
         );
-        
+
         if (agenteAsignacion) {
           setValue("comisionAgente", agenteAsignacion.porcentajeComision);
         }
@@ -270,20 +292,34 @@ export const RegistrarPoliza = ({
       // Para BROKER: buscar asignación del agente en subordinados
       if (isBroker && subordinados.length > 0) {
         const agenteAsignacion = subordinados.find(
-          (asig) => asig.subordinado.idUsuario === watchIdAgente
+          (asig) => asig.subordinado.idUsuario === watchIdAgente,
         );
-        
+
         if (agenteAsignacion) {
           setValue("comisionAgente", agenteAsignacion.porcentajeComision);
         }
       }
 
       // Para AGENTE: su propia comisión viene de su asignación con el supervisor
-      if (isAgent && watchIdAgente === user?.idUsuario && supervisorAsignacion) {
+      if (
+        isAgent &&
+        watchIdAgente === user?.idUsuario &&
+        supervisorAsignacion
+      ) {
         setValue("comisionAgente", supervisorAsignacion.porcentajeComision);
       }
     }
-  }, [watchIdAgente, agentesDelBroker, subordinados, isAdmin, isBroker, isAgent, supervisorAsignacion, user, setValue]);
+  }, [
+    watchIdAgente,
+    agentesDelBroker,
+    subordinados,
+    isAdmin,
+    isBroker,
+    isAgent,
+    supervisorAsignacion,
+    user,
+    setValue,
+  ]);
 
   const onSubmit = async (data: CreatePolizaDto) => {
     const dataToSend = {
@@ -515,7 +551,8 @@ export const RegistrarPoliza = ({
                       value={
                         isBroker
                           ? user?.nombreUsuario || ""
-                          : supervisorAsignacion?.supervisor.nombreUsuario || "Cargando..."
+                          : supervisorAsignacion?.supervisor.nombreUsuario ||
+                            "Cargando..."
                       }
                       disabled
                       className="bg-gray-50"
@@ -560,7 +597,8 @@ export const RegistrarPoliza = ({
                           {isAdmin &&
                             agentesDelBroker
                               .filter(
-                                (asig) => asig.subordinado.rol?.nombreRol === "AGENTE"
+                                (asig) =>
+                                  asig.subordinado.rol?.nombreRol === "AGENTE",
                               )
                               .map((asig) => (
                                 <SelectItem
@@ -575,7 +613,8 @@ export const RegistrarPoliza = ({
                           {isBroker &&
                             subordinados
                               .filter(
-                                (asig) => asig.subordinado.rol?.nombreRol === "AGENTE"
+                                (asig) =>
+                                  asig.subordinado.rol?.nombreRol === "AGENTE",
                               )
                               .map((asig) => (
                                 <SelectItem

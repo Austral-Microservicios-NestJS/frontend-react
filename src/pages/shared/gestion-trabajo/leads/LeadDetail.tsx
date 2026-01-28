@@ -15,6 +15,7 @@ import {
   Copy,
   Car,
   Sparkles,
+  Calendar,
   Settings,
   FileText,
   RefreshCw,
@@ -57,7 +58,6 @@ export default function LeadDetail() {
     error: errorPlaca,
     refetch: refetchPlaca,
   } = leadService.useConsultarPlacaAI(placaParaConsulta);
-
   const propietariosCount = consultaPlacaData?.propietarios?.length ?? 0;
 
   useEffect(() => {
@@ -529,10 +529,10 @@ export default function LeadDetail() {
                       </div>
                       <div>
                         <h3 className="font-semibold text-gray-900">
-                          Consulta AI
+                          Consulta de PLACA
                         </h3>
                         <p className="text-xs text-gray-500">
-                          Datos del vehículo
+                          Datos del vehiculo
                         </p>
                       </div>
                     </div>
@@ -552,7 +552,7 @@ export default function LeadDetail() {
                   {errorPlaca && !isLoadingPlaca && (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
                       <p className="text-red-600 text-xs">
-                        No se pudo obtener información. Intente nuevamente.
+                        No se pudo obtener informacion. Intente nuevamente.
                       </p>
                     </div>
                   )}
@@ -613,7 +613,7 @@ export default function LeadDetail() {
                     </div>
                     <div className="bg-gray-50 border border-gray-100 rounded-lg p-3">
                       <div className="flex items-center gap-1.5 mb-1">
-                        <FileText className="w-3.5 h-3.5 text-gray-500" />
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                         <span className="text-xs text-gray-500">SOAT</span>
                       </div>
                       {isLoadingPlaca ? (
@@ -626,10 +626,8 @@ export default function LeadDetail() {
                     </div>
                     <div className="bg-gray-50 border border-gray-100 rounded-lg p-3">
                       <div className="flex items-center gap-1.5 mb-1">
-                        <FileText className="w-3.5 h-3.5 text-gray-500" />
-                        <span className="text-xs text-gray-500">
-                          Propietarios
-                        </span>
+                        <User className="w-3.5 h-3.5 text-amber-600" />
+                        <span className="text-xs text-gray-500">Propietarios</span>
                       </div>
                       {isLoadingPlaca ? (
                         <Skeleton className="h-5 w-10" />
@@ -642,9 +640,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div className="mt-4 flex items-center justify-between">
-                    <p className="text-xs text-gray-500">
-                      Vista previa de datos.
-                    </p>
+                    <p className="text-xs text-gray-500">Vista previa de datos.</p>
                     <button
                       type="button"
                       onClick={() => setIsConsultaModalOpen(true)}
@@ -680,10 +676,7 @@ export default function LeadDetail() {
                             <div>Clase: {consultaPlacaData?.clase || "-"}</div>
                             <div>Uso: {consultaPlacaData?.uso || "-"}</div>
                             <div>Sede: {consultaPlacaData?.sede || "-"}</div>
-                            <div>
-                              Departamento:{" "}
-                              {consultaPlacaData?.departamentoSede || "-"}
-                            </div>
+                            <div>Departamento: {consultaPlacaData?.departamentoSede || "-"}</div>
                             <div>Estado: {consultaPlacaData?.estado || "-"}</div>
                           </div>
                         </div>
@@ -691,18 +684,13 @@ export default function LeadDetail() {
                         <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
                           <div className="flex items-center gap-2 text-slate-700 mb-3">
                             <Hash className="w-4 h-4" />
-                            <h4 className="text-sm font-semibold">
-                              Identificacion
-                            </h4>
+                            <h4 className="text-sm font-semibold">Identificacion</h4>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-slate-700">
                             <div>Serie: {consultaPlacaData?.nroSerie || "-"}</div>
                             <div>VIN: {consultaPlacaData?.nroVin || "-"}</div>
                             <div>Motor: {consultaPlacaData?.nroMotor || "-"}</div>
-                            <div>
-                              Anotaciones:{" "}
-                              {consultaPlacaData?.anotaciones ?? "-"}
-                            </div>
+                            <div>Anotaciones: {consultaPlacaData?.anotaciones ?? "-"}</div>
                           </div>
                         </div>
 
@@ -712,91 +700,56 @@ export default function LeadDetail() {
                             <h4 className="text-sm font-semibold">SOAT</h4>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-emerald-900/80">
-                            <div>
-                              Estado: {consultaPlacaData?.soat?.estado || "-"}
-                            </div>
-                            <div>
-                              Compania: {consultaPlacaData?.soat?.compania || "-"}
-                            </div>
-                            <div>
-                              Poliza: {consultaPlacaData?.soat?.numeroPoliza || "-"}
-                            </div>
-                            <div>
-                              Vigencia:{" "}
-                              {consultaPlacaData?.soat?.inicio || "-"} -{" "}
-                              {consultaPlacaData?.soat?.fin || "-"}
-                            </div>
-                            <div>
-                              Clase vehiculo:{" "}
-                              {consultaPlacaData?.soat?.claseVehiculo || "-"}
-                            </div>
-                            <div>
-                              Uso vehiculo:{" "}
-                              {consultaPlacaData?.soat?.usoVehiculo || "-"}
-                            </div>
-                            <div>
-                              Tipo: {consultaPlacaData?.soat?.tipo || "-"}
-                            </div>
-                            <div>
-                              Codigo SBS:{" "}
-                              {consultaPlacaData?.soat?.codigoSbsAseguradora || "-"}
-                            </div>
+                            <div>Estado: {consultaPlacaData?.soat?.estado || "-"}</div>
+                            <div>Compania: {consultaPlacaData?.soat?.compania || "-"}</div>
+                            <div>Poliza: {consultaPlacaData?.soat?.numeroPoliza || "-"}</div>
+                            <div>Vigencia: {consultaPlacaData?.soat?.inicio || "-"} - {consultaPlacaData?.soat?.fin || "-"}</div>
+                            <div>Clase vehiculo: {consultaPlacaData?.soat?.claseVehiculo || "-"}</div>
+                            <div>Uso vehiculo: {consultaPlacaData?.soat?.usoVehiculo || "-"}</div>
+                            <div>Tipo: {consultaPlacaData?.soat?.tipo || "-"}</div>
+                            <div>Codigo SBS: {consultaPlacaData?.soat?.codigoSbsAseguradora || "-"}</div>
                           </div>
                         </div>
 
                         <div className="bg-amber-50 border border-amber-100 rounded-xl p-4">
                           <div className="flex items-center gap-2 text-amber-700 mb-3">
                             <User className="w-4 h-4" />
-                            <h4 className="text-sm font-semibold">
-                              Propietarios
-                            </h4>
+                            <h4 className="text-sm font-semibold">Propietarios</h4>
                           </div>
                           {consultaPlacaData?.propietarios?.length ? (
                             <div className="space-y-3 text-sm text-slate-700">
-                              {consultaPlacaData.propietarios.map(
-                                (propietario, index) => (
-                                  <div
-                                    key={`${propietario.nroDocumento || index}`}
-                                    className="border border-amber-200/60 rounded-lg p-3 bg-white/70"
-                                  >
-                                    <div className="flex items-start justify-between gap-3">
-                                      <div className="font-semibold text-slate-900">
-                                        {[
-                                          propietario.nombres,
-                                          propietario.apellidoPaterno,
-                                          propietario.apellidoMaterno,
-                                        ]
-                                          .filter(Boolean)
-                                          .join(" ") || "-"}
-                                      </div>
-                                      <div className="text-xs text-amber-600 font-semibold">
-                                        Doc: {propietario.nroDocumento || "-"}
-                                      </div>
+                              {consultaPlacaData.propietarios.map((propietario, index) => (
+                                <div
+                                  key={`${propietario.nroDocumento || index}`}
+                                  className="border border-amber-200/60 rounded-lg p-3 bg-white/70"
+                                >
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className="font-semibold text-slate-900">
+                                      {[propietario.nombres, propietario.apellidoPaterno, propietario.apellidoMaterno]
+                                        .filter(Boolean)
+                                        .join(" ") || "-"}
                                     </div>
-                                    <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-slate-600">
-                                      <div>
-                                        Direccion: {propietario.direccion || "-"}
-                                      </div>
-                                      <div className="flex items-center gap-1">
-                                        <MapPin className="w-3 h-3 text-amber-600" />
-                                        <span>
-                                          {[propietario.departamento, propietario.provincia, propietario.distrito]
-                                            .filter(Boolean)
-                                            .join(" - ") || "-"}
-                                        </span>
-                                      </div>
-                                      <div>
-                                        Nacimiento: {propietario.nacimiento || "-"}
-                                      </div>
+                                    <div className="text-xs text-amber-600 font-semibold">
+                                      Doc: {propietario.nroDocumento || "-"}
                                     </div>
                                   </div>
-                                ),
-                              )}
+                                  <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-slate-600">
+                                    <div>Direccion: {propietario.direccion || "-"}</div>
+                                    <div className="flex items-center gap-1">
+                                      <MapPin className="w-3 h-3 text-amber-600" />
+                                      <span>
+                                        {[propietario.departamento, propietario.provincia, propietario.distrito]
+                                          .filter(Boolean)
+                                          .join(" - ") || "-"}
+                                      </span>
+                                    </div>
+                                    <div>Nacimiento: {propietario.nacimiento || "-"}</div>
+                                  </div>
+                                </div>
+                              ))}
                             </div>
                           ) : (
-                            <div className="text-sm text-gray-500">
-                              Sin propietarios
-                            </div>
+                            <div className="text-sm text-gray-500">Sin propietarios</div>
                           )}
                         </div>
                       </ModalBody>

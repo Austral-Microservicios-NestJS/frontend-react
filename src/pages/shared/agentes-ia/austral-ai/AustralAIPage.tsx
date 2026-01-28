@@ -212,7 +212,7 @@ export default function AustralAIPage() {
     } catch (error) {
       console.error("Error downloading file:", error);
       toast.error(
-        "Error al descargar el archivo. Por favor intenta nuevamente."
+        "Error al descargar el archivo. Por favor intenta nuevamente.",
       );
     }
   };
