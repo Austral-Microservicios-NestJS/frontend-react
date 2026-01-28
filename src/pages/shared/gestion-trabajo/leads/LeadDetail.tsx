@@ -58,7 +58,6 @@ export default function LeadDetail() {
     refetch: refetchPlaca,
   } = leadService.useConsultarPlacaAI(placaParaConsulta);
 
-  const propietarioPrincipal = consultaPlacaData?.propietarios?.[0];
   const propietariosCount = consultaPlacaData?.propietarios?.length ?? 0;
 
   useEffect(() => {
