@@ -15,7 +15,6 @@ import {
   Copy,
   Car,
   Sparkles,
-  Calendar,
   Settings,
   FileText,
   RefreshCw,
@@ -60,13 +59,6 @@ export default function LeadDetail() {
   } = leadService.useConsultarPlacaAI(placaParaConsulta);
 
   const propietarioPrincipal = consultaPlacaData?.propietarios?.[0];
-  const propietarioNombre = [
-    propietarioPrincipal?.nombres,
-    propietarioPrincipal?.apellidoPaterno,
-    propietarioPrincipal?.apellidoMaterno,
-  ]
-    .filter(Boolean)
-    .join(" ");
   const propietariosCount = consultaPlacaData?.propietarios?.length ?? 0;
 
   useEffect(() => {
