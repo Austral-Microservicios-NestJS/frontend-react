@@ -42,6 +42,8 @@ export type InsightsParams = {
   incluirNoticias?: boolean;
   incluirContextos?: boolean;
   limite?: number;
+  userId?: string;
+  userRole?: string;
 };
 
 const QUERY_KEY = "dashboard";
@@ -54,11 +56,16 @@ export const dashboardService = {
 
   // Obtener insights de IA (noticias + contextos analizados)
   getInsights: async (params: InsightsParams = {}): Promise<InsightsResponse> => {
-    const { data } = await api.post("/dashboard/insights", {
+    const payload: Record<string, any> = {
       incluirNoticias: params.incluirNoticias ?? true,
       incluirContextos: params.incluirContextos ?? true,
       limite: params.limite ?? 5,
-    });
+    };
+    if (params.userId && params.userRole) {
+      payload.userId = params.userId;
+      payload.userRole = params.userRole;
+    }
+    const { data } = await api.post("/dashboard/insights", payload);
     return data;
   },
 

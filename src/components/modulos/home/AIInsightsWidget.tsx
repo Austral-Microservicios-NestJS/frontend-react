@@ -12,6 +12,7 @@ import type { Insight } from "@/services/dashboard.service";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ButtonIA } from "@/components/ui/ButtonIA";
+import { useAuthStore } from "@/store/auth.store";
 
 const getInsightIcon = (tipo: Insight["tipo"]) => {
   switch (tipo) {
@@ -43,10 +44,15 @@ const getInsightStyle = (
 
 export const AIInsightsWidget = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const user = useAuthStore((state) => state.user);
+  const isBroker = user?.rol?.nombreRol?.toUpperCase() === "BROKER";
   const { data, isLoading, error, refetch } = dashboardService.useGetInsights({
     incluirNoticias: true,
     incluirContextos: true,
     limite: 5,
+    ...(isBroker
+      ? { userId: user?.idUsuario, userRole: user?.rol?.nombreRol }
+      : {}),
   });
 
   const handleRefresh = async () => {
@@ -69,7 +75,7 @@ export const AIInsightsWidget = () => {
             </div>
             <div>
               <h3 className="font-semibold text-gray-900 text-lg ml-2">
-                Insights AI
+                Insights
               </h3>
               <p className="text-[10px] text-gray-400 ml-2">
                 Powered by Austral AI
@@ -99,7 +105,7 @@ export const AIInsightsWidget = () => {
             </div>
             <div>
               <h3 className="font-semibold text-gray-900 text-lg ml-2">
-                Insights AI
+                Insights
               </h3>
               <p className="text-[10px] text-gray-400 ml-2">
                 Powered by Austral AI
@@ -137,7 +143,7 @@ export const AIInsightsWidget = () => {
             </div>
             <div>
               <h3 className="font-semibold text-gray-900 text-lg ml-2">
-                Insights AI
+                Insights
               </h3>
               <p className="text-[10px] text-gray-400 ml-2">
                 Powered by Austral AI

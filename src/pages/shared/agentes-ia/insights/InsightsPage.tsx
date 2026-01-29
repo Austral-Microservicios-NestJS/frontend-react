@@ -17,6 +17,7 @@ import { Card } from "@/components/ui/card";
 import { dashboardService } from "@/services/dashboard.service";
 import type { Insight } from "@/services/dashboard.service";
 import { useSidebar } from "@/hooks/useSidebar";
+import { useAuthStore } from "@/store/auth.store";
 
 const getInsightIcon = (tipo: Insight["tipo"], size = "w-5 h-5") => {
   switch (tipo) {
@@ -81,11 +82,16 @@ export default function InsightsPage() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("todos");
+  const user = useAuthStore((state) => state.user);
+  const isBroker = user?.rol?.nombreRol?.toUpperCase() === "BROKER";
 
   const { data, isLoading, error, refetch } = dashboardService.useGetInsights({
     incluirNoticias: true,
     incluirContextos: true,
     limite: 20,
+    ...(isBroker
+      ? { userId: user?.idUsuario, userRole: user?.rol?.nombreRol }
+      : {}),
   });
 
   const handleRefresh = async () => {
@@ -151,7 +157,7 @@ export default function InsightsPage() {
   return (
     <>
       <Header
-        title="Insights AI"
+        title="Insights"
         description="Powered by Austral AI"
         isSidebarOpen={isSidebarOpen}
         onToggleSidebar={toggleSidebar}

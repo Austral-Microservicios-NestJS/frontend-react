@@ -247,6 +247,7 @@ export default function LeadDetail() {
                             telefono: e.target.value,
                           }))
                         }
+                        placeholder="Teléfono (no colocar el prefijo)"
                         className="w-full border rounded px-2 py-1 text-sm"
                       />
                       <button

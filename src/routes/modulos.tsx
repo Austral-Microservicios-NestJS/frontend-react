@@ -135,7 +135,7 @@ export const moduleCategories = [
       },
       {
         id: 74,
-        name: "Insights AI",
+        name: "Insights",
         path: "/dashboard/agentes-ia/insights",
         icon: Zap,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],

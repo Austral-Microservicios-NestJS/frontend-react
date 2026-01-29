@@ -41,6 +41,10 @@ export const RegistrarUsuario = ({
   user,
   addUsuario,
 }: RegistrarUsuarioProps) => {
+  const isBroker = user?.rol?.nombreRol?.toUpperCase() === "BROKER";
+  const availableRoles = isBroker
+    ? roles.filter((role) => role.nombreRol?.toUpperCase() === "AGENTE")
+    : roles;
   const {
     register,
     handleSubmit,
@@ -184,7 +188,7 @@ export const RegistrarUsuario = ({
                         <SelectValue placeholder="Selecciona el rol" />
                       </SelectTrigger>
                       <SelectContent>
-                        {roles.map((option) => (
+                        {availableRoles.map((option) => (
                           <SelectItem key={option.idRol} value={option.idRol}>
                             {option.nombreRol}
                           </SelectItem>

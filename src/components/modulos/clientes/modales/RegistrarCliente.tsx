@@ -41,6 +41,20 @@ const countryPrefixes = [
   { code: "+595", name: "Paraguay" },
 ];
 
+const normalizePhone = (raw?: string) => {
+  if (!raw) return { prefix: "+51", number: "" };
+  const trimmed = String(raw).trim();
+  if (!trimmed) return { prefix: "+51", number: "" };
+  const match = countryPrefixes.find((p) => trimmed.startsWith(p.code));
+  if (match) {
+    return { prefix: match.code, number: trimmed.slice(match.code.length) };
+  }
+  if (trimmed.startsWith("+")) {
+    return { prefix: trimmed, number: "" };
+  }
+  return { prefix: "+51", number: trimmed };
+};
+
 interface RegistrarClienteProps {
   isOpen: boolean;
   onClose: () => void;
@@ -103,6 +117,23 @@ export const RegistrarCliente = ({
     if (!isOpen) {
       reset();
     } else if (isOpen && initialValues) {
+      const telefono1Normalized = normalizePhone(
+        initialValues.telefono1 as string | undefined,
+      );
+      const whatsappNormalized = normalizePhone(
+        initialValues.whatsapp as string | undefined,
+      );
+      const telefono1Number = telefono1Normalized.number;
+      const whatsappNumber =
+        whatsappNormalized.number || telefono1Normalized.number;
+      const telefono1Prefix =
+        telefono1Normalized.number || initialValues.telefono1
+          ? telefono1Normalized.prefix
+          : "+51";
+      const whatsappPrefix =
+        whatsappNormalized.number || initialValues.whatsapp
+          ? whatsappNormalized.prefix
+          : telefono1Prefix;
       // fusionar valores por defecto con initialValues
       reset({
         tipoPersona: "",
@@ -113,17 +144,17 @@ export const RegistrarCliente = ({
         distrito: "",
         provincia: "",
         departamento: "",
-        telefono1: "",
+        telefono1: telefono1Number,
         telefono2: "",
-        whatsapp: "",
+        whatsapp: whatsappNumber,
         emailNotificaciones: "",
         recibirNotificaciones: false,
         cumpleanos: "",
         tipoDocumento: "",
         numeroDocumento: "",
-        telefono1Prefix: "+51",
+        telefono1Prefix,
         telefono2Prefix: "+51",
-        whatsappPrefix: "+51",
+        whatsappPrefix,
         asignadoA: user.idUsuario,
         registradoPor: user.idUsuario,
         ...initialValues,
@@ -138,12 +169,20 @@ export const RegistrarCliente = ({
       whatsappPrefix,
       ...dataWithoutPrefixes
     } = data;
+    const cleanNumber = (value?: string) =>
+      value ? value.replace(/^\+\d+/, "") : value;
     const dataSubmit = {
       ...dataWithoutPrefixes,
       numeroDocumento: Number(data.numeroDocumento),
-      telefono1: data.telefono1 ? `${telefono1Prefix}${data.telefono1}` : null,
-      telefono2: data.telefono2 ? `${telefono2Prefix}${data.telefono2}` : null,
-      whatsapp: data.whatsapp ? `${whatsappPrefix}${data.whatsapp}` : null,
+      telefono1: data.telefono1
+        ? `${telefono1Prefix}${cleanNumber(data.telefono1)}`
+        : null,
+      telefono2: data.telefono2
+        ? `${telefono2Prefix}${cleanNumber(data.telefono2)}`
+        : null,
+      whatsapp: data.whatsapp
+        ? `${whatsappPrefix}${cleanNumber(data.whatsapp)}`
+        : null,
     };
 
     await addCliente(dataSubmit);
