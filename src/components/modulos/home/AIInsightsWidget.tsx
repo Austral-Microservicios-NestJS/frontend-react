@@ -57,6 +57,15 @@ export const AIInsightsWidget = () => {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
+    const params = {
+      incluirNoticias: true,
+      incluirContextos: true,
+      limite: 5,
+      ...(isBroker
+        ? { userId: user?.idUsuario, userRole: user?.rol?.nombreRol }
+        : {}),
+    };
+    await dashboardService.refreshInsights(params);
     await refetch();
     setIsRefreshing(false);
   };

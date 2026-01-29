@@ -50,8 +50,9 @@ const QUERY_KEY = "dashboard";
 
 export const dashboardService = {
   // Invalidar cache de insights en el backend
-  invalidateCache: async (): Promise<void> => {
-    await api.post("/dashboard/invalidate-cache");
+  invalidateCache: async (params?: { userId?: string }): Promise<void> => {
+    const payload = params?.userId ? { userId: params.userId } : undefined;
+    await api.post("/dashboard/invalidate-cache", payload);
   },
 
   // Obtener insights de IA (noticias + contextos analizados)
@@ -72,7 +73,7 @@ export const dashboardService = {
   // Actualizar insights con invalidación de cache
   refreshInsights: async (params: InsightsParams = {}): Promise<InsightsResponse> => {
     // 1. Invalidar cache
-    await dashboardService.invalidateCache();
+    await dashboardService.invalidateCache({ userId: params.userId });
     // 2. Esperar 2 segundos para que el backend procese
     await new Promise((r) => setTimeout(r, 2000));
     // 3. Obtener insights frescos

@@ -98,8 +98,15 @@ export default function InsightsPage() {
     setIsRefreshing(true);
     try {
       // Invalidar cache y obtener insights frescos
-      await dashboardService.invalidateCache();
-      await new Promise((r) => setTimeout(r, 2000));
+      const params = {
+        incluirNoticias: true,
+        incluirContextos: true,
+        limite: 20,
+        ...(isBroker
+          ? { userId: user?.idUsuario, userRole: user?.rol?.nombreRol }
+          : {}),
+      };
+      await dashboardService.refreshInsights(params);
       await refetch();
     } catch (error) {
       console.error("Error al actualizar insights:", error);
