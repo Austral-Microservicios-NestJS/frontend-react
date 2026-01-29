@@ -64,6 +64,7 @@ export default function MapaPage() {
   // Obtener clientes del usuario actual
   const { data: clientes = [], isLoading } = clienteService.useGetByUsuario(
     user?.idUsuario || "",
+    user?.rol?.nombreRol,
   );
 
   const { isLoaded, loadError } = useJsApiLoader({

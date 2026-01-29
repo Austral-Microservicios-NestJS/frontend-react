@@ -2,11 +2,14 @@ import type { ReactNode } from "react";
 
 interface ModalProps {
   children: ReactNode;
+  className?: string;
 }
 
-export const Modal = ({ children }: ModalProps) => {
+export const Modal = ({ children, className = "" }: ModalProps) => {
   return (
-    <div className="flex flex-col gap-4 p-6 h-auto max-h-[85vh] rounded-3xl overflow-y-auto bg-gray-50">
+    <div
+      className={`flex flex-col gap-4 p-6 h-auto max-h-[85vh] rounded-3xl overflow-y-auto bg-gray-50 ${className}`}
+    >
       {children}
     </div>
   );

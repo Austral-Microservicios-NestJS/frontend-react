@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Header, BotonRegistro } from "@/components/shared";
 import { useSidebar } from "@/hooks/useSidebar";
 import { useAuthStore } from "@/store/auth.store";
@@ -12,8 +13,21 @@ export default function ClientesPage() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
   const [isRegistrarOpen, setIsRegistrarOpen] = useState(false);
   const [editingCliente, setEditingCliente] = useState<Cliente | null>(null);
+  const [leadInitialValues, setLeadInitialValues] = useState<Partial<any> | undefined>(undefined);
   const { user } = useAuthStore();
   const { clientes, addCliente, updateCliente } = useClientes();
+  const location = useLocation();
+
+  // Auto-abrir modal con datos del lead si viene desde LeadDetail
+  useEffect(() => {
+    const state = location.state as { leadInitialValues?: Record<string, any> } | null;
+    if (state?.leadInitialValues) {
+      setLeadInitialValues(state.leadInitialValues);
+      setIsRegistrarOpen(true);
+      // Limpiar el state del historial sin provocar re-render de React Router
+      window.history.replaceState({}, "");
+    }
+  }, [location.state]);
 
   const handleEdit = (cliente: Cliente) => {
     setEditingCliente(cliente);
@@ -43,9 +57,13 @@ export default function ClientesPage() {
 
       <RegistrarCliente
         isOpen={isRegistrarOpen}
-        onClose={() => setIsRegistrarOpen(false)}
+        onClose={() => {
+          setIsRegistrarOpen(false);
+          setLeadInitialValues(undefined);
+        }}
         addCliente={addCliente}
         user={user!}
+        initialValues={leadInitialValues}
       />
 
       {editingCliente && (

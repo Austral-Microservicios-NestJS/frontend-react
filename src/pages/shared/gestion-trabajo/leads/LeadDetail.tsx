@@ -7,15 +7,16 @@ import {
   ModalFooter,
   ModalHeader,
 } from "@/components/shared";
+import { RegistrarCliente } from "@/components/modulos/clientes/modales/RegistrarCliente";
 import { useSidebar } from "@/hooks/useSidebar";
 import { leadService } from "@/services/lead.service";
 import { useAuthStore } from "@/store/auth.store";
+import { useClientes } from "@/hooks/useCliente";
 import {
   ArrowLeft,
   Copy,
   Car,
   Sparkles,
-  Calendar,
   Settings,
   FileText,
   RefreshCw,
@@ -23,6 +24,7 @@ import {
   User,
   MapPin,
   Hash,
+  UserPlus,
 } from "lucide-react";
 import days from "dayjs";
 import { useEffect, useState } from "react";
@@ -36,7 +38,8 @@ export default function LeadDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isSidebarOpen, toggleSidebar } = useSidebar();
-  useAuthStore();
+  const { user } = useAuthStore();
+  const { addCliente } = useClientes();
 
   const { data: lead, isLoading } = leadService.useGetById(id || "");
 
@@ -47,6 +50,10 @@ export default function LeadDetail() {
   const [detalleVida, setDetalleVida] = useState<any | null>(null);
   const [leadState, setLeadState] = useState<any | null>(null);
   const [isConsultaModalOpen, setIsConsultaModalOpen] = useState(false);
+  const [isRegistrarClienteOpen, setIsRegistrarClienteOpen] = useState(false);
+  const [leadInitialValues, setLeadInitialValues] = useState<
+    Partial<any> | undefined
+  >(undefined);
 
   // Consulta AI de placa - solo se activa si hay placa en detalleAuto
   const placaParaConsulta = detalleAuto?.placa
@@ -84,6 +91,22 @@ export default function LeadDetail() {
     navigate("/dashboard/gestion-trabajo/leads");
   };
 
+  const handleRegistrarCliente = () => {
+    if (!leadState || !user) return;
+
+    const initialValues: Record<string, any> = {
+      tipoPersona: "NATURAL",
+      nombres: leadState.nombre || "",
+      apellidos: leadState.apellidos || "",
+      emailNotificaciones: leadState.email || "",
+      telefono1: leadState.telefono || "",
+      numeroDocumento: leadState.numeroDocumento || "",
+    };
+
+    setLeadInitialValues(initialValues);
+    setIsRegistrarClienteOpen(true);
+  };
+
   return (
     <>
       <Header
@@ -105,6 +128,14 @@ export default function LeadDetail() {
           >
             <ArrowLeft className="w-4 h-4" />
             Volver
+          </button>
+          <button
+            onClick={handleRegistrarCliente}
+            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-white rounded-lg transition-colors"
+            style={{ backgroundColor: "var(--austral-azul)" }}
+          >
+            <UserPlus className="w-4 h-4" />
+            Registrar Cliente
           </button>
         </div>
       </Header>
@@ -395,69 +426,9 @@ export default function LeadDetail() {
                       </button>
                     </div>
                   </div>
-                </div>
 
-                <div className="mt-4">
-                  <p className="text-sm text-gray-500">Notas</p>
-                  <div className="flex items-start gap-2">
-                    <textarea
-                      value={leadState?.notas ?? ""}
-                      onChange={(e) =>
-                        setLeadState((s: any) => ({
-                          ...s,
-                          notas: e.target.value,
-                        }))
-                      }
-                      className="w-full border rounded px-2 py-1 text-sm min-h-[80px]"
-                    />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        navigator.clipboard.writeText(leadState?.notas ?? "")
-                      }
-                      className="p-1 text-gray-500 hover:text-gray-800"
-                      title="Copiar notas"
-                    >
-                      <Copy className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
 
-                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-500">Etiquetas</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <input
-                        value={
-                          leadState?.etiquetas
-                            ? leadState.etiquetas.join(", ")
-                            : ""
-                        }
-                        onChange={(e) =>
-                          setLeadState((s: any) => ({
-                            ...s,
-                            etiquetas: e.target.value
-                              ? e.target.value.split(/,\s*/)
-                              : [],
-                          }))
-                        }
-                        className="w-full border rounded px-2 py-1 text-sm"
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          navigator.clipboard.writeText(
-                            (leadState?.etiquetas || []).join(", "),
-                          )
-                        }
-                        className="p-1 text-gray-500 hover:text-gray-800"
-                        title="Copiar etiquetas"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-
+                  <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-gray-500">Fechas</p>
                     <div className="mt-2 text-sm text-gray-700">
@@ -514,6 +485,7 @@ export default function LeadDetail() {
                         </button>
                       </div>
                     </div>
+                  </div>
                   </div>
                 </div>
               </div>
@@ -1810,6 +1782,21 @@ export default function LeadDetail() {
           <div className="text-center text-gray-500">Lead no encontrado</div>
         )}
       </div>
+
+      {user && (
+        <RegistrarCliente
+          isOpen={isRegistrarClienteOpen}
+          onClose={() => {
+            setIsRegistrarClienteOpen(false);
+            setLeadInitialValues(undefined);
+          }}
+          addCliente={addCliente}
+          user={user}
+          initialValues={leadInitialValues}
+          presentation="drawer"
+          size="lg"
+        />
+      )}
     </>
   );
 }

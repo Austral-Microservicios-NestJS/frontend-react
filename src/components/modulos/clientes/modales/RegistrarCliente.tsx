@@ -20,6 +20,7 @@ import {
 } from "@/components/ui";
 import { useForm, Controller } from "react-hook-form";
 import { useEffect } from "react";
+import { toast } from "sonner";
 import {
   tipoPersonaOptions,
   tipoDocumentoOptions,
@@ -46,6 +47,8 @@ interface RegistrarClienteProps {
   addCliente: (data: any) => Promise<void>;
   user: User;
   initialValues?: Partial<any>;
+  presentation?: "center" | "drawer";
+  size?: "sm" | "md" | "lg" | "xl" | "full";
 }
 
 export const RegistrarCliente = ({
@@ -54,6 +57,8 @@ export const RegistrarCliente = ({
   addCliente,
   user,
   initialValues,
+  presentation = "center",
+  size = "xl",
 }: RegistrarClienteProps) => {
   const {
     register,
@@ -145,12 +150,27 @@ export const RegistrarCliente = ({
     onClose();
   };
 
+  const isDrawer = presentation === "drawer";
+  const prefixWidthClass = isDrawer ? "w-20" : "w-32";
+
   return (
-    <ModalContainer isOpen={isOpen} onClose={onClose} size="xl">
-      <Modal>
+    <ModalContainer
+      isOpen={isOpen}
+      onClose={onClose}
+      size={size}
+      position={isDrawer ? "right" : "center"}
+      panelClassName={isDrawer ? "h-full rounded-none" : ""}
+    >
+      <Modal
+        className={isDrawer ? "h-full max-h-full rounded-none" : ""}
+      >
         <ModalHeader title="Registrar Nuevo Cliente" onClose={onClose} />
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form
+          onSubmit={handleSubmit(onSubmit, () => {
+            toast.error("Completa los campos obligatorios");
+          })}
+        >
           <ModalBody>
             <FormGroupDivisor>
               <FormGroup>
@@ -321,7 +341,7 @@ export const RegistrarCliente = ({
                         onValueChange={field.onChange}
                         value={field.value}
                       >
-                        <SelectTrigger className="w-32">
+                        <SelectTrigger className={prefixWidthClass}>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -354,7 +374,7 @@ export const RegistrarCliente = ({
                         onValueChange={field.onChange}
                         value={field.value}
                       >
-                        <SelectTrigger className="w-32">
+                        <SelectTrigger className={prefixWidthClass}>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -387,7 +407,7 @@ export const RegistrarCliente = ({
                         onValueChange={field.onChange}
                         value={field.value}
                       >
-                        <SelectTrigger className="w-32">
+                        <SelectTrigger className={prefixWidthClass}>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
