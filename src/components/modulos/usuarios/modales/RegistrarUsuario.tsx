@@ -43,7 +43,7 @@ export const RegistrarUsuario = ({
 }: RegistrarUsuarioProps) => {
   const isBroker = user?.rol?.nombreRol?.toUpperCase() === "BROKER";
   const availableRoles = isBroker
-    ? roles.filter((role) => role.nombreRol?.toUpperCase() === "AGENTE")
+    ? roles.filter((role) => role.nombreRol?.toUpperCase() === "VENDEDOR")
     : roles;
   const {
     register,

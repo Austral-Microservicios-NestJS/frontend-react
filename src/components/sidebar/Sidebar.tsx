@@ -70,9 +70,8 @@ export const Sidebar = () => {
               </div>
             </div>
 
-            {/* User info */}
             {user && (
-              <div className="p-2.5 bg-gray-50 rounded-lg border border-gray-100">
+              <div className="mt-3 p-2.5 bg-gray-50 rounded-lg border border-gray-100">
                 <div className="flex items-center gap-2">
                   <div
                     className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-semibold text-xs shrink-0"
