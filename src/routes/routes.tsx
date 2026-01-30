@@ -13,6 +13,7 @@ import Home from "@/pages/shared/home/Home";
 import CompaniasPage from "@/pages/admin/maestros/companias/CompaniasPage";
 import ActividadesPage from "@/pages/shared/gestion-trabajo/actividades/ActividadesPage";
 import TareasPage from "@/pages/shared/gestion-trabajo/tareas/TareasPage";
+import ObservacionPage from "@/pages/shared/gestion-trabajo/observacion/ObservacionPage";
 import ClientesPage from "@/pages/shared/gestion-trabajo/clientes/ClientesPage";
 import MapaPage from "@/pages/shared/gestion-trabajo/mapa/MapaPage";
 
@@ -103,6 +104,16 @@ const router = createBrowserRouter([
             requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
           >
             <TareasPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "gestion-trabajo/observaciones",
+        element: (
+          <ProtectedRoute
+            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
+          >
+            <ObservacionPage />
           </ProtectedRoute>
         ),
       },

@@ -14,6 +14,7 @@ import {
   Sparkles,
   Zap,
   Map,
+  MessageSquare,
 } from "lucide-react";
 import { Roles } from "@/utils/roles";
 
@@ -39,6 +40,14 @@ export const moduleCategories = [
         name: "Mapa",
         path: "/dashboard/general/mapa",
         icon: Map,
+        roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+        type: ["CRM", "ERP"] as ModuleType[],
+      },
+      {
+        id: 100,
+        name: "Observaciones",
+        path: "/dashboard/gestion-trabajo/observaciones",
+        icon: MessageSquare, // Need to import MessageSquare
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
         type: ["CRM", "ERP"] as ModuleType[],
       },
