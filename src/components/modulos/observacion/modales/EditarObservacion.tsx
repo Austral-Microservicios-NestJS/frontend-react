@@ -3,9 +3,9 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
-  ModalFooter,
   FormGroup,
   FormGroupDivisor,
+  UpdateButtons,
 } from "@/components/shared";
 import {
   Input,
@@ -16,6 +16,7 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
+  ImageUpload,
 } from "@/components/ui";
 import { useForm, Controller } from "react-hook-form";
 import {
@@ -44,7 +45,7 @@ export const EditarObservacion = ({
     register,
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<UpdateObservacion>({
     defaultValues: {
       asunto: observacion.asunto,
@@ -191,28 +192,32 @@ export const EditarObservacion = ({
 
             <FormGroup>
               <Label>Imagen</Label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center text-gray-400 bg-gray-50">
-                Carga de imágenes no disponible
-              </div>
+              <Controller
+                name="imagen" // Ensure UpdateObservacion has 'imagen'
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <ImageUpload
+                    value={value}
+                    onChange={onChange}
+                    previewUrl={
+                      observacion.imagenUrl
+                        ? `${
+                            import.meta.env.VITE_API_URL ||
+                            "http://localhost:3000/api/v1"
+                          }/observacion/image?path=${observacion.imagenUrl}`
+                        : undefined
+                    }
+                  />
+                )}
+              />
             </FormGroup>
           </ModalBody>
 
-          <ModalFooter>
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
-              style={{ backgroundColor: "var(--austral-azul)" }}
-            >
-              Actualizar
-            </button>
-          </ModalFooter>
+          <UpdateButtons
+            onClose={onClose}
+            isSubmitting={isSubmitting}
+            isDirty={isDirty}
+          />
         </form>
       </Modal>
     </ModalContainer>

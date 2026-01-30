@@ -160,10 +160,26 @@ export const ModalDetalleObservacion = ({
               )}
             </div>
 
-            {/* Imagen (Placeholder) */}
-            <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg p-6 flex flex-col items-center justify-center text-gray-400">
-              <span className="text-sm">Imagen adjunta no disponible</span>
-              <span className="text-xs mt-1">(Configuración pendiente)</span>
+            {/* Imagen de Evidencia */}
+            <div className="space-y-2">
+              <Label className="text-xs text-gray-500 uppercase tracking-wider block">
+                Evidencia Adjunta
+              </Label>
+              {observacion.imagenUrl ? (
+                <div className="rounded-lg overflow-hidden border border-gray-200">
+                  <img
+                    src={`${
+                      import.meta.env.VITE_API_URL
+                    }/observacion/image?path=${observacion.imagenUrl}`}
+                    alt="Evidencia"
+                    className="w-full h-auto max-h-96 object-contain bg-gray-50"
+                  />
+                </div>
+              ) : (
+                <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg p-6 flex flex-col items-center justify-center text-gray-400">
+                  <span className="text-sm">Sin imagen adjunta</span>
+                </div>
+              )}
             </div>
           </div>
         </ModalBody>

@@ -1,12 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   ModalContainer,
   Modal,
   ModalHeader,
   ModalBody,
-  ModalFooter,
   FormGroup,
   FormGroupDivisor,
+  SubmitButtons,
 } from "@/components/shared";
 import {
   Input,
@@ -17,6 +17,7 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
+  ImageUpload,
 } from "@/components/ui";
 import { useForm, Controller } from "react-hook-form";
 import {
@@ -63,19 +64,34 @@ export const RegistrarObservacion = ({
     },
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // Resetear formulario cuando el modal se cierra
   useEffect(() => {
     if (!isOpen) {
       reset();
+      setIsSubmitting(false);
     }
   }, [isOpen, reset]);
 
   const onSubmit = async (data: CreateObservacion) => {
-    // Eliminamos creadoPor ya que el hook lo maneja o lo pasamos?
-    // El hook useObservacion.ts espera Omit<CreateObservacion, "creadoPor">
-    const { creadoPor, ...rest } = data;
-    await addObservacion(rest);
-    onClose();
+    setIsSubmitting(true);
+    try {
+      // Eliminamos creadoPor ya que el hook lo maneja o lo pasamos?
+      // El hook useObservacion.ts espera Omit<CreateObservacion, "creadoPor">
+      const { creadoPor, ...rest } = data;
+
+      // Si hay archivo seleccionado, lo agregamos al objeto
+      // Nota: El componente ImageUpload maneja el estado via Controller,
+      // asi que "data.imagen" ya deberia tener el File si se usó el Controller correctamente.
+
+      await addObservacion(rest);
+      onClose();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -216,29 +232,18 @@ export const RegistrarObservacion = ({
             </FormGroupDivisor>
 
             <FormGroup>
-              <Label>Imagen (Próximamente)</Label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center text-gray-400 bg-gray-50">
-                Carga de imágenes con GCS pendiente de configuración
-              </div>
+              <Label>Imagen de evidencia</Label>
+              <Controller
+                name="imagen"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <ImageUpload value={value} onChange={onChange} />
+                )}
+              />
             </FormGroup>
           </ModalBody>
 
-          <ModalFooter>
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
-              style={{ backgroundColor: "var(--austral-azul)" }}
-            >
-              Guardar
-            </button>
-          </ModalFooter>
+          <SubmitButtons onClose={onClose} isSubmitting={isSubmitting} />
         </form>
       </Modal>
     </ModalContainer>

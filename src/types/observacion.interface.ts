@@ -53,6 +53,7 @@ export interface CreateObservacion {
   imagenUrl?: string;
   estado: EstadoObservacion;
   creadoPor: string;
+  imagen?: File;
 }
 
 export interface UpdateObservacion {
@@ -64,6 +65,7 @@ export interface UpdateObservacion {
   imagenUrl?: string;
   estado?: EstadoObservacion;
   fechaResolucion?: string | null;
+  imagen?: File;
 }
 
 // ==================== OPTIONS FOR SELECTS ====================
