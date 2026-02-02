@@ -1,6 +1,6 @@
 import { useCallback, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
-import { X, UploadCloud, Image as ImagenIcon } from "lucide-react";
+import { X, UploadCloud } from "lucide-react";
 
 interface ImageUploadProps {
   value?: File | null;
