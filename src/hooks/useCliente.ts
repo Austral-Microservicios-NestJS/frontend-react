@@ -84,6 +84,22 @@ export const useClientes = () => {
     }
   };
 
+  const importMutation = clienteService.useImport();
+
+  const importarClientes = async (file: File) => {
+    try {
+      const data = await importMutation.mutateAsync({
+        file,
+        userId: idUsuario,
+      });
+      toast.success("Proceso de importación finalizado");
+      return data;
+    } catch (error) {
+      toast.error("Error al importar clientes");
+      throw error;
+    }
+  };
+
   return {
     clientes,
     clientesPorTipo,
@@ -95,5 +111,7 @@ export const useClientes = () => {
     updateCliente,
     deleteCliente,
     toggleActivo,
+    importarClientes,
+    isImporting: importMutation.isPending,
   };
 };

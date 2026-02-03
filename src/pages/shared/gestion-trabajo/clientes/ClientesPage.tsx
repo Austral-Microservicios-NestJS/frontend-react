@@ -7,20 +7,29 @@ import { RegistrarCliente } from "@/components/modulos/clientes/modales/Registra
 import { EditarCliente } from "@/components/modulos/clientes/modales/EditarCliente";
 import { useClientes } from "@/hooks/useCliente";
 import { TablaClientes } from "@/components/modulos/clientes/tablas/TablaClientes";
+import { ImportarClientesModal } from "@/components/modulos/clientes/modales/ImportarClientesModal";
+import { FileSpreadsheet } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import type { Cliente, UpdateCliente } from "@/types/cliente.interface";
 
 export default function ClientesPage() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
   const [isRegistrarOpen, setIsRegistrarOpen] = useState(false);
+  const [isImportarOpen, setIsImportarOpen] = useState(false);
   const [editingCliente, setEditingCliente] = useState<Cliente | null>(null);
-  const [leadInitialValues, setLeadInitialValues] = useState<Partial<any> | undefined>(undefined);
+  const [leadInitialValues, setLeadInitialValues] = useState<
+    Partial<any> | undefined
+  >(undefined);
   const { user } = useAuthStore();
-  const { clientes, addCliente, updateCliente } = useClientes();
+  const { clientes, addCliente, updateCliente, importarClientes } =
+    useClientes();
   const location = useLocation();
 
   // Auto-abrir modal con datos del lead si viene desde LeadDetail
   useEffect(() => {
-    const state = location.state as { leadInitialValues?: Record<string, any> } | null;
+    const state = location.state as {
+      leadInitialValues?: Record<string, any>;
+    } | null;
     if (state?.leadInitialValues) {
       setLeadInitialValues(state.leadInitialValues);
       setIsRegistrarOpen(true);
@@ -47,10 +56,16 @@ export default function ClientesPage() {
         isSidebarOpen={isSidebarOpen}
         onToggleSidebar={toggleSidebar}
       >
-        <BotonRegistro
-          label="Registrar Cliente"
-          onClick={() => setIsRegistrarOpen(true)}
-        />
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setIsImportarOpen(true)}>
+            <FileSpreadsheet className="mr-2 h-4 w-4" />
+            Importar Excel
+          </Button>
+          <BotonRegistro
+            label="Registrar Cliente"
+            onClick={() => setIsRegistrarOpen(true)}
+          />
+        </div>
       </Header>
 
       <TablaClientes clientes={clientes} onEdit={handleEdit} />
@@ -64,6 +79,12 @@ export default function ClientesPage() {
         addCliente={addCliente}
         user={user!}
         initialValues={leadInitialValues}
+      />
+
+      <ImportarClientesModal
+        isOpen={isImportarOpen}
+        onClose={() => setIsImportarOpen(false)}
+        onImport={importarClientes}
       />
 
       {editingCliente && (

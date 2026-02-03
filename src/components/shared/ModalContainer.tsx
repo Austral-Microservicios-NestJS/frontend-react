@@ -120,7 +120,7 @@ export const ModalContainer = ({
       <div
         className={`fixed inset-0 transition-opacity duration-300 ${
           position === "center"
-            ? "bg-black/50 backdrop-blur-sm"
+            ? "bg-black/30 backdrop-blur-xs"
             : "bg-transparent pointer-events-none"
         }`}
         onClick={preventBackdropClose ? undefined : onClose}

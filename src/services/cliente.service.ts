@@ -40,7 +40,10 @@ export const clienteService = {
       const { data } = await api.get(`/clientes/usuario/${idUsuario}`, {
         params,
       });
-      // El backend retorna el array directamente
+      // El backend retorna { data: [...] }
+      if (data && Array.isArray(data.data)) {
+        return data.data;
+      }
       return Array.isArray(data) ? data : [];
     } catch (error) {
       console.error("Error al obtener clientes del usuario:", error);
@@ -92,6 +95,40 @@ export const clienteService = {
       console.error("Error al obtener contextos del cliente:", error);
       return [];
     }
+  },
+
+  downloadTemplate: async (): Promise<void> => {
+    const response = await api.get("/clientes/plantilla-excel/download", {
+      responseType: "blob",
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "Template_Clientes.xlsx");
+    document.body.appendChild(link);
+    link.click();
+    link.parentNode?.removeChild(link);
+  },
+
+  importData: async (
+    file: File,
+    userId: string,
+  ): Promise<{
+    total: number;
+    success: number;
+    failed: number;
+    errors: any[];
+  }> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("userId", userId);
+
+    const { data } = await api.post("/clientes/importar-excel", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return data;
   },
 
   // ==================== REACT QUERY HOOKS ====================
@@ -170,6 +207,17 @@ export const clienteService = {
       enabled: !!idCliente,
       retry: false,
       refetchOnWindowFocus: false,
+    });
+  },
+
+  useImport: () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+      mutationFn: ({ file, userId }: { file: File; userId: string }) =>
+        clienteService.importData(file, userId),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
+      },
     });
   },
 };
