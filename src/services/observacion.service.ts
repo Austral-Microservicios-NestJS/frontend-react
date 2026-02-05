@@ -25,22 +25,30 @@ export const observacionService = {
 
   // Crear observación
   create: async (observacion: CreateObservacion): Promise<Observacion> => {
-    const formData = new FormData();
-    formData.append("asunto", observacion.asunto);
-    formData.append("descripcion", observacion.descripcion);
-    formData.append("categoria", observacion.categoria);
-    if (observacion.prioridad) formData.append("prioridad", observacion.prioridad);
-    formData.append("canal", observacion.canal);
-    formData.append("estado", observacion.estado);
-    formData.append("creadoPor", observacion.creadoPor);
-
+    // Si hay imagen, usar FormData
     if (observacion.imagen) {
+      const formData = new FormData();
+      formData.append("asunto", observacion.asunto);
+      formData.append("descripcion", observacion.descripcion);
+      formData.append("categoria", observacion.categoria);
+      if (observacion.prioridad) formData.append("prioridad", observacion.prioridad);
+      formData.append("canal", observacion.canal);
+      formData.append("estado", observacion.estado);
+      formData.append("creadoPor", observacion.creadoPor);
       formData.append("imagen", observacion.imagen);
+
+      const { data } = await api.post("/observacion", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return data;
     }
 
-    const { data } = await api.post("/observacion", formData, {
+    // Si no hay imagen, enviar como JSON
+    const { data } = await api.post("/observacion", observacion, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        "Content-Type": "application/json",
       },
     });
     return data;
@@ -75,7 +83,11 @@ export const observacionService = {
     }
 
     // Si no hay imagen, enviamos JSON normal
-    const { data } = await api.patch(`/observacion/${id}`, observacionData);
+    const { data } = await api.patch(`/observacion/${id}`, observacionData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     return data;
   },
 
