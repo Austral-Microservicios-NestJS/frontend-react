@@ -165,12 +165,10 @@ export const ModalDetalleObservacion = ({
               <Label className="text-xs text-gray-500 uppercase tracking-wider block">
                 Evidencia Adjunta
               </Label>
-              {observacion.imagenUrl ? (
+              {observacion.imagenEvidencia ? (
                 <div className="rounded-lg overflow-hidden border border-gray-200">
                   <img
-                    src={`${
-                      import.meta.env.VITE_API_URL
-                    }/observacion/image?path=${observacion.imagenUrl}`}
+                    src={observacion.imagenEvidencia}
                     alt="Evidencia"
                     className="w-full h-auto max-h-96 object-contain bg-gray-50"
                   />

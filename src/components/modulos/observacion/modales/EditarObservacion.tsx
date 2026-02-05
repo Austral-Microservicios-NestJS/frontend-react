@@ -44,7 +44,6 @@ export const EditarObservacion = ({
   onSubmit,
   observacion,
 }: EditarObservacionProps) => {
-  const [isUploading, setIsUploading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -62,7 +61,6 @@ export const EditarObservacion = ({
   });
 
   const handleFormSubmit = async (data: UpdateObservacion) => {
-    setIsUploading(true);
     try {
       let imagenUrl: string | undefined = undefined;
 
@@ -89,8 +87,6 @@ export const EditarObservacion = ({
       onClose();
     } catch (error) {
       console.error(error);
-    } finally {
-      setIsUploading(false);
     }
   };
 
@@ -218,7 +214,7 @@ export const EditarObservacion = ({
                       </SelectContent>
                     </Select>
                   )}
-                /> || isUploading
+                />
               </FormGroup>
             </FormGroupDivisor>
 
