@@ -166,11 +166,15 @@ export const ModalDetalleObservacion = ({
                 Evidencia Adjunta
               </Label>
               {observacion.imagenEvidencia ? (
-                <div className="rounded-lg overflow-hidden border border-gray-200">
+                <div className="rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
                   <img
                     src={observacion.imagenEvidencia}
                     alt="Evidencia"
-                    className="w-full h-auto max-h-96 object-contain bg-gray-50"
+                    className="w-full h-auto max-h-96 object-contain"
+                    onError={(e) => {
+                      console.error("Error cargando imagen:", observacion.imagenEvidencia);
+                      e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect fill='%23f3f4f6' width='200' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' fill='%239ca3af'%3EError al cargar imagen%3C/text%3E%3C/svg%3E";
+                    }}
                   />
                 </div>
               ) : (
