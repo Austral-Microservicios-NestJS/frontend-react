@@ -29,7 +29,6 @@ import {
 } from "@/types/observacion.interface";
 import { storageService } from "@/services/storage.service";
 import { toast } from "sonner";
-import { useState } from "react";
 
 interface EditarObservacionProps {
   isOpen: boolean;
