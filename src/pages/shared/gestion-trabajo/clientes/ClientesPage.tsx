@@ -8,7 +8,7 @@ import { EditarCliente } from "@/components/modulos/clientes/modales/EditarClien
 import { useClientes } from "@/hooks/useCliente";
 import { TablaClientes } from "@/components/modulos/clientes/tablas/TablaClientes";
 import { ImportarClientesModal } from "@/components/modulos/clientes/modales/ImportarClientesModal";
-import { FileSpreadsheet, Download, Upload } from "lucide-react";
+import { Download, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { clienteService } from "@/services/cliente.service";
 import { toast } from "sonner";
