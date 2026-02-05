@@ -14,7 +14,8 @@ export const observacionService = {
   // Listar todas las observaciones
   getAll: async (): Promise<Observacion[]> => {
     const { data } = await api.get("/observacion");
-    return data;
+    // El backend devuelve { data: [...], meta: {...} }
+    return data.data || [];
   },
 
   // Obtener observación por ID
