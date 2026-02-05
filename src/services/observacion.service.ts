@@ -26,27 +26,7 @@ export const observacionService = {
 
   // Crear observación
   create: async (observacion: CreateObservacion): Promise<Observacion> => {
-    // Si hay imagen, usar FormData
-    if (observacion.imagen) {
-      const formData = new FormData();
-      formData.append("asunto", observacion.asunto);
-      formData.append("descripcion", observacion.descripcion);
-      formData.append("categoria", observacion.categoria);
-      if (observacion.prioridad) formData.append("prioridad", observacion.prioridad);
-      formData.append("canal", observacion.canal);
-      formData.append("estado", observacion.estado);
-      formData.append("creadoPor", observacion.creadoPor);
-      formData.append("imagen", observacion.imagen);
-
-      const { data } = await api.post("/observacion", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      return data;
-    }
-
-    // Si no hay imagen, enviar como JSON
+    // Ahora siempre enviamos JSON con la URL de la imagen (si existe)
     const { data } = await api.post("/observacion", observacion, {
       headers: {
         "Content-Type": "application/json",
@@ -63,27 +43,7 @@ export const observacionService = {
     id: number;
     data: UpdateObservacion;
   }): Promise<Observacion> => {
-    // Si hay imagen, enviamos FormData
-    if (observacionData.imagen) {
-      const formData = new FormData();
-      const { imagen, ...rest } = observacionData;
-
-      Object.entries(rest).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          formData.append(key, String(value));
-        }
-      });
-      formData.append("imagen", imagen);
-
-      const { data } = await api.patch(`/observacion/${id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      return data;
-    }
-
-    // Si no hay imagen, enviamos JSON normal
+    // Ahora siempre enviamos JSON con la URL de la imagen (si existe)
     const { data } = await api.patch(`/observacion/${id}`, observacionData, {
       headers: {
         "Content-Type": "application/json",

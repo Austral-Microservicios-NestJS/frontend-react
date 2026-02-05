@@ -36,7 +36,7 @@ export interface Observacion {
   categoria: CategoriaObservacion;
   prioridad: PrioridadObservacion;
   canal: CanalObservacion;
-  imagenUrl?: string; // Opcional, reservado para futura implementación con GCS
+  imagenEvidencia?: string | null; // URL de la imagen en storage
   estado: EstadoObservacion;
   fechaResolucion?: string | null;
   creadoPor: string;
@@ -50,7 +50,7 @@ export interface CreateObservacion {
   categoria: CategoriaObservacion;
   prioridad?: PrioridadObservacion;
   canal: CanalObservacion;
-  imagenUrl?: string;
+  imagenEvidencia?: string;
   estado: EstadoObservacion;
   creadoPor: string;
   imagen?: File;
@@ -62,7 +62,7 @@ export interface UpdateObservacion {
   categoria?: CategoriaObservacion;
   prioridad?: PrioridadObservacion;
   canal?: CanalObservacion;
-  imagenUrl?: string;
+  imagenEvidencia?: string;
   estado?: EstadoObservacion;
   fechaResolucion?: string | null;
   imagen?: File;

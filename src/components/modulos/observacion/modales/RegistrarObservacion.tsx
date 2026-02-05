@@ -32,6 +32,8 @@ import {
   type CreateObservacion,
 } from "@/types/observacion.interface";
 import type { User } from "@/store/auth.store";
+import { storageService } from "@/services/storage.service";
+import { toast } from "sonner";
 
 interface RegistrarObservacionProps {
   isOpen: boolean;
@@ -77,15 +79,28 @@ export const RegistrarObservacion = ({
   const onSubmit = async (data: CreateObservacion) => {
     setIsSubmitting(true);
     try {
-      // Eliminamos creadoPor ya que el hook lo maneja o lo pasamos?
-      // El hook useObservacion.ts espera Omit<CreateObservacion, "creadoPor">
-      const { creadoPor, ...rest } = data;
+      let imagenUrl: string | undefined = undefined;
 
-      // Si hay archivo seleccionado, lo agregamos al objeto
-      // Nota: El componente ImageUpload maneja el estado via Controller,
-      // asi que "data.imagen" ya deberia tener el File si se usó el Controller correctamente.
+      // PASO 1: Si hay imagen, subirla primero al storage
+      if (data.imagen) {
+        toast.info("Subiendo imagen...");
+        try {
+          imagenUrl = await storageService.uploadFile(data.imagen);
+          toast.success("Imagen subida correctamente");
+        } catch (error) {
+          toast.error("Error al subir la imagen");
+          throw error;
+        }
+      }
 
-      await addObservacion(rest);
+      // PASO 2: Crear la observación con la URL de la imagen (si existe)
+      const { imagen, creadoPor, ...rest } = data;
+      const observacionData = {
+        ...rest,
+        imagenEvidencia: imagenUrl, // Incluir la URL si se subió la imagen
+      };
+
+      await addObservacion(observacionData);
       onClose();
     } catch (error) {
       console.error(error);

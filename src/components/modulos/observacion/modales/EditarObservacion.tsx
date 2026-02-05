@@ -27,6 +27,9 @@ import {
   type Observacion,
   type UpdateObservacion,
 } from "@/types/observacion.interface";
+import { storageService } from "@/services/storage.service";
+import { toast } from "sonner";
+import { useState } from "react";
 
 interface EditarObservacionProps {
   isOpen: boolean;
@@ -41,6 +44,7 @@ export const EditarObservacion = ({
   onSubmit,
   observacion,
 }: EditarObservacionProps) => {
+  const [isUploading, setIsUploading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -58,8 +62,36 @@ export const EditarObservacion = ({
   });
 
   const handleFormSubmit = async (data: UpdateObservacion) => {
-    await onSubmit(data);
-    onClose();
+    setIsUploading(true);
+    try {
+      let imagenUrl: string | undefined = undefined;
+
+      // PASO 1: Si hay nueva imagen, subirla primero
+      if (data.imagen) {
+        toast.info("Subiendo imagen...");
+        try {
+          imagenUrl = await storageService.uploadFile(data.imagen);
+          toast.success("Imagen subida correctamente");
+        } catch (error) {
+          toast.error("Error al subir la imagen");
+          throw error;
+        }
+      }
+
+      // PASO 2: Actualizar observación con la URL (si se subió nueva imagen)
+      const { imagen, ...rest } = data;
+      const updateData: UpdateObservacion = {
+        ...rest,
+        ...(imagenUrl && { imagenEvidencia: imagenUrl }), // Solo incluir si se subió nueva imagen
+      };
+
+      await onSubmit(updateData);
+      onClose();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -186,7 +218,7 @@ export const EditarObservacion = ({
                       </SelectContent>
                     </Select>
                   )}
-                />
+                /> || isUploading
               </FormGroup>
             </FormGroupDivisor>
 
@@ -200,11 +232,8 @@ export const EditarObservacion = ({
                     value={value}
                     onChange={onChange}
                     previewUrl={
-                      observacion.imagenUrl
-                        ? `${
-                            import.meta.env.VITE_API_URL ||
-                            "http://localhost:3000/api/v1"
-                          }/observacion/image?path=${observacion.imagenUrl}`
+                      observacion.imagenEvidencia
+                        ? observacion.imagenEvidencia
                         : undefined
                     }
                   />
