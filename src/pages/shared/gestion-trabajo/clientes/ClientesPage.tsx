@@ -8,8 +8,10 @@ import { EditarCliente } from "@/components/modulos/clientes/modales/EditarClien
 import { useClientes } from "@/hooks/useCliente";
 import { TablaClientes } from "@/components/modulos/clientes/tablas/TablaClientes";
 import { ImportarClientesModal } from "@/components/modulos/clientes/modales/ImportarClientesModal";
-import { FileSpreadsheet } from "lucide-react";
+import { FileSpreadsheet, Download, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { clienteService } from "@/services/cliente.service";
+import { toast } from "sonner";
 import type { Cliente, UpdateCliente } from "@/types/cliente.interface";
 
 export default function ClientesPage() {
@@ -48,6 +50,15 @@ export default function ClientesPage() {
     }
   };
 
+  const handleDownloadTemplate = async () => {
+    try {
+      await clienteService.downloadTemplate();
+      toast.success("Plantilla descargada correctamente");
+    } catch (error) {
+      toast.error("Error al descargar la plantilla");
+    }
+  };
+
   return (
     <>
       <Header
@@ -57,8 +68,20 @@ export default function ClientesPage() {
         onToggleSidebar={toggleSidebar}
       >
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setIsImportarOpen(true)}>
-            <FileSpreadsheet className="mr-2 h-4 w-4" />
+          <Button
+            variant="outline"
+            onClick={handleDownloadTemplate}
+            title="Descargar plantilla de Excel"
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Descargar Plantilla
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setIsImportarOpen(true)}
+            title="Importar clientes desde Excel"
+          >
+            <Upload className="mr-2 h-4 w-4" />
             Importar Excel
           </Button>
           <BotonRegistro

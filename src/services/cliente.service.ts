@@ -53,7 +53,11 @@ export const clienteService = {
 
   // Crear cliente
   create: async (cliente: CreateCliente): Promise<Cliente> => {
-    const { data } = await api.post("/clientes", cliente);
+    const { data } = await api.post("/clientes", cliente, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     return data;
   },
 
@@ -65,7 +69,11 @@ export const clienteService = {
     id: string;
     data: UpdateCliente;
   }): Promise<Cliente> => {
-    const { data } = await api.patch(`/clientes/${id}`, clienteData);
+    const { data } = await api.patch(`/clientes/${id}`, clienteData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     return data;
   },
 
@@ -98,13 +106,13 @@ export const clienteService = {
   },
 
   downloadTemplate: async (): Promise<void> => {
-    const response = await api.get("/clientes/plantilla-excel/download", {
+    const response = await api.get("/clientes/plantilla/excel", {
       responseType: "blob",
     });
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", "Template_Clientes.xlsx");
+    link.setAttribute("download", "Plantilla_Clientes.xlsx");
     document.body.appendChild(link);
     link.click();
     link.parentNode?.removeChild(link);
@@ -123,7 +131,7 @@ export const clienteService = {
     formData.append("file", file);
     formData.append("userId", userId);
 
-    const { data } = await api.post("/clientes/importar-excel", formData, {
+    const { data } = await api.post("/clientes/importar/excel", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

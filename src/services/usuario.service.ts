@@ -22,11 +22,23 @@ export const usuarioApi = {
   getSubordinados: async (idSupervisor: string) => {
     const response = await api.get<any[]>(`/asignaciones/subordinados/${idSupervisor}`);
     // Mapear asignaciones a usuarios con porcentajeComision incluido
-    return response.data.map((asignacion: any) => ({
-      ...asignacion.subordinado,
-      porcentajeComision: asignacion.porcentajeComision,
-      idAsignacion: asignacion.idAsignacion,
-    })) || [];
+    return (
+      response.data.map((asignacion: any) => ({
+        ...asignacion.subordinado,
+        porcentajeComision:
+          asignacion.comision ??
+          asignacion.porcentajeComision ??
+          asignacion.subordinado?.porcentajeComision,
+        idAsignacion: asignacion.idAsignacion,
+        supervisor: asignacion.supervisor,
+        activo: asignacion.activo ?? asignacion.subordinado?.activo,
+        fechaCreacion:
+          asignacion.fechaCreacion ?? asignacion.subordinado?.fechaCreacion,
+        fechaModificacion:
+          asignacion.fechaModificacion ??
+          asignacion.subordinado?.fechaModificacion,
+      })) || []
+    );
   },
 
   create: async (usuario: CreateUsuario) => {
