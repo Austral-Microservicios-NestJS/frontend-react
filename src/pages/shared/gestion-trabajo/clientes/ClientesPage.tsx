@@ -19,12 +19,19 @@ export default function ClientesPage() {
   const [isRegistrarOpen, setIsRegistrarOpen] = useState(false);
   const [isImportarOpen, setIsImportarOpen] = useState(false);
   const [editingCliente, setEditingCliente] = useState<Cliente | null>(null);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(30);
   const [leadInitialValues, setLeadInitialValues] = useState<
     Partial<any> | undefined
   >(undefined);
   const { user } = useAuthStore();
-  const { clientes, addCliente, updateCliente, importarClientes } =
-    useClientes();
+  
+  // Obtener clientes con paginación
+  const { data, isLoading } = clienteService.useGetAll({ page, limit });
+  const clientes = data?.data || [];
+  const meta = data?.meta || { total: 0, totalPages: 0, page: 1, limit: 30 };
+  
+  const { addCliente, updateCliente, importarClientes } = useClientes();
   const location = useLocation();
 
   // Auto-abrir modal con datos del lead si viene desde LeadDetail
@@ -91,7 +98,23 @@ export default function ClientesPage() {
         </div>
       </Header>
 
-      <TablaClientes clientes={clientes} onEdit={handleEdit} />
+      {isLoading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      ) : (
+        <TablaClientes 
+          clientes={clientes} 
+          onEdit={handleEdit}
+          serverPagination={{
+            currentPage: page,
+            totalPages: meta.totalPages,
+            totalRecords: meta.total,
+            onPageChange: setPage,
+            isLoading: false,
+          }}
+        />
+      )}
 
       <RegistrarCliente
         isOpen={isRegistrarOpen}

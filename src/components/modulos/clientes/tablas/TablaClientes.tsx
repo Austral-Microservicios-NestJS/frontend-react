@@ -16,9 +16,16 @@ import { ContextoIAModal } from "@/components/modulos/clientes/modales/ContextoI
 interface TablaClientesProps {
   clientes: Cliente[];
   onEdit?: (cliente: Cliente) => void;
+  serverPagination?: {
+    currentPage: number;
+    totalPages: number;
+    totalRecords: number;
+    onPageChange: (page: number) => void;
+    isLoading?: boolean;
+  };
 }
 
-export const TablaClientes = ({ clientes, onEdit }: TablaClientesProps) => {
+export const TablaClientes = ({ clientes, onEdit, serverPagination }: TablaClientesProps) => {
   const navigate = useNavigate();
   const [selectedClienteForIA, setSelectedClienteForIA] =
     useState<Cliente | null>(null);
@@ -190,12 +197,13 @@ export const TablaClientes = ({ clientes, onEdit }: TablaClientesProps) => {
         data={clientes}
         columns={columns}
         searchPlaceholder="Buscar por nombre, documento, email..."
-        pageSize={10}
+        pageSize={30}
         showSearch={true}
         showPagination={true}
         showColumnToggle={true}
         emptyMessage="No hay clientes registrados"
         tableId="tabla-clientes"
+        serverPagination={serverPagination}
       />
 
       {selectedClienteForIA && (

@@ -16,13 +16,14 @@ export const clienteService = {
   getAll: async (params?: {
     page?: number;
     limit?: number;
-  }): Promise<{ data: Cliente[]; meta: any }> => {
+  }): Promise<{ data: Cliente[]; meta: { total: number; totalPages: number; page: number; limit: number } }> => {
     try {
       const response = await api.get("/clientes", { params });
-      return response.data.data;
+      // El backend ahora devuelve { data: [...], meta: { total, totalPages, page, limit } }
+      return response.data;
     } catch (error) {
       console.error("Error al obtener clientes:", error);
-      return { data: [], meta: { total: 0, page: 1, lastPage: 1 } };
+      return { data: [], meta: { total: 0, totalPages: 0, page: 1, limit: 30 } };
     }
   },
 
