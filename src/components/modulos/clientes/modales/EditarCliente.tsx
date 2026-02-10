@@ -77,9 +77,23 @@ export const EditarCliente = ({
   const tipoPersona = watch("tipoPersona");
 
   const handleFormSubmit = async (data: UpdateCliente) => {
+    const cleanPhone = (value?: string) =>
+      value ? value.replace(/\D/g, "") : value;
+
     const dataSubmit = {
       ...data,
       numeroDocumento: Number(data.numeroDocumento),
+      latitud:
+        data.latitud !== undefined && data.latitud !== null
+          ? Number(data.latitud)
+          : data.latitud,
+      longitud:
+        data.longitud !== undefined && data.longitud !== null
+          ? Number(data.longitud)
+          : data.longitud,
+      telefono1: cleanPhone(data.telefono1),
+      telefono2: cleanPhone(data.telefono2),
+      whatsapp: cleanPhone(data.whatsapp),
     };
     await onSubmit(dataSubmit);
     onClose();
