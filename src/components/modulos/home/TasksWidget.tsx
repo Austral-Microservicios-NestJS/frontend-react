@@ -8,9 +8,9 @@ import "dayjs/locale/es";
 dayjs.locale("es");
 
 const PRIORITY_CONFIG = {
-  ALTA: { color: "#f43f5e", label: "Alta", bar: "bg-rose-500" },
-  MEDIA: { color: "#f59e0b", label: "Media", bar: "bg-amber-400" },
-  BAJA: { color: "#10b981", label: "Baja", bar: "bg-emerald-500" },
+  ALTA: { color: "#f43f5e", label: "Alta" },
+  MEDIA: { color: "#f59e0b", label: "Media" },
+  BAJA: { color: "#10b981", label: "Baja" },
 };
 
 export const TasksWidget = () => {
@@ -22,9 +22,7 @@ export const TasksWidget = () => {
   const pendingTasks = tareas
     .filter((t) => t.estado !== "COMPLETADA")
     .filter((t) => dayjs(t.fechaVencimiento).isBefore(nextWeek))
-    .sort((a, b) =>
-      dayjs(a.fechaVencimiento).diff(dayjs(b.fechaVencimiento)),
-    )
+    .sort((a, b) => dayjs(a.fechaVencimiento).diff(dayjs(b.fechaVencimiento)))
     .slice(0, 3);
 
   const overdueCount = pendingTasks.filter((t) =>
@@ -34,9 +32,9 @@ export const TasksWidget = () => {
   if (isLoading) {
     return (
       <Card className="h-full border-none shadow-sm ring-1 ring-gray-200">
-        <div className="p-4 h-full flex flex-col gap-3">
+        <div className="px-4 pt-3 pb-4 h-full flex flex-col gap-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-14 bg-gray-50 rounded-xl animate-pulse" />
+            <div key={i} className="h-14.5 bg-gray-50 rounded-xl animate-pulse" />
           ))}
         </div>
       </Card>
@@ -45,7 +43,6 @@ export const TasksWidget = () => {
 
   return (
     <Card className="h-full border-none shadow-sm ring-1 ring-[#003d5c]/10 hover:ring-[#003d5c]/20 transition-all bg-white overflow-hidden relative flex flex-col">
-      {/* Top accent line */}
       <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#003d5c]" />
 
       <div className="px-4 pt-3 pb-4 flex flex-col h-full">
@@ -68,76 +65,79 @@ export const TasksWidget = () => {
           </Link>
         </div>
 
-        {/* Task list */}
-        <div className="flex-1 flex flex-col gap-2 min-h-0">
-          {pendingTasks.length === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center text-center py-6">
-              <div className="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center mb-2">
-                <CheckSquare className="w-5 h-5 text-emerald-500" />
-              </div>
-              <p className="text-sm font-semibold text-gray-800">¡Todo al día!</p>
-              <p className="text-xs text-gray-400 mt-0.5">Sin tareas próximas.</p>
-            </div>
-          ) : (
-            pendingTasks.map((tarea) => {
-              const dueDate = dayjs(tarea.fechaVencimiento);
-              const isOverdue = dueDate.isBefore(today, "day");
-              const isToday = dueDate.isSame(today, "day");
-              const cfg =
-                PRIORITY_CONFIG[
-                  tarea.prioridad as keyof typeof PRIORITY_CONFIG
-                ] ?? PRIORITY_CONFIG.BAJA;
+        {/* Task list — siempre 3 slots para altura constante */}
+        <div className="flex flex-col gap-2 flex-1">
+          {Array.from({ length: 3 }).map((_, i) => {
+            const tarea = pendingTasks[i];
 
+            if (!tarea) {
+              // Slot vacío invisible — mantiene la altura
               return (
                 <div
-                  key={tarea.idTarea}
-                  className="flex items-stretch gap-3 bg-gray-50/80 rounded-xl hover:bg-gray-50 transition-colors border border-gray-100 overflow-hidden"
+                  key={`empty-${i}`}
+                  className="flex items-stretch gap-3 rounded-xl border border-transparent overflow-hidden invisible"
+                  aria-hidden
                 >
-                  {/* Left priority bar */}
-                  <div
-                    className="w-1 shrink-0 rounded-l-xl"
-                    style={{ backgroundColor: cfg.color }}
-                  />
-
-                  {/* Content */}
+                  <div className="w-1 shrink-0" />
                   <div className="flex-1 min-w-0 py-2.5 pr-3">
-                    <p className="text-sm font-semibold text-gray-800 leading-snug line-clamp-2">
-                      {tarea.asunto}
-                    </p>
+                    <p className="text-sm font-semibold">&nbsp;</p>
                     <div className="flex items-center gap-2 mt-1.5">
-                      {/* Priority pill */}
-                      <span
-                        className="text-xs font-bold px-1.5 py-0.5 rounded-full"
-                        style={{
-                          backgroundColor: `${cfg.color}18`,
-                          color: cfg.color,
-                        }}
-                      >
-                        {cfg.label}
-                      </span>
-                      {/* Date */}
-                      <span
-                        className={`flex items-center gap-1 text-xs font-medium ${
-                          isOverdue
-                            ? "text-rose-600"
-                            : isToday
-                              ? "text-amber-600"
-                              : "text-gray-400"
-                        }`}
-                      >
-                        <Clock className="w-3 h-3" />
-                        {isOverdue
-                          ? "Vencida"
-                          : isToday
-                            ? "Hoy"
-                            : dueDate.format("D MMM")}
-                      </span>
+                      <span className="text-xs px-1.5 py-0.5 rounded-full">&nbsp;</span>
                     </div>
                   </div>
                 </div>
               );
-            })
-          )}
+            }
+
+            const dueDate = dayjs(tarea.fechaVencimiento);
+            const isOverdue = dueDate.isBefore(today, "day");
+            const isToday = dueDate.isSame(today, "day");
+            const cfg =
+              PRIORITY_CONFIG[tarea.prioridad as keyof typeof PRIORITY_CONFIG] ??
+              PRIORITY_CONFIG.BAJA;
+
+            return (
+              <div
+                key={tarea.idTarea}
+                className="flex items-stretch gap-3 bg-gray-50/80 rounded-xl hover:bg-gray-50 transition-colors border border-gray-100 overflow-hidden"
+              >
+                {/* Left priority bar */}
+                <div
+                  className="w-1 shrink-0 rounded-l-xl"
+                  style={{ backgroundColor: cfg.color }}
+                />
+                {/* Content */}
+                <div className="flex-1 min-w-0 py-2.5 pr-3">
+                  <p className="text-sm font-semibold text-gray-800 leading-snug line-clamp-2">
+                    {tarea.asunto}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <span
+                      className="text-xs font-bold px-1.5 py-0.5 rounded-full"
+                      style={{
+                        backgroundColor: `${cfg.color}18`,
+                        color: cfg.color,
+                      }}
+                    >
+                      {cfg.label}
+                    </span>
+                    <span
+                      className={`flex items-center gap-1 text-xs font-medium ${
+                        isOverdue
+                          ? "text-rose-600"
+                          : isToday
+                            ? "text-amber-600"
+                            : "text-gray-400"
+                      }`}
+                    >
+                      <Clock className="w-3 h-3" />
+                      {isOverdue ? "Vencida" : isToday ? "Hoy" : dueDate.format("D MMM")}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Footer */}
