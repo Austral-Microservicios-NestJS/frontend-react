@@ -3,6 +3,7 @@ import { QuickActionsWidget } from "@/components/modulos/home/QuickActionsWidget
 import { TasksWidget } from "@/components/modulos/home/TasksWidget";
 import { AustralAIPromo } from "@/components/modulos/home/AustralAIPromo";
 import { AIInsightsWidget } from "@/components/modulos/home/AIInsightsWidget";
+import { MapWidget } from "@/components/modulos/home/MapWidget";
 import { useAuthStore } from "@/store/auth.store";
 import { useSidebar } from "@/hooks/useSidebar";
 import { Menu, FilePlus2, UserPlus, PlusCircle, ChevronLeft } from "lucide-react";
@@ -92,13 +93,17 @@ const Home = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4">
-        {/* FILA 1: TasksWidget + LeadsSummary */}
+        {/* FILA 1: Tareas + Leads + Mapa */}
         <div className="col-span-1 md:col-span-1 lg:col-span-4">
           <TasksWidget />
         </div>
 
-        <div className="col-span-1 md:col-span-1 lg:col-span-8">
+        <div className="col-span-1 md:col-span-1 lg:col-span-4">
           <LeadsSummaryWidget />
+        </div>
+
+        <div className="col-span-1 md:col-span-2 lg:col-span-4">
+          <MapWidget />
         </div>
 
         {/* FILA 2: Insights AI + Austral AI */}

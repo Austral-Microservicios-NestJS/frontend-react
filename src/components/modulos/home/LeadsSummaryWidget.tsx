@@ -1,30 +1,62 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { useLeads } from "@/hooks/useLeads";
-import { Users, ArrowRight } from "lucide-react";
+import { Users, ArrowRight, TrendingUp, Flame } from "lucide-react";
 import { Link } from "react-router-dom";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+
+const STATUS_CONFIG = [
+  {
+    key: "NUEVO" as const,
+    label: "Nuevos",
+    color: "#6366f1",
+    light: "#eef2ff",
+    textColor: "text-indigo-600",
+  },
+  {
+    key: "CONTACTADO" as const,
+    label: "Contactados",
+    color: "#f59e0b",
+    light: "#fffbeb",
+    textColor: "text-amber-600",
+  },
+  {
+    key: "CERRADO" as const,
+    label: "Cerrados",
+    color: "#10b981",
+    light: "#ecfdf5",
+    textColor: "text-emerald-600",
+  },
+  {
+    key: "PERDIDO" as const,
+    label: "Perdidos",
+    color: "#f43f5e",
+    light: "#fff1f2",
+    textColor: "text-rose-500",
+  },
+];
+
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload?.length) {
+    const d = payload[0].payload;
+    return (
+      <div className="bg-white border border-gray-100 shadow-lg rounded-lg px-3 py-2 text-xs">
+        <p className="font-semibold text-gray-800">{d.label}</p>
+        <p style={{ color: d.color }} className="font-bold text-base">
+          {d.value}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
 
 export const LeadsSummaryWidget = () => {
   const { leadsByEstado, isLoading } = useLeads();
 
-  const data = [
-    { name: "Nuevos", value: leadsByEstado.NUEVO.length, color: "#3b82f6" }, // blue-500
-    {
-      name: "Contactados",
-      value: leadsByEstado.CONTACTADO.length,
-      color: "#f59e0b",
-    }, // amber-500
-    { name: "Cerrados", value: leadsByEstado.CERRADO.length, color: "#10b981" }, // emerald-500
-    { name: "Perdidos", value: leadsByEstado.PERDIDO.length, color: "#f43f5e" }, // rose-500
-  ];
+  const data = STATUS_CONFIG.map((s) => ({
+    ...s,
+    value: leadsByEstado[s.key]?.length ?? 0,
+  }));
 
   const totalLeads = data.reduce((acc, item) => acc + item.value, 0);
   const tasaConversion =
@@ -32,113 +64,137 @@ export const LeadsSummaryWidget = () => {
       ? ((leadsByEstado.CERRADO.length / totalLeads) * 100).toFixed(1)
       : "0.0";
 
+  const hotLeads = leadsByEstado.NUEVO.length;
+
   if (isLoading) {
     return (
       <Card className="h-full border-none shadow-sm ring-1 ring-gray-200">
-        <CardHeader className="pb-2 pt-3 px-3">
-          <CardTitle className="text-base font-bold text-gray-900">
-            Mis Leads
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-2 flex items-center justify-center h-[200px]">
-          <div className="w-32 h-32 rounded-full border-4 border-gray-100 border-t-indigo-500 animate-spin" />
-        </CardContent>
+        <div className="p-4 h-full flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full border-4 border-gray-100 border-t-indigo-500 animate-spin" />
+        </div>
       </Card>
     );
   }
 
   return (
-    <Card className="h-full border-none shadow-sm ring-1 ring-[#003d5c]/10 hover:ring-[#003d5c]/20 transition-all bg-white group relative overflow-hidden flex flex-col">
-      {/* Decorative Background Elements */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full blur-3xl -mr-16 -mt-16 opacity-50 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-50 rounded-full blur-2xl -ml-12 -mb-12 opacity-50 pointer-events-none" />
+    <Card className="h-full border-none shadow-sm ring-1 ring-[#003d5c]/10 hover:ring-[#003d5c]/20 transition-all bg-white overflow-hidden relative flex flex-col">
+      {/* Subtle gradient accent */}
+      <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#003d5c]" />
 
-      <div className="p-4 h-full flex flex-col relative z-10">
+      <div className="px-4 pt-3 pb-4 flex flex-col h-full">
         {/* Header */}
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <div className="bg-[#003d5c] p-1.5 rounded-lg">
               <Users className="w-4 h-4 text-white" />
             </div>
-            <h3 className="font-semibold text-gray-900 text-sm ml-2">
+            <h3 className="font-semibold text-gray-900 text-base">
               Resumen de Leads
             </h3>
           </div>
           <Link
             to="/dashboard/gestion-trabajo/leads"
-            className="text-xs font-bold text-white bg-[#003d5c] px-3 py-1.5 rounded-md hover:opacity-90 shadow-sm hover:shadow transition-all flex items-center gap-1.5 group/link"
+            className="flex items-center gap-1 text-sm font-semibold text-[#003d5c] hover:text-[#003d5c]/70 transition-colors group/link"
           >
             Ver tablero
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/link:translate-x-0.5" />
           </Link>
         </div>
 
-        {/* Estadísticas Rápidas */}
-        <div className="grid grid-cols-4 gap-3 mb-3">
-          <div className="bg-white rounded-lg p-3 border border-gray-200">
-            <p className="text-xs text-gray-500 font-semibold mb-1.5">Total</p>
-            <p className="text-2xl font-bold text-gray-900">{totalLeads}</p>
+        {/* Body: donut + stats */}
+        <div className="flex items-center gap-4 flex-1 min-h-0">
+          {/* Donut chart */}
+          <div className="relative shrink-0" style={{ width: 140, height: 140 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={totalLeads === 0 ? [{ value: 1, color: "#e5e7eb", label: "", light: "", textColor: "", key: "NUEVO" as const }] : data}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={44}
+                  outerRadius={65}
+                  dataKey="value"
+                  paddingAngle={totalLeads === 0 ? 0 : 3}
+                  startAngle={90}
+                  endAngle={-270}
+                  strokeWidth={0}
+                >
+                  {(totalLeads === 0
+                    ? [{ color: "#e5e7eb" }]
+                    : data
+                  ).map((entry, index) => (
+                    <Cell key={index} fill={entry.color} />
+                  ))}
+                </Pie>
+                {totalLeads > 0 && <Tooltip content={<CustomTooltip />} />}
+              </PieChart>
+            </ResponsiveContainer>
+            {/* Center */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <p className="text-2xl font-black text-gray-900 leading-none">
+                {totalLeads}
+              </p>
+              <p className="text-[10px] text-gray-400 font-medium mt-0.5">
+                leads
+              </p>
+            </div>
           </div>
-          <div className="bg-white rounded-lg p-3 border border-gray-200">
-            <p className="text-xs text-gray-500 font-semibold mb-1.5">
-              Contactados
-            </p>
-            <p className="text-2xl font-bold text-gray-900">
-              {leadsByEstado.CONTACTADO.length}
-            </p>
-          </div>
-          <div className="bg-white rounded-lg p-3 border border-gray-200">
-            <p className="text-xs text-gray-500 font-semibold mb-1.5">
-              Cerrados
-            </p>
-            <p className="text-2xl font-bold text-gray-900">
-              {leadsByEstado.CERRADO.length}
-            </p>
-          </div>
-          <div className="bg-white rounded-lg p-3 border border-gray-200">
-            <p className="text-xs text-gray-500 font-semibold mb-1.5">
-              Conversión
-            </p>
-            <p className="text-2xl font-bold text-gray-900">
-              {tasaConversion}%
-            </p>
+
+          {/* Stat rows */}
+          <div className="flex flex-col gap-2.5 flex-1 min-w-0">
+            {data.map((item) => {
+              const pct = totalLeads > 0 ? (item.value / totalLeads) * 100 : 0;
+              return (
+                <div key={item.key} className="flex items-center gap-2 group">
+                  {/* Dot */}
+                  <span
+                    className="w-2 h-2 rounded-full shrink-0"
+                    style={{ backgroundColor: item.color }}
+                  />
+                  {/* Label */}
+                  <span className="text-sm text-gray-500 w-22 shrink-0">
+                    {item.label}
+                  </span>
+                  {/* Bar */}
+                  <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-700"
+                      style={{
+                        width: `${pct}%`,
+                        backgroundColor: item.color,
+                      }}
+                    />
+                  </div>
+                  {/* Count */}
+                  <span
+                    className="text-sm font-bold w-5 text-right shrink-0"
+                    style={{ color: item.color }}
+                  >
+                    {item.value}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        {/* Gráfico de Barras */}
-        <div className="h-[180px] w-full relative">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={data}
-              layout="vertical"
-              margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
-            >
-              <XAxis type="number" hide />
-              <YAxis
-                dataKey="name"
-                type="category"
-                tick={{ fontSize: 14, fontWeight: 600, fill: "#4b5563" }}
-                width={90}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip
-                cursor={{ fill: "transparent" }}
-                contentStyle={{
-                  backgroundColor: "rgba(255, 255, 255, 0.95)",
-                  borderRadius: "8px",
-                  border: "none",
-                  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                }}
-                itemStyle={{ fontSize: "12px", fontWeight: 600 }}
-              />
-              <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={24}>
-                {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+        {/* Footer */}
+        <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
+            <span className="text-sm text-gray-400">Conversión</span>
+            <span className="text-sm font-bold text-emerald-600">
+              {tasaConversion}%
+            </span>
+          </div>
+          {hotLeads > 0 && (
+            <div className="flex items-center gap-1 bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full">
+              <Flame className="w-3 h-3" />
+              <span className="text-xs font-semibold">
+                {hotLeads} {hotLeads === 1 ? "nuevo" : "nuevos"}
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </Card>

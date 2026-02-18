@@ -56,9 +56,10 @@ export default function LeadDetail() {
     Partial<any> | undefined
   >(undefined);
 
-  // Consulta AI de placa - solo se activa si hay placa en detalleAuto
-  const placaParaConsulta = detalleAuto?.placa
-    ? detalleAuto.placa.trim().replace(/[\s-]+/g, "").toUpperCase()
+  // Consulta AI de placa - se activa si hay placa en detalleAuto o detalleSoat
+  const placaRaw = detalleAuto?.placa || detalleSoat?.placa;
+  const placaParaConsulta = placaRaw
+    ? placaRaw.trim().replace(/[\s-]+/g, "").toUpperCase()
     : undefined;
   const {
     data: consultaPlacaData,
@@ -143,24 +144,27 @@ export default function LeadDetail() {
         </div>
       </Header>
 
-      <div className="p-6">
+      <div className="p-4">
         {isLoading ? (
           <div className="flex justify-center items-center h-48">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           </div>
         ) : lead ? (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Layout principal: Info Lead + Consulta AI (si aplica) */}
             <div
-              className={`grid gap-6 ${detalleAuto?.placa ? "grid-cols-1 lg:grid-cols-3" : "grid-cols-1"}`}
+              className={`grid gap-6 ${placaRaw ? "grid-cols-1 lg:grid-cols-3" : "grid-cols-1"}`}
             >
               {/* Columna Izquierda - Información del Lead */}
               <div
-                className={`${detalleAuto?.placa ? "lg:col-span-2" : ""} bg-white rounded-lg shadow-sm border border-gray-200 p-4`}
+                className={`${placaRaw ? "lg:col-span-2" : ""} bg-white rounded-lg shadow-sm border border-gray-200 p-4`}
               >
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <h2 className="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b border-gray-100">
+                  Datos del Lead
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <div>
-                    <p className="text-sm text-gray-500">Nombre</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Nombre</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={leadState?.nombre ?? ""}
@@ -170,7 +174,7 @@ export default function LeadDetail() {
                             nombre: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -186,7 +190,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">Email</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Email</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={leadState?.email ?? ""}
@@ -196,7 +200,7 @@ export default function LeadDetail() {
                             email: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -212,7 +216,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">Número de documento</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Número de documento</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={leadState?.numeroDocumento ?? ""}
@@ -222,7 +226,7 @@ export default function LeadDetail() {
                             numeroDocumento: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -240,7 +244,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">Teléfono</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Teléfono</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={leadState?.telefono ?? ""}
@@ -251,7 +255,7 @@ export default function LeadDetail() {
                           }))
                         }
                         placeholder="Teléfono (no colocar el prefijo)"
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -268,8 +272,9 @@ export default function LeadDetail() {
                     </div>
                   </div>
 
+                  {leadState?.empresa && (
                   <div>
-                    <p className="text-sm text-gray-500">Empresa</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Empresa</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={leadState?.empresa ?? ""}
@@ -279,7 +284,7 @@ export default function LeadDetail() {
                             empresa: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -295,9 +300,11 @@ export default function LeadDetail() {
                       </button>
                     </div>
                   </div>
+                  )}
 
+                  {leadState?.cargo && (
                   <div>
-                    <p className="text-sm text-gray-500">Cargo</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Cargo</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={leadState?.cargo ?? ""}
@@ -307,7 +314,7 @@ export default function LeadDetail() {
                             cargo: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -321,9 +328,10 @@ export default function LeadDetail() {
                       </button>
                     </div>
                   </div>
+                  )}
 
                   <div>
-                    <p className="text-sm text-gray-500">Fuente</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Fuente</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={leadState?.fuente ?? ""}
@@ -333,7 +341,7 @@ export default function LeadDetail() {
                             fuente: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -349,7 +357,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">Estado</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Estado</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={leadState?.estado ?? ""}
@@ -359,7 +367,7 @@ export default function LeadDetail() {
                             estado: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -374,8 +382,9 @@ export default function LeadDetail() {
                     </div>
                   </div>
 
+                  {leadState?.valorEstimado && (
                   <div>
-                    <p className="text-sm text-gray-500">Valor estimado</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Valor estimado</p>
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
@@ -386,7 +395,7 @@ export default function LeadDetail() {
                             valorEstimado: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -402,9 +411,10 @@ export default function LeadDetail() {
                       </button>
                     </div>
                   </div>
+                  )}
 
                   <div>
-                    <p className="text-sm text-gray-500">Prioridad</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Prioridad</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={leadState?.prioridad ?? ""}
@@ -414,7 +424,7 @@ export default function LeadDetail() {
                             prioridad: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -432,70 +442,56 @@ export default function LeadDetail() {
                   </div>
 
 
-                  <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-gray-500">Fechas</p>
-                    <div className="mt-2 text-sm text-gray-700">
-                      <div className="flex items-center gap-2">
-                        <div>
-                          Creación:{" "}
-                          {lead.fechaCreacion
-                            ? days(lead.fechaCreacion).format(
-                                "DD/MM/YYYY HH:mm",
-                              )
-                            : "-"}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            navigator.clipboard.writeText(
-                              lead.fechaCreacion
-                                ? days(lead.fechaCreacion).format(
-                                    "DD/MM/YYYY HH:mm",
-                                  )
-                                : "",
-                            )
-                          }
-                          className="p-1 text-gray-500 hover:text-gray-800"
-                          title="Copiar fecha de creación"
-                        >
-                          <Copy className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div>
-                          Última modificación:{" "}
-                          {lead.fechaModificacion
-                            ? days(lead.fechaModificacion).format(
-                                "DD/MM/YYYY HH:mm",
-                              )
-                            : "-"}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            navigator.clipboard.writeText(
-                              lead.fechaModificacion
-                                ? days(lead.fechaModificacion).format(
-                                    "DD/MM/YYYY HH:mm",
-                                  )
-                                : "",
-                            )
-                          }
-                          className="p-1 text-gray-500 hover:text-gray-800"
-                          title="Copiar fecha de modificación"
-                        >
-                          <Copy className="w-4 h-4" />
-                        </button>
-                      </div>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Fecha creación</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        readOnly
+                        value={lead.fechaCreacion ? days(lead.fechaCreacion).format("DD/MM/YYYY HH:mm") : "-"}
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 cursor-default"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigator.clipboard.writeText(
+                            lead.fechaCreacion ? days(lead.fechaCreacion).format("DD/MM/YYYY HH:mm") : "",
+                          )
+                        }
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar fecha de creación"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
+
+                  <div>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Última modificación</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        readOnly
+                        value={lead.fechaModificacion ? days(lead.fechaModificacion).format("DD/MM/YYYY HH:mm") : "-"}
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 cursor-default"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigator.clipboard.writeText(
+                            lead.fechaModificacion ? days(lead.fechaModificacion).format("DD/MM/YYYY HH:mm") : "",
+                          )
+                        }
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar fecha de modificación"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Columna Derecha - Consulta AI Placa (solo si hay detalleAuto con placa) */}
-              {detalleAuto?.placa && (
+              {/* Columna Derecha - Consulta AI Placa (AUTO o SOAT) */}
+              {placaRaw && (
                 <div className="lg:col-span-1 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                   {/* Header */}
                   <div className="flex items-center justify-between mb-4">
@@ -544,7 +540,7 @@ export default function LeadDetail() {
                         <Skeleton className="h-6 w-24" />
                       ) : (
                         <p className="text-lg font-bold text-gray-900">
-                          {consultaPlacaData?.placa || detalleAuto.placa}
+                          {consultaPlacaData?.placa || placaRaw}
                         </p>
                       )}
                     </div>
@@ -557,7 +553,7 @@ export default function LeadDetail() {
                         <Skeleton className="h-5 w-16" />
                       ) : (
                         <p className="text-sm font-semibold text-gray-900">
-                          {consultaPlacaData?.marca || detalleAuto.marca || "-"}
+                          {consultaPlacaData?.marca || detalleAuto?.marca || detalleSoat?.marca || "-"}
                         </p>
                       )}
                     </div>
@@ -570,7 +566,7 @@ export default function LeadDetail() {
                         <Skeleton className="h-5 w-20" />
                       ) : (
                         <p className="text-sm font-semibold text-gray-900">
-                          {consultaPlacaData?.modelo || detalleAuto.modelo || "-"}
+                          {consultaPlacaData?.modelo || detalleAuto?.modelo || detalleSoat?.modelo || "-"}
                         </p>
                       )}
                     </div>
@@ -635,7 +631,7 @@ export default function LeadDetail() {
                     <Modal>
                       <ModalHeader
                         title="Datos del vehiculo"
-                        description={`Placa ${consultaPlacaData?.placa || detalleAuto.placa}`}
+                        description={`Placa ${consultaPlacaData?.placa || placaRaw}`}
                         onClose={() => setIsConsultaModalOpen(false)}
                       />
                       <ModalBody className="space-y-6">
@@ -747,10 +743,10 @@ export default function LeadDetail() {
             {/* Detalle Auto */}
             {detalleAuto && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <h3 className="font-semibold mb-4">Detalle Auto</h3>
+                <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b border-gray-100">Detalle Auto</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <p className="text-sm text-gray-500">Placa</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Placa</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleAuto.placa ?? ""}
@@ -760,7 +756,7 @@ export default function LeadDetail() {
                             placa: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -775,7 +771,7 @@ export default function LeadDetail() {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Marca</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Marca</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleAuto.marca ?? ""}
@@ -785,7 +781,7 @@ export default function LeadDetail() {
                             marca: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -800,7 +796,7 @@ export default function LeadDetail() {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Modelo</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Modelo</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleAuto.modelo ?? ""}
@@ -810,7 +806,7 @@ export default function LeadDetail() {
                             modelo: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -827,7 +823,7 @@ export default function LeadDetail() {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Año</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Año</p>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -840,7 +836,7 @@ export default function LeadDetail() {
                               : undefined,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -857,7 +853,7 @@ export default function LeadDetail() {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Uso del vehículo</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Uso del vehículo</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleAuto.usoVehiculo ?? ""}
@@ -867,7 +863,7 @@ export default function LeadDetail() {
                             usoVehiculo: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -884,7 +880,7 @@ export default function LeadDetail() {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Valor comercial</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Valor comercial</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleAuto.valorComercial ?? ""}
@@ -894,7 +890,7 @@ export default function LeadDetail() {
                             valorComercial: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -912,7 +908,7 @@ export default function LeadDetail() {
                   </div>
                 </div>
                 <div className="mt-4">
-                  <p className="text-sm text-gray-500">Aseguradoras</p>
+                  <p className="text-xs font-semibold text-gray-500 mb-0.5">Aseguradoras</p>
                   <div className="flex items-center gap-2">
                     <input
                       value={detalleAuto.aseguradoras ?? ""}
@@ -922,7 +918,7 @@ export default function LeadDetail() {
                           aseguradoras: e.target.value,
                         }))
                       }
-                      className="w-full border rounded px-2 py-1 text-sm"
+                      className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                     />
                     <button
                       type="button"
@@ -944,10 +940,10 @@ export default function LeadDetail() {
             {/* Detalle SOAT */}
             {detalleSoat && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <h3 className="font-semibold mb-4">Detalle SOAT</h3>
+                <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b border-gray-100">Detalle SOAT</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <p className="text-sm text-gray-500">Placa</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Placa</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleSoat.placa ?? ""}
@@ -957,7 +953,7 @@ export default function LeadDetail() {
                             placa: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -972,7 +968,7 @@ export default function LeadDetail() {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Marca</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Marca</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleSoat.marca ?? ""}
@@ -982,7 +978,7 @@ export default function LeadDetail() {
                             marca: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -997,7 +993,7 @@ export default function LeadDetail() {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Modelo</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Modelo</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleSoat.modelo ?? ""}
@@ -1007,7 +1003,7 @@ export default function LeadDetail() {
                             modelo: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1022,7 +1018,7 @@ export default function LeadDetail() {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Año</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Año</p>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -1033,7 +1029,7 @@ export default function LeadDetail() {
                             anio: e.target.value ? Number(e.target.value) : undefined,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1048,7 +1044,7 @@ export default function LeadDetail() {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Uso del vehículo</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Uso del vehículo</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleSoat.usoVehiculo ?? ""}
@@ -1058,7 +1054,7 @@ export default function LeadDetail() {
                             usoVehiculo: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1073,7 +1069,7 @@ export default function LeadDetail() {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Zona</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Zona</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleSoat.zona ?? ""}
@@ -1083,7 +1079,7 @@ export default function LeadDetail() {
                             zona: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1098,7 +1094,7 @@ export default function LeadDetail() {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Valor comercial</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Valor comercial</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleSoat.valorComercial ?? ""}
@@ -1108,7 +1104,7 @@ export default function LeadDetail() {
                             valorComercial: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1123,7 +1119,7 @@ export default function LeadDetail() {
                     </div>
                   </div>
                   <div className="md:col-span-2">
-                    <p className="text-sm text-gray-500">Aseguradoras</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Aseguradoras</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={
@@ -1139,7 +1135,7 @@ export default function LeadDetail() {
                               : [],
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                         placeholder="Rimac, Pacifico, ..."
                       />
                       <button
@@ -1165,10 +1161,10 @@ export default function LeadDetail() {
             {/* Detalle Vida Ley */}
             {detalleVidaLey && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <h3 className="font-semibold mb-2">Detalle Vida Ley</h3>
+                <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b border-gray-100">Detalle Vida Ley</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <p className="text-sm text-gray-500">RUC</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">RUC</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleVidaLey.rucEmpresa ?? ""}
@@ -1178,7 +1174,7 @@ export default function LeadDetail() {
                             rucEmpresa: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1196,7 +1192,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">Razón social</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Razón social</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleVidaLey.razonSocial ?? ""}
@@ -1206,7 +1202,7 @@ export default function LeadDetail() {
                             razonSocial: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1224,7 +1220,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">
                       Empleados en planilla
                     </p>
                     <div className="flex items-center gap-2">
@@ -1239,7 +1235,7 @@ export default function LeadDetail() {
                               : undefined,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1261,7 +1257,7 @@ export default function LeadDetail() {
 
                 <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <p className="text-sm text-gray-500">Planilla mensual</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Planilla mensual</p>
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
@@ -1272,7 +1268,7 @@ export default function LeadDetail() {
                             planillaMensual: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1290,7 +1286,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">Disponible</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Disponible</p>
                     <div className="flex items-center gap-2">
                       <label className="inline-flex items-center gap-2">
                         <input
@@ -1323,7 +1319,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">ID detalle</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">ID detalle</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleVidaLey.idDetalleVidaLey ?? ""}
@@ -1333,7 +1329,7 @@ export default function LeadDetail() {
                             idDetalleVidaLey: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1356,10 +1352,10 @@ export default function LeadDetail() {
             {/* Detalle Salud */}
             {detalleSalud && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <h3 className="font-semibold mb-2">Detalle Salud</h3>
+                <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b border-gray-100">Detalle Salud</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <p className="text-sm text-gray-500">Edad</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Edad</p>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -1372,7 +1368,7 @@ export default function LeadDetail() {
                               : undefined,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1390,7 +1386,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">Género</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Género</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleSalud.genero ?? ""}
@@ -1400,7 +1396,7 @@ export default function LeadDetail() {
                             genero: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1418,7 +1414,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">Tipo de cobertura</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Tipo de cobertura</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleSalud.tipoCobertura ?? ""}
@@ -1428,7 +1424,7 @@ export default function LeadDetail() {
                             tipoCobertura: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1446,7 +1442,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">Incluir familia</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Incluir familia</p>
                     <div className="flex items-center gap-2">
                       <label className="inline-flex items-center gap-2">
                         <input
@@ -1479,7 +1475,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">
                       Número de dependientes
                     </p>
                     <div className="flex items-center gap-2">
@@ -1494,7 +1490,7 @@ export default function LeadDetail() {
                               : undefined,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1512,7 +1508,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">Tuvo seguro antes</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Tuvo seguro antes</p>
                     <div className="flex items-center gap-2">
                       <label className="inline-flex items-center gap-2">
                         <input
@@ -1545,7 +1541,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">
                       Clínica de preferencia
                     </p>
                     <div className="flex items-center gap-2">
@@ -1557,7 +1553,7 @@ export default function LeadDetail() {
                             clinicaPreferencia: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1575,7 +1571,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">
                       Cobertura geográfica
                     </p>
                     <div className="flex items-center gap-2">
@@ -1587,7 +1583,7 @@ export default function LeadDetail() {
                             coberturaGeografica: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1605,7 +1601,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">Presupuesto mensual</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Presupuesto mensual</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleSalud.presupuestoMensual ?? ""}
@@ -1615,7 +1611,7 @@ export default function LeadDetail() {
                             presupuestoMensual: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1634,7 +1630,7 @@ export default function LeadDetail() {
                 </div>
 
                 <div className="mt-4">
-                  <p className="text-sm text-gray-500">
+                  <p className="text-xs font-semibold text-gray-500 mb-0.5">
                     Enfermedades preexistentes
                   </p>
                   <div className="flex items-center gap-2">
@@ -1656,7 +1652,7 @@ export default function LeadDetail() {
                             : [],
                         }))
                       }
-                      className="w-full border rounded px-2 py-1 text-sm"
+                      className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       placeholder="Separadas por coma"
                     />
                     <button
@@ -1687,10 +1683,10 @@ export default function LeadDetail() {
             {/* Detalle SCTR */}
             {detalleSCTR && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <h3 className="font-semibold mb-2">Detalle SCTR</h3>
+                <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b border-gray-100">Detalle SCTR</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <p className="text-sm text-gray-500">RUC Empresa</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">RUC Empresa</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleSCTR.rucEmpresa ?? ""}
@@ -1700,7 +1696,7 @@ export default function LeadDetail() {
                             rucEmpresa: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1718,7 +1714,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">Razón social</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Razón social</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleSCTR.razonSocial ?? ""}
@@ -1728,7 +1724,7 @@ export default function LeadDetail() {
                             razonSocial: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1746,7 +1742,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">
                       Número de trabajadores
                     </p>
                     <div className="flex items-center gap-2">
@@ -1761,7 +1757,7 @@ export default function LeadDetail() {
                               : undefined,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1779,7 +1775,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">Actividad económica</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Actividad económica</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleSCTR.actividadEconomica ?? ""}
@@ -1789,7 +1785,7 @@ export default function LeadDetail() {
                             actividadEconomica: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1807,7 +1803,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">Tipo de riesgo</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Tipo de riesgo</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleSCTR.tipoRiesgo ?? ""}
@@ -1817,7 +1813,7 @@ export default function LeadDetail() {
                             tipoRiesgo: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1840,10 +1836,10 @@ export default function LeadDetail() {
             {/* Detalle Vida */}
             {detalleVida && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <h3 className="font-semibold mb-2">Detalle Vida</h3>
+                <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b border-gray-100">Detalle Vida</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <p className="text-sm text-gray-500">Edad</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Edad</p>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -1856,7 +1852,7 @@ export default function LeadDetail() {
                               : undefined,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1874,7 +1870,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">Ocupación</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Ocupación</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleVida.ocupacion ?? ""}
@@ -1884,7 +1880,7 @@ export default function LeadDetail() {
                             ocupacion: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1902,7 +1898,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">Suma asegurada</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Suma asegurada</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleVida.sumaAsegurada ?? ""}
@@ -1912,7 +1908,7 @@ export default function LeadDetail() {
                             sumaAsegurada: e.target.value,
                           }))
                         }
-                        className="w-full border rounded px-2 py-1 text-sm"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
                       <button
                         type="button"
@@ -1930,7 +1926,7 @@ export default function LeadDetail() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">Fuma</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Fuma</p>
                     <div className="flex items-center gap-2">
                       <label className="inline-flex items-center gap-2">
                         <input
@@ -1964,7 +1960,7 @@ export default function LeadDetail() {
                 </div>
 
                 <div className="mt-4">
-                  <p className="text-sm text-gray-500">Beneficiarios</p>
+                  <p className="text-xs font-semibold text-gray-500 mb-0.5">Beneficiarios</p>
                   <div className="flex items-center gap-2">
                     <input
                       value={
@@ -1980,7 +1976,7 @@ export default function LeadDetail() {
                           beneficiarios: e.target.value,
                         }))
                       }
-                      className="w-full border rounded px-2 py-1 text-sm"
+                      className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                     />
                     <button
                       type="button"
