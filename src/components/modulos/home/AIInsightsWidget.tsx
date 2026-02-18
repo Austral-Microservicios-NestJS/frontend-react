@@ -83,7 +83,7 @@ export const AIInsightsWidget = () => {
               </div>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-lg ml-2">
+              <h3 className="font-semibold text-gray-900 text-sm ml-2">
                 Insights
               </h3>
               <p className="text-[10px] text-gray-400 ml-2">
@@ -113,7 +113,7 @@ export const AIInsightsWidget = () => {
               </div>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-lg ml-2">
+              <h3 className="font-semibold text-gray-900 text-sm ml-2">
                 Insights
               </h3>
               <p className="text-[10px] text-gray-400 ml-2">
@@ -151,7 +151,7 @@ export const AIInsightsWidget = () => {
               </div>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-lg ml-2">
+              <h3 className="font-semibold text-gray-900 text-sm ml-2">
                 Insights
               </h3>
               <p className="text-[10px] text-gray-400 ml-2">

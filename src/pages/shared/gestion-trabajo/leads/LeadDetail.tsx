@@ -48,6 +48,7 @@ export default function LeadDetail() {
   const [detalleSalud, setDetalleSalud] = useState<any | null>(null);
   const [detalleSCTR, setDetalleSCTR] = useState<any | null>(null);
   const [detalleVida, setDetalleVida] = useState<any | null>(null);
+  const [detalleSoat, setDetalleSoat] = useState<any | null>(null);
   const [leadState, setLeadState] = useState<any | null>(null);
   const [isConsultaModalOpen, setIsConsultaModalOpen] = useState(false);
   const [isRegistrarClienteOpen, setIsRegistrarClienteOpen] = useState(false);
@@ -77,6 +78,7 @@ export default function LeadDetail() {
       setDetalleSalud(lead.detalleSalud ? { ...lead.detalleSalud } : null);
       setDetalleSCTR(lead.detalleSCTR ? { ...lead.detalleSCTR } : null);
       setDetalleVida(lead.detalleVida ? { ...lead.detalleVida } : null);
+      setDetalleSoat(lead.detalleSoat ? { ...lead.detalleSoat } : null);
     } else {
       setLeadState(null);
       setDetalleVidaLey(null);
@@ -84,6 +86,7 @@ export default function LeadDetail() {
       setDetalleSalud(null);
       setDetalleSCTR(null);
       setDetalleVida(null);
+      setDetalleSoat(null);
     }
   }, [lead]);
 
@@ -933,6 +936,227 @@ export default function LeadDetail() {
                     >
                       <Copy className="w-4 h-4" />
                     </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Detalle SOAT */}
+            {detalleSoat && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <h3 className="font-semibold mb-4">Detalle SOAT</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-500">Placa</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleSoat.placa ?? ""}
+                        onChange={(e) =>
+                          setDetalleSoat((d: any) => ({
+                            ...d,
+                            placa: e.target.value,
+                          }))
+                        }
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigator.clipboard.writeText(detalleSoat.placa ?? "")
+                        }
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar placa"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Marca</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleSoat.marca ?? ""}
+                        onChange={(e) =>
+                          setDetalleSoat((d: any) => ({
+                            ...d,
+                            marca: e.target.value,
+                          }))
+                        }
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigator.clipboard.writeText(detalleSoat.marca ?? "")
+                        }
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar marca"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Modelo</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleSoat.modelo ?? ""}
+                        onChange={(e) =>
+                          setDetalleSoat((d: any) => ({
+                            ...d,
+                            modelo: e.target.value,
+                          }))
+                        }
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigator.clipboard.writeText(detalleSoat.modelo ?? "")
+                        }
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar modelo"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Año</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        value={detalleSoat.anio ?? ""}
+                        onChange={(e) =>
+                          setDetalleSoat((d: any) => ({
+                            ...d,
+                            anio: e.target.value ? Number(e.target.value) : undefined,
+                          }))
+                        }
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigator.clipboard.writeText(String(detalleSoat.anio ?? ""))
+                        }
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar año"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Uso del vehículo</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleSoat.usoVehiculo ?? ""}
+                        onChange={(e) =>
+                          setDetalleSoat((d: any) => ({
+                            ...d,
+                            usoVehiculo: e.target.value,
+                          }))
+                        }
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigator.clipboard.writeText(detalleSoat.usoVehiculo ?? "")
+                        }
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar uso del vehículo"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Zona</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleSoat.zona ?? ""}
+                        onChange={(e) =>
+                          setDetalleSoat((d: any) => ({
+                            ...d,
+                            zona: e.target.value,
+                          }))
+                        }
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigator.clipboard.writeText(detalleSoat.zona ?? "")
+                        }
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar zona"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Valor comercial</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleSoat.valorComercial ?? ""}
+                        onChange={(e) =>
+                          setDetalleSoat((d: any) => ({
+                            ...d,
+                            valorComercial: e.target.value,
+                          }))
+                        }
+                        className="w-full border rounded px-2 py-1 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigator.clipboard.writeText(detalleSoat.valorComercial ?? "")
+                        }
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar valor comercial"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="md:col-span-2">
+                    <p className="text-sm text-gray-500">Aseguradoras</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={
+                          Array.isArray(detalleSoat.aseguradoras)
+                            ? detalleSoat.aseguradoras.join(", ")
+                            : detalleSoat.aseguradoras ?? ""
+                        }
+                        onChange={(e) =>
+                          setDetalleSoat((d: any) => ({
+                            ...d,
+                            aseguradoras: e.target.value
+                              ? e.target.value.split(",").map((s: string) => s.trim())
+                              : [],
+                          }))
+                        }
+                        className="w-full border rounded px-2 py-1 text-sm"
+                        placeholder="Rimac, Pacifico, ..."
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigator.clipboard.writeText(
+                            Array.isArray(detalleSoat.aseguradoras)
+                              ? detalleSoat.aseguradoras.join(", ")
+                              : detalleSoat.aseguradoras ?? "",
+                          )
+                        }
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar aseguradoras"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

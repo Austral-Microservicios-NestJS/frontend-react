@@ -24,6 +24,7 @@ export interface Lead {
   detalleSCTR?: DetalleSCTR | null;
   detalleVida?: DetalleVida | null;
   detalleVidaLey?: DetalleVidaLey | null;
+  detalleSoat?: DetalleSoat | null;
 }
 
 // ==================== DETALLES POR TIPO DE SEGURO ====================
@@ -95,6 +96,22 @@ export interface DetalleVidaLey {
   razonSocial: string;
   numeroEmpleadosPlanilla: number;
   planillaMensual: string;
+  disponible: boolean;
+  fechaCreacion: string;
+  fechaModificacion: string;
+}
+
+export interface DetalleSoat {
+  idDetalleSoat: string;
+  idLead: string;
+  placa: string;
+  marca: string;
+  modelo: string;
+  anio: number;
+  usoVehiculo: UsoVehiculo;
+  zona?: string;
+  valorComercial?: string;
+  aseguradoras?: string[];
   disponible: boolean;
   fechaCreacion: string;
   fechaModificacion: string;

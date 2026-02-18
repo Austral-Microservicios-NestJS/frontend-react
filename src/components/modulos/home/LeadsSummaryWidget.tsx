@@ -60,7 +60,7 @@ export const LeadsSummaryWidget = () => {
             <div className="bg-[#003d5c] p-1.5 rounded-lg">
               <Users className="w-4 h-4 text-white" />
             </div>
-            <h3 className="font-semibold text-gray-900 text-lg ml-2">
+            <h3 className="font-semibold text-gray-900 text-sm ml-2">
               Resumen de Leads
             </h3>
           </div>
@@ -77,13 +77,13 @@ export const LeadsSummaryWidget = () => {
         <div className="grid grid-cols-4 gap-3 mb-3">
           <div className="bg-white rounded-lg p-3 border border-gray-200">
             <p className="text-xs text-gray-500 font-semibold mb-1.5">Total</p>
-            <p className="text-3xl font-bold text-gray-900">{totalLeads}</p>
+            <p className="text-2xl font-bold text-gray-900">{totalLeads}</p>
           </div>
           <div className="bg-white rounded-lg p-3 border border-gray-200">
             <p className="text-xs text-gray-500 font-semibold mb-1.5">
               Contactados
             </p>
-            <p className="text-3xl font-bold text-gray-900">
+            <p className="text-2xl font-bold text-gray-900">
               {leadsByEstado.CONTACTADO.length}
             </p>
           </div>
@@ -91,7 +91,7 @@ export const LeadsSummaryWidget = () => {
             <p className="text-xs text-gray-500 font-semibold mb-1.5">
               Cerrados
             </p>
-            <p className="text-3xl font-bold text-gray-900">
+            <p className="text-2xl font-bold text-gray-900">
               {leadsByEstado.CERRADO.length}
             </p>
           </div>
@@ -99,7 +99,7 @@ export const LeadsSummaryWidget = () => {
             <p className="text-xs text-gray-500 font-semibold mb-1.5">
               Conversión
             </p>
-            <p className="text-3xl font-bold text-gray-900">
+            <p className="text-2xl font-bold text-gray-900">
               {tasaConversion}%
             </p>
           </div>

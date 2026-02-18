@@ -16,9 +16,11 @@ import {
   CheckCircle2,
   MoreHorizontal,
   Calendar,
-  DollarSign,
   Building2,
-  FileText,
+  Phone,
+  Mail,
+  ArrowRight,
+  Tag,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -338,7 +340,7 @@ function LeadColumn({
   );
 }
 
-// Modern Lead Card with DnD
+// Lead Card with DnD
 function LeadCard({
   lead,
   onEdit,
@@ -352,186 +354,112 @@ function LeadCard({
     e.dataTransfer.setData("text/plain", lead.idLead);
   };
 
-  const getPriorityStyles = (prioridad: string) => {
-    switch (prioridad) {
-      case "ALTA":
-        return "bg-red-50 text-red-700 border-red-100";
-      case "MEDIA":
-        return "bg-amber-50 text-amber-700 border-amber-100";
-      case "BAJA":
-        return "bg-emerald-50 text-emerald-700 border-emerald-100";
-      default:
-        return "bg-gray-50 text-gray-700 border-gray-100";
-    }
+  const priorityConfig: Record<string, { bar: string; badge: string; label: string }> = {
+    ALTA:  { bar: "bg-red-500",    badge: "bg-red-50 text-red-700 border-red-200",     label: "Alta" },
+    MEDIA: { bar: "bg-amber-400",  badge: "bg-amber-50 text-amber-700 border-amber-200", label: "Media" },
+    BAJA:  { bar: "bg-emerald-400",badge: "bg-emerald-50 text-emerald-700 border-emerald-200", label: "Baja" },
   };
+
+  const p = priorityConfig[lead.prioridad] ?? priorityConfig.MEDIA;
 
   return (
     <div
       draggable
       onDragStart={handleDragStart}
-      onClick={() => onEdit(lead)}
-      className="group bg-white rounded-md p-3 border border-gray-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all duration-200 cursor-pointer active:cursor-grabbing"
+      className="group relative bg-white rounded-xl border border-gray-200/80 shadow-sm hover:shadow-md transition-all duration-200 active:cursor-grabbing overflow-hidden"
     >
-      {/* Header: Prioridad y Tipo de Seguro */}
-      <div className="flex items-start justify-between mb-2">
-        <div className="flex gap-1 flex-wrap">
-          <span
-            className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${getPriorityStyles(
-              lead.prioridad,
-            )}`}
+      {/* Barra de prioridad izquierda */}
+      <div className={`absolute left-0 top-0 bottom-0 w-1 ${p.bar} rounded-l-xl`} />
+
+      <div className="pl-4 pr-3 pt-3 pb-3">
+        {/* Header: badges */}
+        <div className="flex items-center justify-between mb-2.5">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${p.badge}`}>
+              {p.label}
+            </span>
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-blue-50 text-blue-700 border-blue-200">
+              {lead.tipoSeguro.replace("_", " ")}
+            </span>
+          </div>
+          <button
+            className="text-gray-300 hover:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={(e) => { e.stopPropagation(); onEdit(lead); }}
+            title="Editar"
           >
-            {lead.prioridad}
-          </span>
-          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded border bg-blue-50 text-blue-700 border-blue-100">
-            {lead.tipoSeguro.replace("_", " ")}
-          </span>
+            <MoreHorizontal className="w-3.5 h-3.5" />
+          </button>
         </div>
-        <button className="text-gray-300 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
-          <MoreHorizontal className="w-3.5 h-3.5" />
-        </button>
-      </div>
 
-      {/* Nombre y Empresa */}
-      <h4 className="font-medium text-gray-800 text-sm mb-1 leading-tight group-hover:text-blue-600 transition-colors">
-        {lead.nombre}
-      </h4>
+        {/* Nombre */}
+        <h4
+          className="font-semibold text-gray-900 text-sm leading-snug mb-1 cursor-pointer hover:text-blue-600 transition-colors"
+          onClick={() => onEdit(lead)}
+        >
+          {lead.nombre}
+        </h4>
 
-      {lead.empresa && (
-        <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
-          <Building2 className="w-3 h-3" />
-          <span className="truncate max-w-[180px]">{lead.empresa}</span>
-        </div>
-      )}
-
-      {/* Detalles específicos según tipo de seguro (Resumen Expandido) */}
-      <div className="mb-3 bg-gray-50/80 rounded p-2 border border-gray-100 space-y-1.5">
-        {lead.tipoSeguro === "AUTO" && lead.detalleAuto && (
-          <>
-            <div className="flex items-center gap-1.5 text-[11px] font-medium text-gray-700">
-              <span>🚗</span>
-              <span className="truncate">
-                {lead.detalleAuto.marca} {lead.detalleAuto.modelo} (
-                {lead.detalleAuto.anio})
-              </span>
-            </div>
-            <div className="flex items-center justify-between text-[10px] text-gray-500">
-              <span className="bg-white px-1 rounded border border-gray-200">
-                {lead.detalleAuto.placa}
-              </span>
-              <span className="capitalize">
-                {lead.detalleAuto.usoVehiculo.toLowerCase()}
-              </span>
-            </div>
-          </>
-        )}
-        {lead.tipoSeguro === "SALUD" && lead.detalleSalud && (
-          <>
-            <div className="flex items-center gap-1.5 text-[11px] font-medium text-gray-700">
-              <span>🏥</span>
-              <span>
-                {lead.detalleSalud.edad} años •{" "}
-                {lead.detalleSalud.genero === "MASCULINO" ? "Hombre" : "Mujer"}
-              </span>
-            </div>
-            <div className="text-[10px] text-gray-500 flex flex-col gap-0.5">
-              <span className="truncate">
-                Plan: {lead.detalleSalud.tipoCobertura}
-              </span>
-              {lead.detalleSalud.clinicaPreferencia && (
-                <span className="truncate text-gray-400">
-                  Pref: {lead.detalleSalud.clinicaPreferencia}
-                </span>
-              )}
-            </div>
-          </>
-        )}
-        {lead.tipoSeguro === "VIDA" && lead.detalleVida && (
-          <>
-            <div className="flex items-center gap-1.5 text-[11px] font-medium text-gray-700">
-              <span>❤️</span>
-              <span>Suma: S/ {lead.detalleVida.sumaAsegurada}</span>
-            </div>
-            <div className="flex items-center justify-between text-[10px] text-gray-500">
-              <span className="truncate max-w-[100px]">
-                {lead.detalleVida.ocupacion}
-              </span>
-              {lead.detalleVida.fuma && (
-                <span className="text-red-500 text-[9px] border border-red-100 bg-red-50 px-1 rounded">
-                  Fuma
-                </span>
-              )}
-            </div>
-          </>
-        )}
-        {lead.tipoSeguro === "VIDA_LEY" && (
-          <div className="flex items-center gap-1.5 text-[11px] font-medium text-gray-700">
-            <span>⚖️</span>
-            <span>Vida Ley</span>
+        {/* Empresa */}
+        {lead.empresa && (
+          <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
+            <Building2 className="w-3 h-3 shrink-0" />
+            <span className="truncate">{lead.empresa}</span>
           </div>
         )}
 
-        {/* Notas si existen */}
+        {/* Contacto */}
+        {(lead.email || lead.telefono) && (
+          <div className="space-y-1 mb-3">
+            {lead.email && (
+              <div className="flex items-center gap-1.5 text-[11px] text-gray-500">
+                <Mail className="w-3 h-3 text-gray-400 shrink-0" />
+                <span className="truncate">{lead.email}</span>
+              </div>
+            )}
+            {lead.telefono && (
+              <div className="flex items-center gap-1.5 text-[11px] text-gray-500">
+                <Phone className="w-3 h-3 text-gray-400 shrink-0" />
+                <span>{lead.telefono}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Notas */}
         {lead.notas && (
-          <div className="pt-1.5 border-t border-gray-200/60">
-            <p className="text-[10px] text-gray-500 italic truncate">
+          <div className="mb-3 px-2.5 py-2 bg-gray-50 rounded-lg border border-gray-100">
+            <p className="text-[10px] text-gray-500 italic line-clamp-2 leading-relaxed">
               "{lead.notas}"
             </p>
           </div>
         )}
-      </div>
 
-      {/* Footer: Fecha, Fuente y Valor */}
-      <div className="flex items-center justify-between pt-2 border-t border-gray-50">
-        <div className="flex flex-col gap-0.5">
-          <div className="flex items-center gap-1.5 text-[10px] text-gray-400">
-            <Calendar className="w-3 h-3" />
-            <span>
-              {new Date(lead.fechaCreacion).toLocaleDateString("es-PE", {
-                day: "numeric",
-                month: "short",
-              })}
-            </span>
+        {/* Footer */}
+        <div className="flex items-center justify-between pt-2.5 border-t border-gray-100">
+          <div className="flex items-center gap-3 text-[10px] text-gray-400">
+            <div className="flex items-center gap-1">
+              <Calendar className="w-3 h-3" />
+              <span>
+                {new Date(lead.fechaCreacion).toLocaleDateString("es-PE", {
+                  day: "numeric",
+                  month: "short",
+                })}
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Tag className="w-3 h-3" />
+              <span className="uppercase tracking-wide">{lead.fuente?.replace(/_/g, " ")}</span>
+            </div>
           </div>
-          <div className="text-[9px] text-gray-300 font-medium uppercase tracking-wider">
-            {lead.fuente?.replace("_", " ")}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-6 px-2 text-[10px] border-blue-200 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
-            onClick={(e) => {
-              e.stopPropagation();
-              // TODO: Implementar navegación a cotización
-            }}
-          >
-            <FileText className="w-3 h-3 mr-1.5" />
-            Cotizar
-          </Button>
 
           <Link
             to={`/dashboard/gestion-trabajo/leads/${lead.idLead}`}
             onClick={(e) => e.stopPropagation()}
-            className="inline-block"
-            title="Ver detalles"
+            className="inline-flex items-center gap-1 text-[11px] font-semibold text-white bg-[#0066CC] hover:bg-[#0052A3] px-3 py-1.5 rounded-lg transition-colors shadow-sm"
           >
-            <Button
-              size="sm"
-              variant="ghost"
-              className="h-6 px-2 text-[10px] text-gray-600 hover:bg-gray-50 hover:text-gray-800"
-            >
-              Detalles
-            </Button>
+            Ver detalle
+            <ArrowRight className="w-3 h-3" />
           </Link>
-
-          {lead.valorEstimado && (
-            <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-100">
-              <DollarSign className="w-3 h-3" />
-              {lead.valorEstimado}
-            </div>
-          )}
         </div>
       </div>
     </div>

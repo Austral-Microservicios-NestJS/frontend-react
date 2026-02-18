@@ -93,7 +93,7 @@ export const Header = ({
                       <ArrowLeft className="w-4 h-4" />
                     </button>
                   )}
-                  <h1 className="text-lg font-semibold text-gray-900 truncate">
+                  <h1 className="text-xl font-bold text-gray-900 truncate">
                     {title}
                   </h1>
                   {tutorialActive && (

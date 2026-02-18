@@ -25,7 +25,7 @@ export const TasksWidget = () => {
       // Sort by due date (earliest first)
       return dayjs(a.fechaVencimiento).diff(dayjs(b.fechaVencimiento));
     })
-    .slice(0, 5); // Show top 5
+    .slice(0, 3); // Show top 3
 
   if (isLoading) {
     return (
@@ -58,7 +58,7 @@ export const TasksWidget = () => {
             <div className="bg-[#003d5c] p-1.5 rounded-lg">
               <CheckSquare className="w-4 h-4 text-white" />
             </div>
-            <h3 className="font-semibold text-gray-900 text-lg ml-2">
+            <h3 className="font-semibold text-gray-900 text-sm ml-2">
               Tareas Pendientes
             </h3>
           </div>
