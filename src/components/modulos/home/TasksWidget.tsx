@@ -66,7 +66,17 @@ export const TasksWidget = () => {
         </div>
 
         {/* Task list — siempre 3 slots para altura constante */}
-        <div className="flex flex-col gap-2 flex-1">
+        <div className="flex flex-col gap-2 flex-1 relative">
+          {/* Empty state centrado cuando no hay tareas */}
+          {pendingTasks.length === 0 && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-10">
+              <div className="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center mb-2">
+                <CheckSquare className="w-5 h-5 text-emerald-500" />
+              </div>
+              <p className="text-sm font-semibold text-gray-800">¡Todo al día!</p>
+              <p className="text-xs text-gray-400 mt-0.5">Sin tareas próximas.</p>
+            </div>
+          )}
           {Array.from({ length: 3 }).map((_, i) => {
             const tarea = pendingTasks[i];
 
