@@ -378,9 +378,11 @@ function LeadCard({
             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${p.badge}`}>
               {p.label}
             </span>
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-blue-50 text-blue-700 border-blue-200">
-              {lead.tipoSeguro.replace("_", " ")}
-            </span>
+            {lead.tipoSeguro && (
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-blue-50 text-blue-700 border-blue-200">
+                {lead.tipoSeguro.replace("_", " ")}
+              </span>
+            )}
           </div>
           <button
             className="text-gray-300 hover:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity"

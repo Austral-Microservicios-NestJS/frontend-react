@@ -32,8 +32,8 @@ export const Sidebar = () => {
     }))
     .filter((category) => category.modules.length > 0);
 
-  // Estado de cajones colapsables (true = abierto por defecto)
-  const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
+  // Estado de cajones colapsables — todos abiertos excepto "maestros"
+  const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({ maestros: false });
   const isCategoryOpen = (id: string) => openCategories[id] !== false;
   const toggleCategory = (id: string) =>
     setOpenCategories((prev) => ({ ...prev, [id]: prev[id] === false ? true : false }));
