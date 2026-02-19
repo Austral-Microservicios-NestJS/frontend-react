@@ -25,7 +25,11 @@ interface TablaClientesProps {
   };
 }
 
-export const TablaClientes = ({ clientes, onEdit, serverPagination }: TablaClientesProps) => {
+export const TablaClientes = ({
+  clientes,
+  onEdit,
+  serverPagination,
+}: TablaClientesProps) => {
   const navigate = useNavigate();
   const [selectedClienteForIA, setSelectedClienteForIA] =
     useState<Cliente | null>(null);
@@ -37,7 +41,14 @@ export const TablaClientes = ({ clientes, onEdit, serverPagination }: TablaClien
       cell: ({ row }) => (
         <span
           className="px-2 py-1 text-xs font-medium rounded-full text-white"
-          style={{ backgroundColor: "var(--austral-azul)" }}
+          style={{
+            backgroundColor:
+              row.original.tipoPersona === "JURIDICO"
+                ? "var(--austral-azul-ejecutivo)"
+                : row.original.tipoPersona === "NATURAL"
+                  ? "var(--austral-azul)"
+                  : "var(--austral-gris)", // opcional fallback
+          }}
         >
           {row.original.tipoPersona}
         </span>

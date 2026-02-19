@@ -8,6 +8,9 @@ import {
   flexRender,
   type SortingState,
   type ColumnDef,
+  type VisibilityState,
+  type ColumnResizeMode,
+  type ColumnSizingState,
 } from "@tanstack/react-table";
 import {
   Search,
@@ -15,14 +18,69 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  ChevronUp,
-  ChevronDown,
+  ArrowUp,
+  ArrowDown,
+  ArrowUpDown,
   FileText,
-  Columns3,
+  Settings2,
   RotateCcw,
-  Info,
+  X,
+  Eye,
+  EyeOff,
+  ChevronsUpDown,
+  AlignJustify,
+  AlignCenter,
+  LayoutList,
 } from "lucide-react";
 import { useTableStore } from "@/store/table.store";
+
+// ─── Constantes de diseño ─────────────────────────────────────────────────────
+
+const AUSTRAL_AZUL = "#003d5c";
+
+export type TableDensity = "compact" | "normal" | "comfortable";
+
+const DENSITY_CONFIG: Record<
+  TableDensity,
+  { py: string; px: string; text: string; label: string }
+> = {
+  compact: { py: "py-1.5", px: "px-3", text: "text-xs", label: "Compacta" },
+  normal: { py: "py-2.5", px: "px-3", text: "text-xs", label: "Normal" },
+  comfortable: {
+    py: "py-3.5",
+    px: "px-4",
+    text: "text-sm",
+    label: "Espaciosa",
+  },
+};
+
+const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
+
+// ─── Skeleton Row ─────────────────────────────────────────────────────────────
+
+const SkeletonRow = ({
+  cols,
+  density,
+}: {
+  cols: number;
+  density: TableDensity;
+}) => {
+  const d = DENSITY_CONFIG[density];
+  return (
+    <tr className="border-b border-gray-100">
+      {Array.from({ length: cols }).map((_, i) => (
+        <td key={i} className={`${d.px} ${d.py}`}>
+          <div
+            className="h-4 rounded bg-gray-200 animate-pulse"
+            style={{ width: `${60 + ((i * 37) % 40)}%` }}
+          />
+        </td>
+      ))}
+    </tr>
+  );
+};
+
+// ─── Tipos ───────────────────────────────────────────────────────────────────
 
 interface ServerPaginationConfig {
   currentPage: number;
@@ -51,6 +109,7 @@ interface TableProps<T> {
   tableId?: string;
   serverPagination?: ServerPaginationConfig;
   serverSearch?: ServerSearchConfig;
+  defaultDensity?: TableDensity;
 }
 
 export const Table = <T,>({
@@ -67,29 +126,36 @@ export const Table = <T,>({
   tableId = "default",
   serverPagination,
   serverSearch,
+  defaultDensity = "normal",
 }: TableProps<T>) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [showColumnSelector, setShowColumnSelector] = useState(false);
+  const [density, setDensity] = useState<TableDensity>(defaultDensity);
+  const [currentPageSize, setCurrentPageSize] = useState(pageSize);
+  const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
   const columnSelectorRef = useRef<HTMLDivElement>(null);
 
-  // Zustand store para visibilidad de columnas y columnas minimizadas
+  const usingServerPagination = serverPagination !== undefined;
+  const usingServerSearch = serverSearch !== undefined;
+  const isLoading = usingServerPagination && serverPagination.isLoading;
+  const d = DENSITY_CONFIG[density];
+
+  // ── Zustand ──────────────────────────────────────────────────────────────
   const {
     columnVisibility,
     setColumnVisibility,
     minimizedColumns,
     setMinimizedColumns,
     resetMinimizedColumns: resetMinimizedColumnsStore,
+    toggleColumn,
   } = useTableStore();
-  const tableColumnVisibility =
+
+  const tableColumnVisibility: VisibilityState =
     columnVisibility[tableId] || initialColumnVisibility;
   const columnasMinimizadas = minimizedColumns[tableId] || {};
 
-  // Determinar si se está usando paginación/búsqueda del servidor
-  const usingServerPagination = serverPagination !== undefined;
-  const usingServerSearch = serverSearch !== undefined;
-
-  // Sincronizar visibilidad de columnas con Zustand
+  // ── Sincronizar visibilidad inicial ──────────────────────────────────────
   useEffect(() => {
     if (
       Object.keys(initialColumnVisibility).length > 0 &&
@@ -99,27 +165,24 @@ export const Table = <T,>({
     }
   }, [tableId, initialColumnVisibility, columnVisibility, setColumnVisibility]);
 
-  // Las columnas minimizadas se manejan automáticamente con Zustand
-
-  // Cerrar el selector de columnas al hacer click fuera
+  // ── Cerrar dropdown al click externo ────────────────────────────────────
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    const handleClickOutside = (event: MouseEvent) => {
       if (
         columnSelectorRef.current &&
         !columnSelectorRef.current.contains(event.target as Node)
       ) {
         setShowColumnSelector(false);
       }
-    }
-
+    };
     if (showColumnSelector) {
       document.addEventListener("mousedown", handleClickOutside);
-      return () => {
+      return () =>
         document.removeEventListener("mousedown", handleClickOutside);
-      };
     }
   }, [showColumnSelector]);
 
+  // ── TanStack Table ────────────────────────────────────────────────────────
   const table = useReactTable({
     data,
     columns,
@@ -127,6 +190,8 @@ export const Table = <T,>({
       sorting,
       globalFilter: usingServerSearch ? serverSearch.searchTerm : globalFilter,
       columnVisibility: tableColumnVisibility,
+      pagination: { pageSize: currentPageSize, pageIndex: 0 },
+      columnSizing,
     },
     onSortingChange: setSorting,
     onGlobalFilterChange: usingServerSearch
@@ -139,318 +204,603 @@ export const Table = <T,>({
           : updater;
       setColumnVisibility(tableId, newVisibility);
     },
+    onColumnSizingChange: setColumnSizing,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     enableMultiSort: true,
+    enableColumnResizing: true,
+    columnResizeMode: "onChange" as ColumnResizeMode,
     ...(usingServerPagination
-      ? {
-          manualPagination: true,
-          pageCount: serverPagination.totalPages,
-        }
+      ? { manualPagination: true, pageCount: serverPagination.totalPages }
       : {}),
     initialState: {
-      pagination: {
-        pageSize: pageSize,
-      },
+      pagination: { pageSize: currentPageSize },
     },
   });
 
-  // Función para manejar click en encabezado
+  // ── Helpers de columnas ───────────────────────────────────────────────────
+  const getColumnWidth = (columnId: string) =>
+    columnasMinimizadas[columnId] ? 30 : undefined;
+
+  const toggleMinimizeColumn = (columnId: string) => {
+    setMinimizedColumns(tableId, {
+      ...columnasMinimizadas,
+      [columnId]: !columnasMinimizadas[columnId],
+    });
+  };
+
   const handleHeaderClick = (header: any, event: React.MouseEvent) => {
     if (event.altKey || event.metaKey) {
-      // Alt/Option + Click = Minimizar/Restaurar columna
       event.preventDefault();
-      setMinimizedColumns(tableId, {
-        ...columnasMinimizadas,
-        [header.column.id]: !columnasMinimizadas[header.column.id],
-      });
+      toggleMinimizeColumn(header.column.id);
     } else {
-      // Click normal = Ordenar
       header.column.getToggleSortingHandler()?.(event);
     }
   };
 
-  // Función para obtener el ancho de la columna
-  const getColumnWidth = (columnId: string) => {
-    if (columnasMinimizadas[columnId]) {
-      return 30; // Ancho minimizado
-    }
-    return undefined; // Ancho automático
+  const getColumnLabel = (column: any): string => {
+    const h = column.columnDef.header;
+    return typeof h === "string" ? h : column.id;
   };
 
-  // Función para alternar minimización de columna
-  const toggleMinimizeColumn = (columnId: string) => {
-    const currentMinimized = columnasMinimizadas[columnId] || false;
-    setMinimizedColumns(tableId, {
-      ...columnasMinimizadas,
-      [columnId]: !currentMinimized,
+  const allColumnsVisible = table
+    .getAllLeafColumns()
+    .every((col) => tableColumnVisibility[col.id] !== false);
+
+  const toggleAllColumns = () => {
+    const newVis: VisibilityState = {};
+    table.getAllLeafColumns().forEach((col) => {
+      newVis[col.id] = !allColumnsVisible;
     });
+    setColumnVisibility(tableId, newVis);
   };
 
-  // Función para resetear columnas minimizadas
-  const resetMinimizedColumns = () => {
-    resetMinimizedColumnsStore(tableId);
+  // ── Paginación calculada ──────────────────────────────────────────────────
+  const totalPages = usingServerPagination
+    ? serverPagination.totalPages
+    : table.getPageCount();
+  const currentPage = usingServerPagination
+    ? serverPagination.currentPage - 1
+    : table.getState().pagination.pageIndex;
+  const totalRecords = usingServerPagination
+    ? serverPagination.totalRecords
+    : table.getFilteredRowModel().rows.length;
+  const fromRecord = currentPage * currentPageSize + 1;
+  const toRecord = Math.min((currentPage + 1) * currentPageSize, totalRecords);
+
+  const goToPage = (page: number) => {
+    if (usingServerPagination) {
+      serverPagination.onPageChange(page + 1);
+    } else {
+      table.setPageIndex(page);
+    }
   };
+
+  const pageNumbers = (() => {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i);
+    if (currentPage <= 3) return [0, 1, 2, 3, 4, -1, totalPages - 1];
+    if (currentPage >= totalPages - 4)
+      return [
+        0,
+        -1,
+        totalPages - 5,
+        totalPages - 4,
+        totalPages - 3,
+        totalPages - 2,
+        totalPages - 1,
+      ];
+    return [
+      0,
+      -1,
+      currentPage - 1,
+      currentPage,
+      currentPage + 1,
+      -2,
+      totalPages - 1,
+    ];
+  })();
+
+  const activeSearchTerm = usingServerSearch
+    ? serverSearch.searchTerm
+    : globalFilter;
+
+  const visibleColsCount = table
+    .getAllLeafColumns()
+    .filter((c) => tableColumnVisibility[c.id] !== false).length;
+  const totalColsCount = table.getAllLeafColumns().length;
+  const hasHiddenColumns = visibleColsCount < totalColsCount;
 
   return (
-    <div className={`space-y-4 ${className}`}>
-      {/* Barra de búsqueda y controles */}
+    <div className={`flex flex-col gap-3 ${className}`}>
+      {/* ── Toolbar ─────────────────────────────────────────────────────────── */}
       {(showSearch || showColumnToggle) && (
-        <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center sm:justify-between">
+        <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
           {/* Búsqueda */}
           {showSearch && (
-            <div className="relative flex-1 max-w-md">
+            <div className="relative flex-1 max-w-sm">
               <Search
-                className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                size={14}
               />
               <input
                 type="text"
                 placeholder={searchPlaceholder}
-                value={
-                  usingServerSearch
-                    ? serverSearch.searchTerm
-                    : globalFilter ?? ""
-                }
+                value={activeSearchTerm ?? ""}
                 onChange={(e) =>
                   usingServerSearch
                     ? serverSearch.onSearchChange(e.target.value)
                     : setGlobalFilter(e.target.value)
                 }
-                className="w-full pl-9 pr-3 py-1.5 border border-gray-300 rounded-lg transition-all duration-200 text-xs focus:ring-2 focus:ring-offset-0 outline-none"
-                style={{ borderColor: 'gray' }}
-                onFocus={(e) => e.target.style.borderColor = 'var(--austral-azul)'}
-                onBlur={(e) => e.target.style.borderColor = ''}
+                className="w-full pl-8 pr-8 py-2 border border-gray-300 rounded-lg text-xs text-gray-800 placeholder-gray-400 bg-white outline-none transition-all duration-150 focus:border-gray-400"
               />
+              {activeSearchTerm && (
+                <button
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors"
+                  onClick={() =>
+                    usingServerSearch
+                      ? serverSearch.onSearchChange("")
+                      : setGlobalFilter("")
+                  }
+                >
+                  <X size={13} />
+                </button>
+              )}
             </div>
           )}
 
-          {/* Selector de columnas */}
-          {showColumnToggle && (
-            <div className="relative shrink-0" ref={columnSelectorRef}>
-              <button
-                onClick={() => setShowColumnSelector(!showColumnSelector)}
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-gray-700 text-xs font-medium w-full sm:w-auto"
-              >
-                <Columns3 size={14} />
-                <span>Columnas</span>
-              </button>
+          {/* Controles derecha */}
+          <div className="flex items-center gap-2 ml-auto">
+            {/* Selector de densidad */}
+            <div className="flex items-center gap-0.5 border border-gray-300 rounded-lg overflow-hidden bg-white">
+              {[
+                {
+                  key: "compact" as TableDensity,
+                  Icon: AlignJustify,
+                  title: "Compacta",
+                },
+                {
+                  key: "normal" as TableDensity,
+                  Icon: AlignCenter,
+                  title: "Normal",
+                },
+                {
+                  key: "comfortable" as TableDensity,
+                  Icon: LayoutList,
+                  title: "Espaciosa",
+                },
+              ].map(({ key, Icon, title }) => (
+                <button
+                  key={key}
+                  title={title}
+                  onClick={() => setDensity(key)}
+                  className="p-1.5 transition-colors duration-150"
+                  style={{
+                    backgroundColor:
+                      density === key ? AUSTRAL_AZUL : "transparent",
+                    color: density === key ? "#fff" : "#9ca3af",
+                  }}
+                >
+                  <Icon size={13} />
+                </button>
+              ))}
+            </div>
 
-              {/* Dropdown de columnas - MEJORADO */}
-              {showColumnSelector && (
-                <div className="absolute right-0 top-full mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-xl z-50">
-                  <div className="p-3">
+            {/* Toggle de columnas */}
+            {showColumnToggle && (
+              <div className="relative shrink-0" ref={columnSelectorRef}>
+                <button
+                  onClick={() => setShowColumnSelector(!showColumnSelector)}
+                  className="inline-flex items-center justify-center gap-1.5 px-3 py-2 border rounded-lg text-xs font-medium transition-colors duration-150"
+                  style={{
+                    borderColor:
+                      hasHiddenColumns || showColumnSelector
+                        ? AUSTRAL_AZUL
+                        : "#d1d5db",
+                    backgroundColor: showColumnSelector
+                      ? AUSTRAL_AZUL
+                      : "white",
+                    color: showColumnSelector
+                      ? "#fff"
+                      : hasHiddenColumns
+                        ? AUSTRAL_AZUL
+                        : "#374151",
+                  }}
+                >
+                  <Settings2 size={13} />
+                  <span>Columnas</span>
+                  {hasHiddenColumns && !showColumnSelector && (
+                    <span
+                      className="text-[10px] font-bold px-1.5 py-0.5 rounded-full text-white ml-0.5"
+                      style={{ backgroundColor: AUSTRAL_AZUL }}
+                    >
+                      {totalColsCount - visibleColsCount}
+                    </span>
+                  )}
+                </button>
+
+                {/* ── Dropdown columnas ──────────────────────────────────── */}
+                {showColumnSelector && (
+                  <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
                     {/* Header */}
-                    <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-200">
-                      <h3 className="text-sm font-semibold text-gray-900">
+                    <div
+                      className="flex items-center justify-between px-4 py-3"
+                      style={{ backgroundColor: AUSTRAL_AZUL }}
+                    >
+                      <span className="text-xs font-semibold text-white uppercase tracking-wide">
                         Gestionar Columnas
-                      </h3>
+                      </span>
                       <button
                         onClick={() => setShowColumnSelector(false)}
-                        className="text-gray-400 hover:text-gray-600 text-xl leading-none"
+                        className="text-white/60 hover:text-white transition-colors"
                       >
-                        ×
+                        <X size={14} />
                       </button>
                     </div>
 
-                    {/* Lista de columnas - MINIMIZAR */}
-                    <div className="space-y-1.5 max-h-64 overflow-y-auto mb-3">
+                    {/* Sub-header: toggle all */}
+                    <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 bg-gray-50">
+                      <span className="text-xs text-gray-500">
+                        <span className="font-semibold text-gray-700">
+                          {visibleColsCount}
+                        </span>{" "}
+                        de{" "}
+                        <span className="font-semibold text-gray-700">
+                          {totalColsCount}
+                        </span>{" "}
+                        visibles
+                      </span>
+                      <button
+                        onClick={toggleAllColumns}
+                        className="text-xs font-medium transition-colors hover:underline"
+                        style={{ color: AUSTRAL_AZUL }}
+                      >
+                        {allColumnsVisible ? "Ocultar todas" : "Mostrar todas"}
+                      </button>
+                    </div>
+
+                    {/* Lista de columnas */}
+                    <div className="max-h-64 overflow-y-auto divide-y divide-gray-50">
                       {table.getAllLeafColumns().map((column) => {
+                        const isVisible =
+                          tableColumnVisibility[column.id] !== false;
                         const isMinimized = columnasMinimizadas[column.id];
+                        const label = getColumnLabel(column);
+
                         return (
                           <div
                             key={column.id}
-                            className="flex items-center gap-2 px-2.5 py-2 rounded-lg hover:bg-gray-50"
+                            className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors"
                           >
-                            <span className="flex-1 text-sm text-gray-700 font-medium">
-                              {typeof column.columnDef.header === "string"
-                                ? column.columnDef.header
-                                : column.id}
-                            </span>
+                            {/* Ojo: toggle visibilidad */}
                             <button
-                              onClick={() => toggleMinimizeColumn(column.id)}
-                              className={`text-xs px-3 py-1.5 rounded font-medium transition-all duration-200 ${
-                                isMinimized
-                                  ? "bg-blue-500 text-white hover:bg-blue-600 shadow-sm"
-                                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                              }`}
+                              onClick={() => toggleColumn(tableId, column.id)}
                               title={
-                                isMinimized
-                                  ? "Restaurar columna"
-                                  : "Minimizar columna"
+                                isVisible
+                                  ? "Ocultar columna"
+                                  : "Mostrar columna"
                               }
+                              className="flex-shrink-0 transition-colors"
                             >
-                              {isMinimized ? "Restaurar" : "Minimizar"}
+                              {isVisible ? (
+                                <Eye
+                                  size={14}
+                                  style={{ color: AUSTRAL_AZUL }}
+                                />
+                              ) : (
+                                <EyeOff size={14} className="text-gray-300" />
+                              )}
                             </button>
+
+                            {/* Nombre */}
+                            <span
+                              className={`flex-1 text-xs font-medium ${isVisible ? "text-gray-800" : "text-gray-400 line-through"}`}
+                            >
+                              {label}
+                            </span>
+
+                            {/* Minimizar (solo si visible) */}
+                            {isVisible && (
+                              <button
+                                onClick={() => toggleMinimizeColumn(column.id)}
+                                title={
+                                  isMinimized
+                                    ? "Restaurar ancho"
+                                    : "Minimizar columna"
+                                }
+                                className="flex-shrink-0 p-1 rounded border transition-colors"
+                                style={
+                                  isMinimized
+                                    ? {
+                                        backgroundColor: AUSTRAL_AZUL,
+                                        borderColor: AUSTRAL_AZUL,
+                                        color: "#fff",
+                                      }
+                                    : {
+                                        backgroundColor: "white",
+                                        borderColor: "#e5e7eb",
+                                        color: "#9ca3af",
+                                      }
+                                }
+                              >
+                                <ChevronsUpDown size={11} />
+                              </button>
+                            )}
                           </div>
                         );
                       })}
                     </div>
 
-                    {/* Botón restablecer */}
-                    <button
-                      onClick={() => {
-                        resetMinimizedColumns();
-                        setShowColumnSelector(false);
-                      }}
-                      className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                    >
-                      <RotateCcw size={14} />
-                      Restaurar Columnas
-                    </button>
+                    {/* Footer */}
+                    <div className="px-4 py-2.5 border-t border-gray-100 flex gap-2 bg-gray-50">
+                      <button
+                        onClick={() => resetMinimizedColumnsStore(tableId)}
+                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-gray-300 rounded-lg bg-white text-gray-600 hover:bg-gray-100 transition-colors"
+                      >
+                        <RotateCcw size={11} />
+                        Restablecer
+                      </button>
+                      <button
+                        onClick={() => setShowColumnSelector(false)}
+                        className="flex-1 flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg text-white transition-colors"
+                        style={{ backgroundColor: AUSTRAL_AZUL }}
+                      >
+                        Aplicar
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-          )}
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
-      {/* Tabla */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      {/* ── Tabla ────────────────────────────────────────────────────────────── */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="border-b border-gray-200" style={{ backgroundColor: 'var(--austral-azul)' }}>
+          <table
+            className="w-full border-collapse"
+            style={{ tableLayout: "fixed" }}
+          >
+            {/* THEAD */}
+            <thead>
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
+                  {headerGroup.headers.map((header, idx) => {
                     const isMinimized = columnasMinimizadas[header.id];
                     const width = getColumnWidth(header.id);
+                    const sorted = header.column.getIsSorted();
+                    const canSort = header.column.getCanSort();
+                    const isLast = idx === headerGroup.headers.length - 1;
+
                     return (
                       <th
                         key={header.id}
-                        className="px-2 sm:px-3 py-2 text-left text-xs font-semibold text-white cursor-pointer whitespace-nowrap group relative"
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#002a42'}
-                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--austral-azul)'}
                         onClick={(e) => handleHeaderClick(header, e)}
-                        title="Click para ordenar | Alt+Click para minimizar"
+                        title={
+                          canSort
+                            ? "Click para ordenar · Alt+Click para minimizar"
+                            : undefined
+                        }
+                        className={`${d.px} py-3 text-left select-none ${canSort ? "cursor-pointer" : ""}`}
                         style={{
-                          backgroundColor: 'var(--austral-azul)',
-                          width: width ? `${width}px` : undefined,
+                          position: "relative",
+                          backgroundColor: "#ffffff",
+                          width: width ? `${width}px` : `${header.getSize()}px`,
                           minWidth: width ? `${width}px` : undefined,
                           maxWidth: width ? `${width}px` : undefined,
-                          transition: "all 0.2s ease-in-out",
+                          borderRight: !isLast ? "1px solid #e5e7eb" : "none",
+                          borderBottom: "2px solid #e5e7eb",
+                          transition: "background-color 0.15s ease",
+                          overflow: "hidden",
                         }}
+                        onMouseEnter={(e) =>
+                          (e.currentTarget.style.backgroundColor = "#f1f5f9")
+                        }
+                        onMouseLeave={(e) =>
+                          (e.currentTarget.style.backgroundColor = "#ffffff")
+                        }
                       >
-                        <div className="flex items-center gap-1.5">
-                          {isMinimized ? (
-                            <div className="flex items-center justify-center h-full">
-                              <span className="transform -rotate-90 text-[10px] whitespace-nowrap origin-center">
-                                {typeof header.column.columnDef.header ===
-                                "string"
-                                  ? header.column.columnDef.header
-                                  : "•"}
-                              </span>
-                            </div>
-                          ) : (
-                            <>
+                        {isMinimized ? (
+                          <div className="flex items-center justify-center">
+                            <span
+                              className="text-base font-bold leading-none"
+                              style={{ color: AUSTRAL_AZUL }}
+                            >
+                              •
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1.5 whitespace-nowrap">
+                            <span
+                              className="text-xs font-semibold uppercase tracking-wide"
+                              style={{ color: AUSTRAL_AZUL }}
+                            >
                               {header.isPlaceholder
                                 ? null
                                 : flexRender(
                                     header.column.columnDef.header,
-                                    header.getContext()
+                                    header.getContext(),
                                   )}
-                              {header.column.getCanSort() && (
-                                <div className="flex items-center gap-0.5">
-                                  {/* Indicador de orden para multi-sorting */}
-                                  {header.column.getIsSorted() && (
-                                    <span className="text-[10px] font-bold text-white rounded-full w-3.5 h-3.5 flex items-center justify-center" style={{ backgroundColor: '#002a42' }}>
-                                      {header.column.getSortIndex() + 1}
-                                    </span>
-                                  )}
-                                  <div className="flex flex-col">
-                                    <ChevronUp
-                                      size={10}
-                                      className={`${
-                                        header.column.getIsSorted() === "asc"
-                                          ? "text-white"
-                                          : "text-blue-200"
-                                      }`}
-                                    />
-                                    <ChevronDown
-                                      size={10}
-                                      className={`${
-                                        header.column.getIsSorted() === "desc"
-                                          ? "text-white"
-                                          : "text-blue-200"
-                                      }`}
-                                    />
-                                  </div>
-                                </div>
-                              )}
-                            </>
-                          )}
-
-                          {/* Tooltip para Alt+Click */}
-                          <div className="absolute top-full left-0 mt-1 px-1.5 py-0.5 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                            <Info size={8} className="inline mr-0.5" />
-                            Alt+Click para minimizar
+                            </span>
+                            {canSort && (
+                              <span className="shrink-0">
+                                {sorted === "asc" ? (
+                                  <ArrowUp
+                                    size={12}
+                                    style={{ color: AUSTRAL_AZUL }}
+                                  />
+                                ) : sorted === "desc" ? (
+                                  <ArrowDown
+                                    size={12}
+                                    style={{ color: AUSTRAL_AZUL }}
+                                  />
+                                ) : (
+                                  <ArrowUpDown
+                                    size={11}
+                                    className="text-gray-400"
+                                  />
+                                )}
+                              </span>
+                            )}
+                            {sorted && header.column.getSortIndex() > 0 && (
+                              <span
+                                className="text-[9px] font-bold text-white rounded-full w-3.5 h-3.5 flex items-center justify-center flex-shrink-0"
+                                style={{
+                                  backgroundColor: AUSTRAL_AZUL,
+                                }}
+                              >
+                                {header.column.getSortIndex() + 1}
+                              </span>
+                            )}
                           </div>
-                        </div>
+                        )}
+                        {/* Handle de redimensionado */}
+                        {!isMinimized && header.column.getCanResize() && (
+                          <div
+                            onMouseDown={(e) => {
+                              e.stopPropagation();
+                              header.getResizeHandler()(e);
+                            }}
+                            onTouchStart={(e) => {
+                              e.stopPropagation();
+                              header.getResizeHandler()(e);
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="absolute right-0 top-0 h-full w-1.5 cursor-col-resize select-none touch-none"
+                            style={{
+                              backgroundColor: header.column.getIsResizing()
+                                ? AUSTRAL_AZUL
+                                : "transparent",
+                              transition: "background-color 0.15s ease",
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!header.column.getIsResizing())
+                                e.currentTarget.style.backgroundColor =
+                                  "#cbd5e1";
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!header.column.getIsResizing())
+                                e.currentTarget.style.backgroundColor =
+                                  "transparent";
+                            }}
+                          />
+                        )}
                       </th>
                     );
                   })}
                 </tr>
               ))}
             </thead>
-            <tbody className="divide-y divide-gray-200">
-              {table.getRowModel().rows.length > 0 ? (
-                table.getRowModel().rows.map((row, index) => {
-                  const rowClassName = `transition-colors duration-150 ${
-                    index % 2 === 0
-                      ? "bg-white hover:bg-gray-50"
-                      : "bg-gray-50 hover:bg-gray-100"
-                  }`;
 
-                  return (
-                    <tr key={row.id} className={rowClassName}>
-                      {row.getVisibleCells().map((cell) => {
-                        const width = getColumnWidth(cell.column.id);
-                        const isMinimized = columnasMinimizadas[cell.column.id];
-                        return (
-                          <td
-                            key={cell.id}
-                            className="px-2 sm:px-3 py-2 text-xs text-gray-900 whitespace-nowrap"
-                            style={{
-                              width: width ? `${width}px` : undefined,
-                              minWidth: width ? `${width}px` : undefined,
-                              maxWidth: width ? `${width}px` : undefined,
-                              overflow: isMinimized ? "hidden" : "visible",
-                              transition: "all 0.2s ease-in-out",
-                            }}
-                          >
-                            {isMinimized ? (
-                              <div
-                                className="h-full w-full"
-                                title="Columna minimizada"
-                              />
-                            ) : (
-                              flexRender(
+            {/* TBODY */}
+            <tbody className="divide-y divide-gray-100">
+              {isLoading ? (
+                Array.from({ length: Math.min(currentPageSize, 8) }).map(
+                  (_, i) => (
+                    <SkeletonRow
+                      key={i}
+                      cols={table.getVisibleLeafColumns().length}
+                      density={density}
+                    />
+                  ),
+                )
+              ) : table.getRowModel().rows.length > 0 ? (
+                table.getRowModel().rows.map((row, index) => (
+                  <tr
+                    key={row.id}
+                    className="transition-colors duration-100"
+                    style={{
+                      backgroundColor: index % 2 === 0 ? "#ffffff" : "#f8fafc",
+                    }}
+                    onMouseEnter={(e) => {
+                      (
+                        e.currentTarget as HTMLTableRowElement
+                      ).style.backgroundColor = "#eef3f7";
+                    }}
+                    onMouseLeave={(e) => {
+                      (
+                        e.currentTarget as HTMLTableRowElement
+                      ).style.backgroundColor =
+                        index % 2 === 0 ? "#ffffff" : "#f8fafc";
+                    }}
+                  >
+                    {row.getVisibleCells().map((cell) => {
+                      const width = getColumnWidth(cell.column.id);
+                      const isMinimized = columnasMinimizadas[cell.column.id];
+                      return (
+                        <td
+                          key={cell.id}
+                          className={`${d.px} ${d.py} ${d.text} text-gray-700 align-middle`}
+                          style={{
+                            width: width
+                              ? `${width}px`
+                              : `${cell.column.getSize()}px`,
+                            minWidth: width ? `${width}px` : undefined,
+                            maxWidth: width ? `${width}px` : undefined,
+                            overflow: "hidden",
+                            transition: "all 0.15s ease",
+                            whiteSpace: isMinimized ? "nowrap" : undefined,
+                          }}
+                        >
+                          {isMinimized
+                            ? null
+                            : flexRender(
                                 cell.column.columnDef.cell,
-                                cell.getContext()
-                              )
-                            )}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  );
-                })
+                                cell.getContext(),
+                              )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))
               ) : (
                 <tr>
                   <td
-                    colSpan={columns.length}
-                    className="px-2 sm:px-4 py-12 text-center"
+                    colSpan={table.getVisibleLeafColumns().length}
+                    className="px-4 py-16 text-center"
                   >
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-                        <FileText className="w-8 h-8 text-gray-400" />
+                    <div className="flex flex-col items-center gap-3">
+                      <div
+                        className="w-14 h-14 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: "#f1f5f9" }}
+                      >
+                        <FileText
+                          className="w-6 h-6 opacity-30"
+                          style={{ color: AUSTRAL_AZUL }}
+                        />
                       </div>
-                      <p className="text-gray-500 font-medium">
-                        {emptyMessage}
-                      </p>
+                      <div className="space-y-1">
+                        <p className="text-sm font-semibold text-gray-500">
+                          {emptyMessage}
+                        </p>
+                        {activeSearchTerm && (
+                          <p className="text-xs text-gray-400">
+                            Sin resultados para{" "}
+                            <span className="font-medium text-gray-600">
+                              "{activeSearchTerm}"
+                            </span>
+                          </p>
+                        )}
+                      </div>
+                      {activeSearchTerm && (
+                        <button
+                          onClick={() =>
+                            usingServerSearch
+                              ? serverSearch.onSearchChange("")
+                              : setGlobalFilter("")
+                          }
+                          className="text-xs font-medium px-4 py-1.5 rounded-lg border transition-colors hover:bg-gray-50"
+                          style={{
+                            borderColor: AUSTRAL_AZUL,
+                            color: AUSTRAL_AZUL,
+                          }}
+                        >
+                          Limpiar búsqueda
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -459,176 +809,129 @@ export const Table = <T,>({
           </table>
         </div>
 
-        {/* Paginación */}
-        {showPagination &&
-          (usingServerPagination
-            ? serverPagination.totalPages > 1
-            : table.getPageCount() > 1) && (
-            <div className="px-3 py-2.5 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="flex items-center gap-1.5 text-xs text-gray-600">
-                <span>Mostrando</span>
-                <span className="font-medium">
-                  {usingServerPagination
-                    ? (serverPagination.currentPage - 1) * pageSize + 1
-                    : table.getState().pagination.pageIndex *
-                        table.getState().pagination.pageSize +
-                      1}
+        {/* ── Footer / Paginación ─────────────────────────────────────────── */}
+        {showPagination && totalPages >= 1 && !isLoading && (
+          <div className="px-4 py-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-gray-50">
+            {/* Info + selector de page size */}
+            <div className="flex items-center gap-3 text-xs text-gray-500 flex-wrap">
+              <span>
+                Mostrando{" "}
+                <span className="font-semibold text-gray-700">
+                  {fromRecord}
                 </span>
-                <span>a</span>
-                <span className="font-medium">
-                  {usingServerPagination
-                    ? Math.min(
-                        serverPagination.currentPage * pageSize,
-                        serverPagination.totalRecords
-                      )
-                    : Math.min(
-                        (table.getState().pagination.pageIndex + 1) *
-                          table.getState().pagination.pageSize,
-                        table.getFilteredRowModel().rows.length
-                      )}
+                {" – "}
+                <span className="font-semibold text-gray-700">{toRecord}</span>
+                {" de "}
+                <span className="font-semibold text-gray-700">
+                  {totalRecords}
                 </span>
-                <span>de</span>
-                <span className="font-medium">
-                  {usingServerPagination
-                    ? serverPagination.totalRecords
-                    : table.getFilteredRowModel().rows.length}
-                </span>
-                <span>resultados</span>
-                {usingServerPagination && serverPagination.isLoading && (
-                  <span className="ml-1.5 text-[10px] text-blue-600 animate-pulse">
-                    Cargando...
-                  </span>
-                )}
-              </div>
+                {" registros"}
+              </span>
 
+              {!usingServerPagination && (
+                <>
+                  <span className="text-gray-300">|</span>
+                  <div className="flex items-center gap-1.5">
+                    <span>Ver</span>
+                    <select
+                      value={currentPageSize}
+                      onChange={(e) => {
+                        const size = Number(e.target.value);
+                        setCurrentPageSize(size);
+                        table.setPageSize(size);
+                        table.setPageIndex(0);
+                      }}
+                      className="border border-gray-300 rounded px-1.5 py-0.5 text-xs font-semibold bg-white outline-none cursor-pointer"
+                      style={{ color: AUSTRAL_AZUL }}
+                    >
+                      {PAGE_SIZE_OPTIONS.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                    </select>
+                    <span>por página</span>
+                  </div>
+                </>
+              )}
+
+              {isLoading && (
+                <span className="text-xs text-blue-500 animate-pulse">
+                  Cargando...
+                </span>
+              )}
+            </div>
+
+            {/* Botones de navegación */}
+            {totalPages > 1 && (
               <div className="flex items-center gap-1">
                 <button
-                  onClick={() =>
-                    usingServerPagination
-                      ? serverPagination.onPageChange(1)
-                      : table.setPageIndex(0)
-                  }
-                  disabled={
-                    usingServerPagination
-                      ? serverPagination.currentPage === 1
-                      : !table.getCanPreviousPage()
-                  }
-                  className="inline-flex items-center gap-0.5 px-2 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+                  onClick={() => goToPage(0)}
+                  disabled={currentPage === 0}
+                  className="p-1.5 rounded-lg border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  title="Primera página"
                 >
-                  <ChevronsLeft size={14} />
+                  <ChevronsLeft size={13} />
                 </button>
 
                 <button
-                  onClick={() =>
-                    usingServerPagination
-                      ? serverPagination.onPageChange(
-                          serverPagination.currentPage - 1
-                        )
-                      : table.previousPage()
-                  }
-                  disabled={
-                    usingServerPagination
-                      ? serverPagination.currentPage === 1
-                      : !table.getCanPreviousPage()
-                  }
-                  className="inline-flex items-center gap-0.5 px-2 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage === 0}
+                  className="p-1.5 rounded-lg border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  title="Página anterior"
                 >
-                  <ChevronLeft size={14} />
-                  <span className="hidden sm:inline">Anterior</span>
+                  <ChevronLeft size={13} />
                 </button>
 
                 <div className="flex items-center gap-0.5">
-                  {Array.from(
-                    {
-                      length: Math.min(
-                        5,
-                        usingServerPagination
-                          ? serverPagination.totalPages
-                          : table.getPageCount()
-                      ),
-                    },
-                    (_, i) => {
-                      let page;
-                      const currentPage = usingServerPagination
-                        ? serverPagination.currentPage - 1
-                        : table.getState().pagination.pageIndex;
-                      const totalPages = usingServerPagination
-                        ? serverPagination.totalPages
-                        : table.getPageCount();
-
-                      if (totalPages <= 5) {
-                        page = i;
-                      } else if (currentPage <= 2) {
-                        page = i;
-                      } else if (currentPage >= totalPages - 3) {
-                        page = totalPages - 5 + i;
-                      } else {
-                        page = currentPage - 2 + i;
-                      }
-
-                      return (
-                        <button
-                          key={page}
-                          onClick={() =>
-                            usingServerPagination
-                              ? serverPagination.onPageChange(page + 1)
-                              : table.setPageIndex(page)
-                          }
-                          className={`w-7 h-7 text-xs font-medium rounded-lg transition-colors duration-150 ${
-                            currentPage === page
-                              ? "text-white"
-                              : "text-gray-700 hover:bg-gray-100"
-                          }`}
-                          style={currentPage === page ? { backgroundColor: 'var(--austral-azul)' } : {}}
-                        >
-                          {page + 1}
-                        </button>
-                      );
-                    }
+                  {pageNumbers.map((page, i) =>
+                    page < 0 ? (
+                      <span
+                        key={`ellipsis-${i}`}
+                        className="w-7 text-center text-xs text-gray-400 select-none"
+                      >
+                        …
+                      </span>
+                    ) : (
+                      <button
+                        key={page}
+                        onClick={() => goToPage(page)}
+                        className="w-7 h-7 rounded-lg text-xs font-medium transition-colors border"
+                        style={{
+                          backgroundColor:
+                            currentPage === page ? AUSTRAL_AZUL : "white",
+                          color: currentPage === page ? "#fff" : "#374151",
+                          borderColor:
+                            currentPage === page ? AUSTRAL_AZUL : "#e5e7eb",
+                        }}
+                      >
+                        {page + 1}
+                      </button>
+                    ),
                   )}
                 </div>
 
                 <button
-                  onClick={() =>
-                    usingServerPagination
-                      ? serverPagination.onPageChange(
-                          serverPagination.currentPage + 1
-                        )
-                      : table.nextPage()
-                  }
-                  disabled={
-                    usingServerPagination
-                      ? serverPagination.currentPage >=
-                        serverPagination.totalPages
-                      : !table.getCanNextPage()
-                  }
-                  className="inline-flex items-center gap-0.5 px-2 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage >= totalPages - 1}
+                  className="p-1.5 rounded-lg border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  title="Página siguiente"
                 >
-                  <span className="hidden sm:inline">Siguiente</span>
-                  <ChevronRight size={14} />
+                  <ChevronRight size={13} />
                 </button>
 
                 <button
-                  onClick={() =>
-                    usingServerPagination
-                      ? serverPagination.onPageChange(
-                          serverPagination.totalPages
-                        )
-                      : table.setPageIndex(table.getPageCount() - 1)
-                  }
-                  disabled={
-                    usingServerPagination
-                      ? serverPagination.currentPage >=
-                        serverPagination.totalPages
-                      : !table.getCanNextPage()
-                  }
-                  className="inline-flex items-center gap-0.5 px-2 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+                  onClick={() => goToPage(totalPages - 1)}
+                  disabled={currentPage >= totalPages - 1}
+                  className="p-1.5 rounded-lg border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  title="Última página"
                 >
-                  <ChevronsRight size={14} />
+                  <ChevronsRight size={13} />
                 </button>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
