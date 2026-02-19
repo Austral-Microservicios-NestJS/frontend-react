@@ -4,9 +4,16 @@ import { TasksWidget } from "@/components/modulos/home/TasksWidget";
 import { AustralAIPromo } from "@/components/modulos/home/AustralAIPromo";
 import { AIInsightsWidget } from "@/components/modulos/home/AIInsightsWidget";
 import { MapWidget } from "@/components/modulos/home/MapWidget";
+import { StatsRowWidget } from "@/components/modulos/home/StatsRowWidget";
 import { useAuthStore } from "@/store/auth.store";
 import { useSidebar } from "@/hooks/useSidebar";
-import { Menu, FilePlus2, UserPlus, PlusCircle, ChevronLeft } from "lucide-react";
+import {
+  Menu,
+  FilePlus2,
+  UserPlus,
+  PlusCircle,
+  ChevronLeft,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Home = () => {
@@ -68,7 +75,8 @@ const Home = () => {
             </button>
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
-                ¡Bienvenido, <span className="text-[#003d5c]">{displayName}</span>!
+                ¡Bienvenido,{" "}
+                <span className="text-[#003d5c]">{displayName}</span>!
               </h1>
               <p className="text-gray-500 mt-0.5 text-sm font-medium">
                 ¿Qué te gustaría gestionar hoy?
@@ -93,7 +101,7 @@ const Home = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4">
-        {/* FILA 1: Tareas + Leads + Mapa */}
+        {/* FILA 1: Tareas + Leads */}
         <div className="col-span-1 md:col-span-1 lg:col-span-4">
           <TasksWidget />
         </div>
@@ -102,17 +110,23 @@ const Home = () => {
           <LeadsSummaryWidget />
         </div>
 
-        <div className="col-span-1 md:col-span-2 lg:col-span-4">
-          <MapWidget />
+        {/* COLUMNA DERECHA: Mapa (alto) + Austral AI (bajo) — ocupa filas 1 y 2 */}
+        <div className="col-span-1 md:col-span-2 lg:col-span-4 lg:row-span-2 flex flex-col gap-4 lg:h-full">
+          <div className="min-h-0" style={{ flex: "7 1 0%" }}>
+            <MapWidget />
+          </div>
+          <div className="min-h-0" style={{ flex: "3 1 2%" }}>
+            <AustralAIPromo />
+          </div>
         </div>
 
-        {/* FILA 2: Insights AI + Austral AI */}
-        <div className="col-span-1 md:col-span-1 lg:col-span-7">
+        {/* FILA 2: Insights + Mini stats */}
+        <div className="col-span-1 md:col-span-1 lg:col-span-6">
           <AIInsightsWidget />
         </div>
 
-        <div className="col-span-1 md:col-span-1 lg:col-span-5">
-          <AustralAIPromo />
+        <div className="col-span-1 md:col-span-1 lg:col-span-2">
+          <StatsRowWidget />
         </div>
 
         {/* FILA 3: Acciones (móvil) */}

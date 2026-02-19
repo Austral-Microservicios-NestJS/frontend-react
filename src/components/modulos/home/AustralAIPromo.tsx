@@ -4,51 +4,53 @@ import ShinyText from "@/components/ui/ShinyText";
 
 export const AustralAIPromo = () => {
   return (
-    <div className="relative overflow-hidden rounded-xl shadow-lg text-white h-full min-h-[180px] flex flex-col justify-center p-5 md:p-6 group bg-slate-900">
-      {/* Lava Background Effect */}
+    <div className="relative overflow-hidden rounded-xl shadow-lg text-white h-full min-h-[180px] flex flex-col justify-between p-5 group bg-slate-900">
+      {/* Animated blobs */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-600 rounded-full mix-blend-screen filter blur-[80px] opacity-40 animate-blob"></div>
-        <div className="absolute top-[-10%] right-[-10%] w-96 h-96 bg-blue-600 rounded-full mix-blend-screen filter blur-[80px] opacity-40 animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-[-20%] left-[20%] w-96 h-96 bg-indigo-600 rounded-full mix-blend-screen filter blur-[80px] opacity-40 animate-blob animation-delay-4000"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-cyan-600 rounded-full mix-blend-screen filter blur-[80px] opacity-40 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-72 h-72 bg-purple-600 rounded-full mix-blend-screen filter blur-[70px] opacity-40 animate-blob" />
+        <div className="absolute top-[-10%] right-[-10%] w-72 h-72 bg-blue-600 rounded-full mix-blend-screen filter blur-[70px] opacity-40 animate-blob animation-delay-2000" />
+        <div className="absolute bottom-[-20%] left-[20%] w-72 h-72 bg-indigo-600 rounded-full mix-blend-screen filter blur-[70px] opacity-40 animate-blob animation-delay-4000" />
       </div>
 
-      {/* Overlay gradient for readability */}
-      <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/40 to-transparent z-0 pointer-events-none" />
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-linear-to-br from-slate-900/70 via-slate-900/30 to-transparent z-0 pointer-events-none" />
 
-      {/* Logo de Austral en el fondo (derecha) */}
-      <div className="absolute right-8 top-1/2 -translate-y-1/2 w-48 h-48 md:w-96 md:h-64 opacity-40 pointer-events-none z-0 mix-blend-overlay">
+      {/* Logo grande a la derecha, mitad visible */}
+      <div className="absolute right-6 top-1/2 -translate-y-1/2 w-70 h-70 opacity-20 pointer-events-none z-0">
         <img
           src="/images/logo-austral-main.png"
-          alt="Austral Logo"
+          alt=""
           className="w-full h-full object-contain invert brightness-0"
         />
       </div>
 
-      <div className="relative z-10 max-w-xl pl-1">
-        <h2 className="text-3xl md:text-4xl font-bold mb-3 leading-tight drop-shadow-xl tracking-tight">
-          <ShinyText
-            text="Austral AI"
-            disabled={false}
-            speed={2}
-            className=""
-            color="#d1d5db"
-            shineColor="#ffffff"
-          />
-        </h2>
+      {/* Content */}
+      <div className="relative z-10 flex flex-col justify-center h-full gap-6">
+        {/* Title + description */}
+        <div>
+          <h2 className="text-4xl font-black leading-none tracking-tight mb-3">
+            <ShinyText
+              text="Austral AI"
+              disabled={false}
+              speed={2}
+              className=""
+              color="#d1d5db"
+              shineColor="#ffffff"
+            />
+          </h2>
+          <p className="text-white/55 text-sm font-medium leading-snug max-w-48">
+            Analiza pólizas, gestiona documentos y automatiza tareas con IA.
+          </p>
+        </div>
 
-        <p className="text-blue-100/90 mb-6 max-w-md text-sm md:text-base leading-relaxed drop-shadow-sm font-medium">
-          Asistente inteligente para análisis de pólizas, gestión de documentos
-          y automatización de tareas. El futuro de los seguros está aquí.
-        </p>
-
-        <Link to="/dashboard/agentes-ia/austral-ai" className="inline-block">
+        {/* CTA */}
+        <Link to="/dashboard/agentes-ia/austral-ai" className="w-fit">
           <div className="relative group/btn">
-            <span className="absolute inset-0 aurora-bg rounded-lg opacity-100" />
-            <button className="relative flex items-center gap-2 px-6 py-3 rounded-lg text-white font-bold text-sm hover:bg-white/10 transition-all shadow-xl">
+            <span className="absolute inset-0 aurora-bg rounded-lg opacity-90 pointer-events-none" />
+            <button className="relative flex items-center gap-2 px-5 py-2.5 rounded-lg bg-transparent text-white font-bold text-sm hover:bg-white/10 transition-all shadow-lg">
               <Sparkles className="w-4 h-4" />
               Probar ahora
-              <ArrowRight className="w-4 h-4 opacity-70 group-hover/btn:translate-x-1 transition-transform" />
+              <ArrowRight className="w-4 h-4 opacity-70 group-hover/btn:translate-x-0.5 transition-transform" />
             </button>
           </div>
         </Link>

@@ -40,7 +40,11 @@ const miniMapOptions: google.maps.MapOptions = {
   gestureHandling: "greedy",
   clickableIcons: false,
   styles: [
-    { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
+    {
+      featureType: "poi",
+      elementType: "labels",
+      stylers: [{ visibility: "off" }],
+    },
     { featureType: "transit", stylers: [{ visibility: "off" }] },
   ],
 };
@@ -59,21 +63,34 @@ export const MapWidget = () => {
 
   const clientesConCoordenadas = clientes
     .filter((c) => c.latitud && c.longitud)
-    .map((c) => ({ ...c, latitud: Number(c.latitud), longitud: Number(c.longitud) }))
-    .filter((c) => !isNaN(c.latitud) && !isNaN(c.longitud) && c.latitud !== 0 && c.longitud !== 0);
+    .map((c) => ({
+      ...c,
+      latitud: Number(c.latitud),
+      longitud: Number(c.longitud),
+    }))
+    .filter(
+      (c) =>
+        !isNaN(c.latitud) &&
+        !isNaN(c.longitud) &&
+        c.latitud !== 0 &&
+        c.longitud !== 0,
+    );
 
   const onLoad = useCallback(
     (map: google.maps.Map) => {
       if (clientesConCoordenadas.length > 0) {
         const bounds = new google.maps.LatLngBounds();
-        clientesConCoordenadas.forEach((c) => bounds.extend({ lat: c.latitud, lng: c.longitud }));
+        clientesConCoordenadas.forEach((c) =>
+          bounds.extend({ lat: c.latitud, lng: c.longitud }),
+        );
         map.fitBounds(bounds, 40);
       }
     },
     [clientesConCoordenadas],
   );
 
-  const isReady = isLoaded && !loadingClientes && !loadError && GOOGLE_MAPS_API_KEY;
+  const isReady =
+    isLoaded && !loadingClientes && !loadError && GOOGLE_MAPS_API_KEY;
 
   return (
     <Card className="h-full border-none shadow-sm ring-1 ring-[#003d5c]/10 hover:ring-[#003d5c]/20 transition-all bg-white overflow-hidden relative flex flex-col">
@@ -162,9 +179,6 @@ export const MapWidget = () => {
               {clientesConCoordenadas.length}
             </span>
           </div>
-          <span className="text-xs text-gray-400">
-            {clientes.length} clientes en total
-          </span>
         </div>
       </div>
     </Card>
