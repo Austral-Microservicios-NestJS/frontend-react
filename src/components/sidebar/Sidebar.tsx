@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
-import { LogOut, Settings, Users, Building2 } from "lucide-react";
+import { LogOut, Settings, Users, Building2, ChevronDown } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { useSidebarStore } from "@/store/sidebar.store";
 import { moduleCategories } from "@/routes/modulos";
@@ -30,6 +31,12 @@ export const Sidebar = () => {
       ),
     }))
     .filter((category) => category.modules.length > 0);
+
+  // Estado de cajones colapsables (true = abierto por defecto)
+  const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
+  const isCategoryOpen = (id: string) => openCategories[id] !== false;
+  const toggleCategory = (id: string) =>
+    setOpenCategories((prev) => ({ ...prev, [id]: prev[id] === false ? true : false }));
 
   // Colores según el modo
   const activeColor = viewMode === "CRM" ? "#003D5C" : "#0c4cbaff"; // Verde CRM, Azul índigo ERP
@@ -134,28 +141,46 @@ export const Sidebar = () => {
           {/* Navegación */}
           <nav className="flex-1 p-3 overflow-y-auto">
             {userRole ? (
-              <div className="space-y-4">
-                {filteredCategories.map((category, categoryIndex) => (
-                  <div key={category.id} className="space-y-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div
-                        className={`w-1.5 h-1.5 rounded-full ${
-                          categoryIndex === 0
-                            ? "bg-emerald-500"
-                            : categoryIndex === 1
-                            ? "bg-blue-500"
-                            : categoryIndex === 2
-                            ? "bg-purple-500"
-                            : "bg-orange-500"
-                        }`}
-                      ></div>
-                      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                        {category.title}
-                      </h3>
-                    </div>
+              <div className="space-y-1">
+                {filteredCategories.map((category, categoryIndex) => {
+                  const isOpen = isCategoryOpen(category.id);
+                  const dotColor =
+                    categoryIndex === 0
+                      ? "bg-emerald-500"
+                      : categoryIndex === 1
+                      ? "bg-blue-500"
+                      : categoryIndex === 2
+                      ? "bg-purple-500"
+                      : "bg-orange-500";
 
-                    <div className="space-y-0.5">
-                      {category.modules.map((module) => {
+                  return (
+                  <div key={category.id}>
+                    {/* Header colapsable */}
+                    <button
+                      onClick={() => toggleCategory(category.id)}
+                      className="w-full flex items-center justify-between gap-2 px-1 py-1.5 rounded-md hover:bg-gray-50 transition-colors group mb-0.5"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
+                        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                          {category.title}
+                        </h3>
+                      </div>
+                      <ChevronDown
+                        className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-300 ${
+                          isOpen ? "rotate-0" : "-rotate-90"
+                        }`}
+                      />
+                    </button>
+
+                    {/* Módulos colapsables con animación */}
+                    <div
+                      className="grid transition-all duration-300 ease-in-out"
+                      style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
+                    >
+                      <div className="overflow-hidden">
+                        <div className="space-y-0.5 pb-2">
+                          {category.modules.map((module) => {
                         const isActive = location.pathname.startsWith(
                           module.path
                         );
@@ -231,9 +256,12 @@ export const Sidebar = () => {
                           </button>
                         );
                       })}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-32 text-gray-400">
