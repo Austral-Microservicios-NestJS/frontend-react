@@ -3,10 +3,11 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
-  ModalFooter,
   FormGroup,
   FormGroupDivisor,
   LocationInput,
+  PhoneInput,
+  UpdateButtons,
 } from "@/components/shared";
 import {
   Input,
@@ -46,7 +47,7 @@ export const EditarCliente = ({
     control,
     watch,
     setValue,
-    formState: {},
+    formState: { isSubmitting, isDirty },
   } = useForm<UpdateCliente>({
     defaultValues: {
       tipoPersona: cliente.tipoPersona,
@@ -77,9 +78,6 @@ export const EditarCliente = ({
   const tipoPersona = watch("tipoPersona");
 
   const handleFormSubmit = async (data: UpdateCliente) => {
-    const cleanPhone = (value?: string) =>
-      value ? value.replace(/\D/g, "") : value;
-
     const dataSubmit = {
       ...data,
       numeroDocumento: Number(data.numeroDocumento),
@@ -91,9 +89,11 @@ export const EditarCliente = ({
         data.longitud !== undefined && data.longitud !== null
           ? Number(data.longitud)
           : data.longitud,
-      telefono1: cleanPhone(data.telefono1),
-      telefono2: cleanPhone(data.telefono2),
-      whatsapp: cleanPhone(data.whatsapp),
+      telefono1: data.telefono1 || undefined,
+      telefono2: data.telefono2 || undefined,
+      whatsapp: data.whatsapp || undefined,
+      emailNotificaciones: data.emailNotificaciones || undefined,
+      cumpleanos: data.cumpleanos || undefined,
     };
     await onSubmit(dataSubmit);
     onClose();
@@ -108,7 +108,7 @@ export const EditarCliente = ({
           <ModalBody>
             <FormGroupDivisor>
               <FormGroup>
-                <Label htmlFor="tipoPersona">Tipo de Persona</Label>
+                <Label htmlFor="tipoPersona" required>Tipo de Persona</Label>
                 <Controller
                   name="tipoPersona"
                   control={control}
@@ -130,7 +130,7 @@ export const EditarCliente = ({
                 />
               </FormGroup>
               <FormGroup>
-                <Label htmlFor="tipoDocumento">Tipo de Documento</Label>
+                <Label htmlFor="tipoDocumento" required>Tipo de Documento</Label>
                 <Controller
                   name="tipoDocumento"
                   control={control}
@@ -154,7 +154,7 @@ export const EditarCliente = ({
             </FormGroupDivisor>
 
             <FormGroup>
-              <Label htmlFor="numeroDocumento">Número de Documento</Label>
+              <Label htmlFor="numeroDocumento" required>Número de Documento</Label>
               <Input
                 id="numeroDocumento"
                 type="number"
@@ -165,7 +165,7 @@ export const EditarCliente = ({
 
             {tipoPersona === "JURIDICO" && (
               <FormGroup>
-                <Label htmlFor="razonSocial">Razón Social</Label>
+                <Label htmlFor="razonSocial" required>Razón Social</Label>
                 <Input
                   id="razonSocial"
                   placeholder="Ej: Empresa SAC"
@@ -177,7 +177,7 @@ export const EditarCliente = ({
             {tipoPersona === "NATURAL" && (
               <FormGroupDivisor>
                 <FormGroup>
-                  <Label htmlFor="nombres">Nombres</Label>
+                  <Label htmlFor="nombres" required>Nombres</Label>
                   <Input
                     id="nombres"
                     placeholder="Ej: Juan Pedro"
@@ -185,7 +185,7 @@ export const EditarCliente = ({
                   />
                 </FormGroup>
                 <FormGroup>
-                  <Label htmlFor="apellidos">Apellidos</Label>
+                  <Label htmlFor="apellidos" required>Apellidos</Label>
                   <Input
                     id="apellidos"
                     placeholder="Ej: Pérez Gómez"
@@ -206,7 +206,7 @@ export const EditarCliente = ({
             </FormGroup>
 
             <FormGroup>
-              <Label htmlFor="direccion">Dirección</Label>
+              <Label htmlFor="direccion" required>Dirección</Label>
               <Controller
                 name="direccion"
                 control={control}
@@ -267,30 +267,43 @@ export const EditarCliente = ({
 
             <FormGroupDivisor columns={3}>
               <FormGroup>
-                <Label htmlFor="telefono1">Teléfono Principal</Label>
-                <Input
-                  id="telefono1"
-                  type="text"
-                  placeholder="Ej: 999888777"
-                  {...register("telefono1", { required: true })}
+                <Label htmlFor="telefono1" required>Teléfono Principal</Label>
+                <Controller
+                  name="telefono1"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <PhoneInput
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  )}
                 />
               </FormGroup>
               <FormGroup>
                 <Label htmlFor="telefono2">Teléfono Secundario</Label>
-                <Input
-                  id="telefono2"
-                  type="text"
-                  placeholder="Ej: 999888777"
-                  {...register("telefono2")}
+                <Controller
+                  name="telefono2"
+                  control={control}
+                  render={({ field }) => (
+                    <PhoneInput
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  )}
                 />
               </FormGroup>
               <FormGroup>
                 <Label htmlFor="whatsapp">WhatsApp</Label>
-                <Input
-                  id="whatsapp"
-                  type="text"
-                  placeholder="Ej: 999888777"
-                  {...register("whatsapp")}
+                <Controller
+                  name="whatsapp"
+                  control={control}
+                  render={({ field }) => (
+                    <PhoneInput
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  )}
                 />
               </FormGroup>
             </FormGroupDivisor>
@@ -329,22 +342,7 @@ export const EditarCliente = ({
             </FormGroupDivisor>
           </ModalBody>
 
-          <ModalFooter>
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
-              style={{ backgroundColor: "var(--austral-azul)" }}
-            >
-              Actualizar
-            </button>
-          </ModalFooter>
+          <UpdateButtons onClose={onClose} isSubmitting={isSubmitting} isDirty={isDirty} />
         </form>
       </Modal>
     </ModalContainer>

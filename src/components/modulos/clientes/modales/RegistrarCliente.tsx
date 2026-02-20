@@ -3,10 +3,11 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
-  ModalFooter,
   FormGroup,
   FormGroupDivisor,
   LocationInput,
+  PhoneInput,
+  SubmitButtons,
 } from "@/components/shared";
 import {
   Input,
@@ -20,40 +21,11 @@ import {
 } from "@/components/ui";
 import { useForm, Controller } from "react-hook-form";
 import { useEffect } from "react";
-import { toast } from "sonner";
 import {
   tipoPersonaOptions,
   tipoDocumentoOptions,
 } from "@/types/cliente.interface";
 import type { User } from "@/store/auth.store";
-
-// Opciones de prefijos de países
-const countryPrefixes = [
-  { code: "+51", name: "Perú" },
-  { code: "+56", name: "Chile" },
-  { code: "+54", name: "Argentina" },
-  { code: "+57", name: "Colombia" },
-  { code: "+58", name: "Venezuela" },
-  { code: "+52", name: "México" },
-  { code: "+1", name: "Estados Unidos" },
-  { code: "+34", name: "España" },
-  { code: "+593", name: "Ecuador" },
-  { code: "+595", name: "Paraguay" },
-];
-
-const normalizePhone = (raw?: string) => {
-  if (!raw) return { prefix: "+51", number: "" };
-  const trimmed = String(raw).trim();
-  if (!trimmed) return { prefix: "+51", number: "" };
-  const match = countryPrefixes.find((p) => trimmed.startsWith(p.code));
-  if (match) {
-    return { prefix: match.code, number: trimmed.slice(match.code.length) };
-  }
-  if (trimmed.startsWith("+")) {
-    return { prefix: trimmed, number: "" };
-  }
-  return { prefix: "+51", number: trimmed };
-};
 
 interface RegistrarClienteProps {
   isOpen: boolean;
@@ -81,7 +53,7 @@ export const RegistrarCliente = ({
     reset,
     watch,
     setValue,
-    formState: {},
+    formState: { isSubmitting, errors },
   } = useForm({
     defaultValues: {
       tipoPersona: "",
@@ -102,9 +74,6 @@ export const RegistrarCliente = ({
       cumpleanos: "",
       tipoDocumento: "",
       numeroDocumento: "",
-      telefono1Prefix: "+51",
-      telefono2Prefix: "+51",
-      whatsappPrefix: "+51",
       asignadoA: user.idUsuario,
       registradoPor: user.idUsuario,
     },
@@ -117,24 +86,6 @@ export const RegistrarCliente = ({
     if (!isOpen) {
       reset();
     } else if (isOpen && initialValues) {
-      const telefono1Normalized = normalizePhone(
-        initialValues.telefono1 as string | undefined,
-      );
-      const whatsappNormalized = normalizePhone(
-        initialValues.whatsapp as string | undefined,
-      );
-      const telefono1Number = telefono1Normalized.number;
-      const whatsappNumber =
-        whatsappNormalized.number || telefono1Normalized.number;
-      const telefono1Prefix =
-        telefono1Normalized.number || initialValues.telefono1
-          ? telefono1Normalized.prefix
-          : "+51";
-      const whatsappPrefix =
-        whatsappNormalized.number || initialValues.whatsapp
-          ? whatsappNormalized.prefix
-          : telefono1Prefix;
-      // fusionar valores por defecto con initialValues
       reset({
         tipoPersona: "",
         razonSocial: "",
@@ -144,17 +95,14 @@ export const RegistrarCliente = ({
         distrito: "",
         provincia: "",
         departamento: "",
-        telefono1: telefono1Number,
+        telefono1: "",
         telefono2: "",
-        whatsapp: whatsappNumber,
+        whatsapp: "",
         emailNotificaciones: "",
         recibirNotificaciones: false,
         cumpleanos: "",
         tipoDocumento: "",
         numeroDocumento: "",
-        telefono1Prefix,
-        telefono2Prefix: "+51",
-        whatsappPrefix,
         asignadoA: user.idUsuario,
         registradoPor: user.idUsuario,
         ...initialValues,
@@ -163,57 +111,42 @@ export const RegistrarCliente = ({
   }, [isOpen, reset, initialValues, user]);
 
   const onSubmit = async (data: any) => {
-    const {
-      telefono1Prefix,
-      telefono2Prefix,
-      whatsappPrefix,
-      ...dataWithoutPrefixes
-    } = data;
-    const cleanNumber = (value?: string) =>
-      value ? value.replace(/^\+\d+/, "") : value;
     const dataSubmit = {
-      ...dataWithoutPrefixes,
+      ...data,
       numeroDocumento: Number(data.numeroDocumento),
-      telefono1: data.telefono1
-        ? `${telefono1Prefix}${cleanNumber(data.telefono1)}`
-        : null,
-      telefono2: data.telefono2
-        ? `${telefono2Prefix}${cleanNumber(data.telefono2)}`
-        : null,
-      whatsapp: data.whatsapp
-        ? `${whatsappPrefix}${cleanNumber(data.whatsapp)}`
-        : null,
+      telefono1: data.telefono1 || null,
+      telefono2: data.telefono2 || null,
+      whatsapp: data.whatsapp || null,
+      emailNotificaciones: data.emailNotificaciones || null,
+      cumpleanos: data.cumpleanos || null,
     };
 
     await addCliente(dataSubmit);
     onClose();
   };
 
-  const isDrawer = presentation === "drawer";
-  const prefixWidthClass = isDrawer ? "w-20" : "w-32";
-
   return (
     <ModalContainer
       isOpen={isOpen}
       onClose={onClose}
       size={size}
-      position={isDrawer ? "right" : "center"}
-      panelClassName={isDrawer ? "h-full rounded-none" : ""}
+      position={presentation === "drawer" ? "right" : "center"}
+      panelClassName={presentation === "drawer" ? "h-full rounded-none" : ""}
     >
       <Modal
-        className={isDrawer ? "h-full max-h-full rounded-none" : ""}
+        className={
+          presentation === "drawer" ? "h-full max-h-full rounded-none" : ""
+        }
       >
         <ModalHeader title="Registrar Nuevo Cliente" onClose={onClose} />
 
-        <form
-          onSubmit={handleSubmit(onSubmit, () => {
-            toast.error("Completa los campos obligatorios");
-          })}
-        >
+        <form onSubmit={handleSubmit(onSubmit)}>
           <ModalBody>
             <FormGroupDivisor>
               <FormGroup>
-                <Label htmlFor="tipoPersona">Tipo de Persona</Label>
+                <Label htmlFor="tipoPersona" required>
+                  Tipo de Persona
+                </Label>
                 <Controller
                   name="tipoPersona"
                   control={control}
@@ -233,9 +166,16 @@ export const RegistrarCliente = ({
                     </Select>
                   )}
                 />
+                {errors.tipoPersona && (
+                  <span className="text-sm text-red-500">
+                    El tipo de persona es requerido
+                  </span>
+                )}
               </FormGroup>
               <FormGroup>
-                <Label htmlFor="tipoDocumento">Tipo de Documento</Label>
+                <Label htmlFor="tipoDocumento" required>
+                  Tipo de Documento
+                </Label>
                 <Controller
                   name="tipoDocumento"
                   control={control}
@@ -255,34 +195,55 @@ export const RegistrarCliente = ({
                     </Select>
                   )}
                 />
+                {errors.tipoDocumento && (
+                  <span className="text-sm text-red-500">
+                    El tipo de documento es requerido
+                  </span>
+                )}
               </FormGroup>
             </FormGroupDivisor>
 
             <FormGroup>
-              <Label htmlFor="numeroDocumento">Número de Documento</Label>
+              <Label htmlFor="numeroDocumento" required>
+                Número de Documento
+              </Label>
               <Input
                 id="numeroDocumento"
                 type="number"
                 placeholder="Ej: 12345678"
                 {...register("numeroDocumento", { required: true })}
               />
+              {errors.numeroDocumento && (
+                <span className="text-sm text-red-500">
+                  El número de documento es requerido
+                </span>
+              )}
             </FormGroup>
 
             {tipoPersona === "JURIDICO" && (
               <FormGroup>
-                <Label htmlFor="razonSocial">Razón Social</Label>
+                <Label htmlFor="razonSocial" required>
+                  Razón Social
+                </Label>
                 <Input
                   id="razonSocial"
                   placeholder="Ej: Empresa SAC"
                   {...register("razonSocial", { required: true })}
                 />
+                {errors.razonSocial && (
+                  <span className="text-sm text-red-500">
+                    La razón social es requerida
+                  </span>
+                )}
               </FormGroup>
             )}
 
             {tipoPersona === "NATURAL" && (
               <FormGroupDivisor>
                 <FormGroup>
-                  <Label htmlFor="nombres">Nombres</Label>
+                  <Label htmlFor="nombres" required>
+                    Nombres
+                  </Label>
                   <Input
                     id="nombres"
                     placeholder="Ej: Juan Pedro"
@@ -290,7 +251,9 @@ export const RegistrarCliente = ({
                   />
                 </FormGroup>
                 <FormGroup>
-                  <Label htmlFor="apellidos">Apellidos</Label>
+                  <Label htmlFor="apellidos" required>
+                    Apellidos
+                  </Label>
                   <Input
                     id="apellidos"
                     placeholder="Ej: Pérez Gómez"
@@ -305,13 +268,15 @@ export const RegistrarCliente = ({
                 id="cumpleanos"
                 placeholder="Ej: 1990-01-01"
                 type="date"
-                {...register("cumpleanos", { required: true })}
+                {...register("cumpleanos", { required: false })}
               />
             </FormGroup>
 
             {/* Ubicacion */}
             <FormGroup>
-              <Label htmlFor="direccion">Dirección</Label>
+              <Label htmlFor="direccion" required>
+                Dirección
+              </Label>
               <Controller
                 name="direccion"
                 control={control}
@@ -341,6 +306,11 @@ export const RegistrarCliente = ({
                   />
                 )}
               />
+              {errors.direccion && (
+                <span className="text-sm text-red-500">
+                  La dirección es requerida
+                </span>
+              )}
             </FormGroup>
             <FormGroupDivisor columns={3}>
               <FormGroup>
@@ -370,103 +340,40 @@ export const RegistrarCliente = ({
             </FormGroupDivisor>
             <FormGroupDivisor columns={3}>
               <FormGroup>
-                <Label htmlFor="telefono1">Telefono Principal</Label>
-                <div className="flex gap-2">
-                  <Controller
-                    name="telefono1Prefix"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <SelectTrigger className={prefixWidthClass}>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {countryPrefixes.map((prefix) => (
-                            <SelectItem key={prefix.code} value={prefix.code}>
-                              {prefix.name} ({prefix.code})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  <Input
-                    id="telefono1"
-                    type="text"
-                    placeholder="999888777"
-                    className="flex-1"
-                    {...register("telefono1")}
-                  />
-                </div>
+                <Label htmlFor="telefono1" required>Telefono Principal</Label>
+                <Controller
+                  name="telefono1"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <PhoneInput value={field.value} onChange={field.onChange} />
+                  )}
+                />
+                {errors.telefono1 && (
+                  <span className="text-sm text-red-500">
+                    El teléfono principal es requerido
+                  </span>
+                )}
               </FormGroup>
               <FormGroup>
                 <Label htmlFor="telefono2">Telefono Secundario</Label>
-                <div className="flex gap-2">
-                  <Controller
-                    name="telefono2Prefix"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <SelectTrigger className={prefixWidthClass}>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {countryPrefixes.map((prefix) => (
-                            <SelectItem key={prefix.code} value={prefix.code}>
-                              {prefix.name} ({prefix.code})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  <Input
-                    id="telefono2"
-                    type="text"
-                    placeholder="999888777"
-                    className="flex-1"
-                    {...register("telefono2")}
-                  />
-                </div>
+                <Controller
+                  name="telefono2"
+                  control={control}
+                  render={({ field }) => (
+                    <PhoneInput value={field.value} onChange={field.onChange} />
+                  )}
+                />
               </FormGroup>
               <FormGroup>
                 <Label htmlFor="whatsapp">WhatsApp</Label>
-                <div className="flex gap-2">
-                  <Controller
-                    name="whatsappPrefix"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <SelectTrigger className={prefixWidthClass}>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {countryPrefixes.map((prefix) => (
-                            <SelectItem key={prefix.code} value={prefix.code}>
-                              {prefix.name} ({prefix.code})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  <Input
-                    id="whatsapp"
-                    type="text"
-                    placeholder="999888777"
-                    className="flex-1"
-                    {...register("whatsapp")}
-                  />
-                </div>
+                <Controller
+                  name="whatsapp"
+                  control={control}
+                  render={({ field }) => (
+                    <PhoneInput value={field.value} onChange={field.onChange} />
+                  )}
+                />
               </FormGroup>
             </FormGroupDivisor>
             <FormGroupDivisor>
@@ -476,7 +383,7 @@ export const RegistrarCliente = ({
                   id="emailNotificaciones"
                   type="email"
                   placeholder="Ej: correo@correo.com"
-                  {...register("emailNotificaciones", { required: true })}
+                  {...register("emailNotificaciones", { required: false })}
                 />
               </FormGroup>
               <FormGroup>
@@ -503,22 +410,7 @@ export const RegistrarCliente = ({
             </FormGroupDivisor>
           </ModalBody>
 
-          <ModalFooter>
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
-              style={{ backgroundColor: "var(--austral-azul)" }}
-            >
-              Guardar
-            </button>
-          </ModalFooter>
+          <SubmitButtons onClose={onClose} isSubmitting={isSubmitting} />
         </form>
       </Modal>
     </ModalContainer>

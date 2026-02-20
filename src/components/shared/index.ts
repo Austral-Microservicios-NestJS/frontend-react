@@ -11,5 +11,6 @@ export * from "./Grid";
 export * from "./FormGroup";
 export * from "./FormGroupDivisor";
 export * from "./LocationInput";
+export * from "./PhoneInput";
 export * from "./SubmittButtons";
 export * from "./UpdateButtons";

@@ -105,21 +105,21 @@ export const TablaClientes = ({
         </div>
       ),
     },
-    {
-      accessorKey: "recibirNotificaciones",
-      header: "Notificaciones",
-      cell: ({ row }) => (
-        <span
-          className={`px-2 py-1 text-xs font-medium rounded-full ${
-            row.original.recibirNotificaciones
-              ? "bg-green-100 text-green-800"
-              : "bg-gray-100 text-gray-800"
-          }`}
-        >
-          {row.original.recibirNotificaciones ? "Sí" : "No"}
-        </span>
-      ),
-    },
+    // {
+    //   accessorKey: "recibirNotificaciones",
+    //   header: "Notificaciones",
+    //   cell: ({ row }) => (
+    //     <span
+    //       className={`px-2 py-1 text-xs font-medium rounded-full ${
+    //         row.original.recibirNotificaciones
+    //           ? "bg-green-100 text-green-800"
+    //           : "bg-gray-100 text-gray-800"
+    //       }`}
+    //     >
+    //       {row.original.recibirNotificaciones ? "Sí" : "No"}
+    //     </span>
+    //   ),
+    // },
     {
       accessorKey: "activo",
       header: "Estado",
