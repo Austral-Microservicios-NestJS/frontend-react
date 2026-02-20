@@ -1163,186 +1163,104 @@ export default function LeadDetail() {
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                 <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b border-gray-100">Detalle Vida Ley</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* RUC */}
                   <div>
-                    <p className="text-xs font-semibold text-gray-500 mb-0.5">RUC</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">RUC Empresa</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleVidaLey.rucEmpresa ?? ""}
-                        onChange={(e) =>
-                          setDetalleVidaLey((d: any) => ({
-                            ...d,
-                            rucEmpresa: e.target.value,
-                          }))
-                        }
+                        onChange={(e) => setDetalleVidaLey((d: any) => ({ ...d, rucEmpresa: e.target.value }))}
                         className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          navigator.clipboard.writeText(
-                            detalleVidaLey.rucEmpresa ?? "",
-                          )
-                        }
-                        className="p-1 text-gray-500 hover:text-gray-800"
-                        title="Copiar RUC"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </button>
+                      <button type="button" onClick={() => navigator.clipboard.writeText(detalleVidaLey.rucEmpresa ?? "")} className="p-1 text-gray-500 hover:text-gray-800" title="Copiar RUC"><Copy className="w-4 h-4" /></button>
                     </div>
                   </div>
 
+                  {/* Razón social */}
                   <div>
-                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Razón social</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Razón Social</p>
                     <div className="flex items-center gap-2">
                       <input
                         value={detalleVidaLey.razonSocial ?? ""}
-                        onChange={(e) =>
-                          setDetalleVidaLey((d: any) => ({
-                            ...d,
-                            razonSocial: e.target.value,
-                          }))
-                        }
+                        onChange={(e) => setDetalleVidaLey((d: any) => ({ ...d, razonSocial: e.target.value }))}
                         className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          navigator.clipboard.writeText(
-                            detalleVidaLey.razonSocial ?? "",
-                          )
-                        }
-                        className="p-1 text-gray-500 hover:text-gray-800"
-                        title="Copiar razón social"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </button>
+                      <button type="button" onClick={() => navigator.clipboard.writeText(detalleVidaLey.razonSocial ?? "")} className="p-1 text-gray-500 hover:text-gray-800" title="Copiar razón social"><Copy className="w-4 h-4" /></button>
                     </div>
                   </div>
 
+                  {/* Actividad económica */}
                   <div>
-                    <p className="text-xs font-semibold text-gray-500 mb-0.5">
-                      Empleados en planilla
-                    </p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Actividad Económica</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={detalleVidaLey.actividadEconomica ?? ""}
+                        onChange={(e) => setDetalleVidaLey((d: any) => ({ ...d, actividadEconomica: e.target.value }))}
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
+                      />
+                      <button type="button" onClick={() => navigator.clipboard.writeText(detalleVidaLey.actividadEconomica ?? "")} className="p-1 text-gray-500 hover:text-gray-800" title="Copiar actividad económica"><Copy className="w-4 h-4" /></button>
+                    </div>
+                  </div>
+
+                  {/* Nº empleados en planilla */}
+                  <div>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Empleados en Planilla</p>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
                         value={detalleVidaLey.numeroEmpleadosPlanilla ?? ""}
-                        onChange={(e) =>
-                          setDetalleVidaLey((d: any) => ({
-                            ...d,
-                            numeroEmpleadosPlanilla: e.target.value
-                              ? Number(e.target.value)
-                              : undefined,
-                          }))
-                        }
+                        onChange={(e) => setDetalleVidaLey((d: any) => ({ ...d, numeroEmpleadosPlanilla: e.target.value ? Number(e.target.value) : undefined }))}
                         className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          navigator.clipboard.writeText(
-                            String(
-                              detalleVidaLey.numeroEmpleadosPlanilla ?? "",
-                            ),
-                          )
-                        }
-                        className="p-1 text-gray-500 hover:text-gray-800"
-                        title="Copiar número de empleados"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </button>
+                      <button type="button" onClick={() => navigator.clipboard.writeText(String(detalleVidaLey.numeroEmpleadosPlanilla ?? ""))} className="p-1 text-gray-500 hover:text-gray-800" title="Copiar número de empleados"><Copy className="w-4 h-4" /></button>
                     </div>
                   </div>
-                </div>
 
-                <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Planilla mensual */}
                   <div>
-                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Planilla mensual</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Planilla Mensual</p>
                     <div className="flex items-center gap-2">
                       <input
-                        type="text"
                         value={detalleVidaLey.planillaMensual ?? ""}
-                        onChange={(e) =>
-                          setDetalleVidaLey((d: any) => ({
-                            ...d,
-                            planillaMensual: e.target.value,
-                          }))
-                        }
+                        onChange={(e) => setDetalleVidaLey((d: any) => ({ ...d, planillaMensual: e.target.value }))}
                         className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
+                        placeholder="S/ 0.00"
                       />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          navigator.clipboard.writeText(
-                            String(detalleVidaLey.planillaMensual ?? ""),
-                          )
-                        }
-                        className="p-1 text-gray-500 hover:text-gray-800"
-                        title="Copiar planilla mensual"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </button>
+                      <button type="button" onClick={() => navigator.clipboard.writeText(String(detalleVidaLey.planillaMensual ?? ""))} className="p-1 text-gray-500 hover:text-gray-800" title="Copiar planilla mensual"><Copy className="w-4 h-4" /></button>
                     </div>
                   </div>
 
+                  {/* ¿Planilla al día? */}
                   <div>
-                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Disponible</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">¿Planilla al día?</p>
                     <div className="flex items-center gap-2">
-                      <label className="inline-flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={!!detalleVidaLey.disponible}
-                          onChange={(e) =>
-                            setDetalleVidaLey((d: any) => ({
-                              ...d,
-                              disponible: e.target.checked,
-                            }))
-                          }
-                        />
-                        <span className="text-sm">
-                          {detalleVidaLey.disponible ? "Sí" : "No"}
-                        </span>
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          navigator.clipboard.writeText(
-                            String(detalleVidaLey.disponible ?? ""),
-                          )
-                        }
-                        className="p-1 text-gray-500 hover:text-gray-800"
-                        title="Copiar disponible"
+                      <select
+                        value={detalleVidaLey.tienePlanillaAlDia ?? ""}
+                        onChange={(e) => setDetalleVidaLey((d: any) => ({ ...d, tienePlanillaAlDia: e.target.value }))}
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
                       >
-                        <Copy className="w-4 h-4" />
-                      </button>
+                        <option value="">Seleccionar...</option>
+                        <option value="sí">Sí</option>
+                        <option value="no">No</option>
+                      </select>
+                      <button type="button" onClick={() => navigator.clipboard.writeText(detalleVidaLey.tienePlanillaAlDia ?? "")} className="p-1 text-gray-500 hover:text-gray-800" title="Copiar"><Copy className="w-4 h-4" /></button>
                     </div>
                   </div>
 
+                  {/* Es renovación */}
                   <div>
-                    <p className="text-xs font-semibold text-gray-500 mb-0.5">ID detalle</p>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">¿Es renovación?</p>
                     <div className="flex items-center gap-2">
-                      <input
-                        value={detalleVidaLey.idDetalleVidaLey ?? ""}
-                        onChange={(e) =>
-                          setDetalleVidaLey((d: any) => ({
-                            ...d,
-                            idDetalleVidaLey: e.target.value,
-                          }))
-                        }
+                      <select
+                        value={detalleVidaLey.esRenovacion ?? ""}
+                        onChange={(e) => setDetalleVidaLey((d: any) => ({ ...d, esRenovacion: e.target.value }))}
                         className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          navigator.clipboard.writeText(
-                            detalleVidaLey.idDetalleVidaLey ?? "",
-                          )
-                        }
-                        className="p-1 text-gray-500 hover:text-gray-800"
-                        title="Copiar id detalle"
                       >
-                        <Copy className="w-4 h-4" />
-                      </button>
+                        <option value="">Seleccionar...</option>
+                        <option value="primera vez">Primera vez</option>
+                        <option value="renovación">Renovación</option>
+                      </select>
+                      <button type="button" onClick={() => navigator.clipboard.writeText(detalleVidaLey.esRenovacion ?? "")} className="p-1 text-gray-500 hover:text-gray-800" title="Copiar"><Copy className="w-4 h-4" /></button>
                     </div>
                   </div>
                 </div>
@@ -1805,7 +1723,7 @@ export default function LeadDetail() {
                   <div>
                     <p className="text-xs font-semibold text-gray-500 mb-0.5">Tipo de riesgo</p>
                     <div className="flex items-center gap-2">
-                      <input
+                      <select
                         value={detalleSCTR.tipoRiesgo ?? ""}
                         onChange={(e) =>
                           setDetalleSCTR((d: any) => ({
@@ -1814,7 +1732,12 @@ export default function LeadDetail() {
                           }))
                         }
                         className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
-                      />
+                      >
+                        <option value="">Seleccionar...</option>
+                        <option value="BAJO">BAJO</option>
+                        <option value="MEDIO">MEDIO</option>
+                        <option value="ALTO">ALTO</option>
+                      </select>
                       <button
                         type="button"
                         onClick={() =>
