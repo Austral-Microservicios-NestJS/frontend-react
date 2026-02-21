@@ -1,7 +1,7 @@
 import { Table } from "@/components/shared";
 import { type ColumnDef } from "@tanstack/react-table";
 import { type Poliza } from "@/types/poliza.interface";
-import { FileText, Calendar } from "lucide-react";
+import { FileText, Calendar, ShieldAlert } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -10,14 +10,17 @@ import {
 } from "@/components/ui/popover";
 import { MoreHorizontal, Pencil } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { DetallePolizaModal } from "../modales/DetallePolizaModal";
 
 interface TablaPolizasProps {
   polizas: Poliza[];
   onEdit?: (poliza: Poliza) => void;
+  clienteId?: string;
 }
 
-export const TablaPolizas = ({ polizas, onEdit }: TablaPolizasProps) => {
+export const TablaPolizas = ({ polizas, onEdit, clienteId }: TablaPolizasProps) => {
+  const navigate = useNavigate();
   const [selectedPoliza, setSelectedPoliza] = useState<Poliza | null>(null);
   const columns: ColumnDef<Poliza>[] = [
     {
@@ -152,6 +155,21 @@ export const TablaPolizas = ({ polizas, onEdit }: TablaPolizasProps) => {
                   Ver Detalles
                 </button>
               </PopoverClose>
+              {clienteId && (
+                <PopoverClose asChild>
+                  <button
+                    onClick={() =>
+                      navigate(
+                        `/dashboard/gestion-trabajo/clientes/${clienteId}/polizas/${row.original.id ?? row.original.idPoliza}/siniestros`
+                      )
+                    }
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                  >
+                    <ShieldAlert className="w-4 h-4" />
+                    Ver Siniestros
+                  </button>
+                </PopoverClose>
+              )}
             </div>
           </PopoverContent>
         </Popover>

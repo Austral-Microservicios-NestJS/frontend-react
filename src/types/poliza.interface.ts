@@ -3,7 +3,8 @@ import type { Producto } from "./producto.interface";
 import type { Ramo } from "./ramo.interface";
 
 export interface Poliza {
-  idPoliza: string;
+  id: string;
+  idPoliza?: string;
   numeroPoliza: string;
   nombreAsegurado: string;
   idCliente: string;

@@ -99,7 +99,7 @@ export default function ClientePolizasPage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           </div>
         ) : (
-          <TablaPolizas polizas={polizas} />
+          <TablaPolizas polizas={polizas} clienteId={id} />
         )}
       </div>
 
