@@ -35,6 +35,8 @@ import ClienteInversionesPage from "@/pages/shared/gestion-trabajo/clientes/[id]
 import PolizaSiniestrosPage from "@/pages/shared/gestion-trabajo/clientes/[id]/polizas/[polizaId]/siniestros/PolizaSiniestrosPage";
 import RamoProductosPage from "@/pages/admin/maestros/ramos/[id]/productos/RamoProductosPage";
 
+import GestionComercialPage from "@/pages/shared/gestion-trabajo/gestion-comercial/GestionComercialPage";
+
 // Componentes de Broker
 import AgentesPage from "@/pages/broker/agentes/AgentesPage";
 
@@ -185,6 +187,16 @@ const router = createBrowserRouter([
             requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
           >
             <PolizasPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "gestion-trabajo/gestion-comercial",
+        element: (
+          <ProtectedRoute
+            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
+          >
+            <GestionComercialPage />
           </ProtectedRoute>
         ),
       },
