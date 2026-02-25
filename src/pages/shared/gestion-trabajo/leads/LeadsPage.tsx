@@ -4,7 +4,7 @@ import { useSidebar } from "@/hooks/useSidebar";
 import { RegistrarLead } from "@/components/modulos/leads/modales/RegistrarLead";
 import { useLeads } from "@/hooks/useLeads";
 import type { Lead, CreateLead } from "@/types/lead.interface";
-import { EstadoLead, TipoSeguro, tipoSeguroOptions } from "@/types/lead.interface";
+import { EstadoLead, tipoSeguroOptions } from "@/types/lead.interface";
 import {
   LayoutGrid,
   List,
