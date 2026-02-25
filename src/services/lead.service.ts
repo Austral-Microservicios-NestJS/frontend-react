@@ -84,6 +84,20 @@ export const leadService = {
     await api.delete(`/leads/${id}`);
   },
 
+  // Búsqueda server-side por texto (nombre, email, teléfono, empresa, documento)
+  search: async (query: string): Promise<Lead[]> => {
+    try {
+      const response = await api.get<{ data: Lead[] }>(
+        `/leads/buscar?q=${encodeURIComponent(query)}&limit=100`,
+      );
+      const leads = response.data.data;
+      return Array.isArray(leads) ? leads : [];
+    } catch (error) {
+      console.error("Error al buscar leads:", error);
+      return [];
+    }
+  },
+
   // Consulta AI de placa vehicular
   consultarPlacaAI: async (placa: string): Promise<ConsultaPlacaResponse> => {
     const { data } = await api.get<ConsultaPlacaResponse>(`/vehiculos/placa/${placa}`);

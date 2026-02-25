@@ -11,20 +11,12 @@ export const useLeads = () => {
   const updateMutation = leadService.useUpdate();
   const deleteMutation = leadService.useDelete();
 
-  // Filtrar leads por usuario actual
+  // Validar que allLeads sea un array
   const leads = useMemo(() => {
-    // Validar que allLeads sea un array
     if (!Array.isArray(allLeads)) {
       console.warn("allLeads no es un array:", allLeads);
       return [];
     }
-
-    // NOTA: El backend actual NO incluye idUsuario en los leads
-    // Por ahora mostramos todos los leads
-    // TODO: Cuando el backend agregue idUsuario, descomentar el filtro:
-    // if (!user?.idUsuario) return [];
-    // return allLeads.filter((lead) => lead.idUsuario === user.idUsuario);
-
     return allLeads;
   }, [allLeads]);
 
@@ -37,6 +29,33 @@ export const useLeads = () => {
       PERDIDO: leads.filter((lead) => lead.estado === "PERDIDO"),
     };
   }, [leads]);
+
+  // Filtrar leads por término de búsqueda (búsqueda client-side instantánea)
+  const filterLeads = (searchQuery: string, tipoSeguroFilter?: string) => {
+    const q = searchQuery.trim().toLowerCase();
+    return leads.filter((lead) => {
+      const matchesSearch =
+        !q ||
+        lead.nombre?.toLowerCase().includes(q) ||
+        lead.email?.toLowerCase().includes(q) ||
+        lead.telefono?.toLowerCase().includes(q) ||
+        lead.empresa?.toLowerCase().includes(q) ||
+        (lead as any).numeroDocumento?.toLowerCase().includes(q);
+      const matchesTipo =
+        !tipoSeguroFilter || lead.tipoSeguro === tipoSeguroFilter;
+      return matchesSearch && matchesTipo;
+    });
+  };
+
+  const filterByEstado = (searchQuery: string, tipoSeguroFilter?: string) => {
+    const filtered = filterLeads(searchQuery, tipoSeguroFilter);
+    return {
+      NUEVO: filtered.filter((l) => l.estado === "NUEVO"),
+      CONTACTADO: filtered.filter((l) => l.estado === "CONTACTADO"),
+      CERRADO: filtered.filter((l) => l.estado === "CERRADO"),
+      PERDIDO: filtered.filter((l) => l.estado === "PERDIDO"),
+    };
+  };
 
   const addLead = async (leadData: CreateLead) => {
     try {
@@ -88,6 +107,7 @@ export const useLeads = () => {
   return {
     leads,
     leadsByEstado,
+    filterByEstado,
     isLoading,
     error,
     addLead,

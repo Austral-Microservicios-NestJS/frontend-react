@@ -1,10 +1,10 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { Header, BotonRegistro } from "@/components/shared";
 import { useSidebar } from "@/hooks/useSidebar";
 import { RegistrarLead } from "@/components/modulos/leads/modales/RegistrarLead";
 import { useLeads } from "@/hooks/useLeads";
 import type { Lead, CreateLead } from "@/types/lead.interface";
-import { EstadoLead } from "@/types/lead.interface";
+import { EstadoLead, TipoSeguro, tipoSeguroOptions } from "@/types/lead.interface";
 import {
   LayoutGrid,
   List,
@@ -21,6 +21,8 @@ import {
   Mail,
   ArrowRight,
   Tag,
+  X,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -31,16 +33,32 @@ export default function LeadsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [leadToEdit, setLeadToEdit] = useState<Lead | null>(null);
   const [viewMode, setViewMode] = useState<"kanban" | "list">("kanban");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [tipoSeguroFilter, setTipoSeguroFilter] = useState<string>("");
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
 
   const {
     leads,
     leadsByEstado,
+    filterByEstado,
     addLead,
     updateLead,
     cambiarEstadoLead,
     isLoading,
     error,
   } = useLeads();
+
+  // Leads filtrados por búsqueda y tipo de seguro — se recalcula instantáneamente
+  const filteredByEstado = useMemo(
+    () => filterByEstado(searchQuery, tipoSeguroFilter || undefined),
+    [searchQuery, tipoSeguroFilter, leads]
+  );
+
+  const isFiltering = searchQuery.trim() !== "" || tipoSeguroFilter !== "";
+  const activeByEstado = isFiltering ? filteredByEstado : leadsByEstado;
+  const totalFiltered = isFiltering
+    ? Object.values(filteredByEstado).reduce((acc, arr) => acc + arr.length, 0)
+    : leads.length;
 
   const handleOpenModal = () => {
     setLeadToEdit(null);
@@ -131,29 +149,29 @@ export default function LeadsPage() {
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <StatsCard
-              title="Total Leads"
-              value={leads.length}
+              title={isFiltering ? "Resultados" : "Total Leads"}
+              value={totalFiltered}
               icon={Users}
               color="text-blue-600"
               bg="bg-blue-50"
             />
             <StatsCard
               title="Nuevos"
-              value={leadsByEstado.NUEVO.length}
+              value={activeByEstado.NUEVO.length}
               icon={Target}
               color="text-indigo-600"
               bg="bg-indigo-50"
             />
             <StatsCard
               title="Ganados"
-              value={leadsByEstado.CERRADO.length}
+              value={activeByEstado.CERRADO.length}
               icon={CheckCircle2}
               color="text-emerald-600"
               bg="bg-emerald-50"
             />
             <StatsCard
               title="Perdidos"
-              value={leadsByEstado.PERDIDO.length}
+              value={activeByEstado.PERDIDO.length}
               icon={Ban}
               color="text-rose-600"
               bg="bg-rose-50"
@@ -165,27 +183,86 @@ export default function LeadsPage() {
             <div className="relative max-w-md w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
-                placeholder="Buscar leads..."
-                className="pl-9 bg-white border-gray-200 focus:border-blue-500 transition-colors h-9 text-sm rounded-md"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Buscar por nombre, email, teléfono, empresa, documento..."
+                className="pl-9 pr-9 bg-white border-gray-200 focus:border-blue-500 transition-colors h-9 text-sm rounded-md"
               />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-gray-600 border-gray-200 hover:bg-white hover:text-gray-900 h-9 rounded-md"
-            >
-              <Filter className="w-4 h-4 mr-2" />
-              Filtros
-            </Button>
+            <div className="relative">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFilterDropdown((v) => !v)}
+                className={`text-gray-600 border-gray-200 hover:bg-white hover:text-gray-900 h-9 rounded-md ${tipoSeguroFilter ? "border-blue-400 text-blue-600 bg-blue-50" : ""}`}
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                {tipoSeguroFilter
+                  ? tipoSeguroOptions.find((o) => o.value === tipoSeguroFilter)?.label ?? "Filtros"
+                  : "Filtros"}
+                <ChevronDown className="w-3 h-3 ml-1" />
+              </Button>
+              {showFilterDropdown && (
+                <div className="absolute right-0 top-full mt-1 w-52 bg-white border border-gray-200 rounded-lg shadow-lg z-20 py-1">
+                  <button
+                    onClick={() => { setTipoSeguroFilter(""); setShowFilterDropdown(false); }}
+                    className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${!tipoSeguroFilter ? "font-semibold text-blue-600" : "text-gray-700"}`}
+                  >
+                    Todos los tipos
+                  </button>
+                  {tipoSeguroOptions.map((opt) => (
+                    <button
+                      key={opt.value}
+                      onClick={() => { setTipoSeguroFilter(opt.value); setShowFilterDropdown(false); }}
+                      className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${tipoSeguroFilter === opt.value ? "font-semibold text-blue-600" : "text-gray-700"}`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
+
+          {/* Resultado de búsqueda */}
+          {isFiltering && (
+            <div className="flex items-center gap-2 text-sm text-gray-500 -mt-2">
+              <span>
+                {totalFiltered === 0
+                  ? "Sin resultados"
+                  : `${totalFiltered} lead${totalFiltered !== 1 ? "s" : ""} encontrado${totalFiltered !== 1 ? "s" : ""}`}
+                {searchQuery && <span className="font-medium text-gray-700"> para "{searchQuery}"</span>}
+                {tipoSeguroFilter && (
+                  <span className="font-medium text-gray-700">
+                    {searchQuery ? " · " : " "}
+                    {tipoSeguroOptions.find((o) => o.value === tipoSeguroFilter)?.label}
+                  </span>
+                )}
+              </span>
+              <button
+                onClick={() => { setSearchQuery(""); setTipoSeguroFilter(""); }}
+                className="text-blue-500 hover:text-blue-700 underline text-xs ml-1"
+              >
+                Limpiar filtros
+              </button>
+            </div>
+          )}
 
           {/* Kanban Board */}
           <div className="flex-1 overflow-x-auto pb-4">
             <div className="flex gap-4 h-full min-w-[1000px]">
               <LeadColumn
                 title="Nuevo"
-                count={leadsByEstado.NUEVO.length}
-                leads={leadsByEstado.NUEVO}
+                count={activeByEstado.NUEVO.length}
+                leads={activeByEstado.NUEVO}
                 estado="NUEVO"
                 statusColor="bg-indigo-500"
                 onDrop={handleDrop}
@@ -193,8 +270,8 @@ export default function LeadsPage() {
               />
               <LeadColumn
                 title="Contactado"
-                count={leadsByEstado.CONTACTADO.length}
-                leads={leadsByEstado.CONTACTADO}
+                count={activeByEstado.CONTACTADO.length}
+                leads={activeByEstado.CONTACTADO}
                 estado="CONTACTADO"
                 statusColor="bg-blue-500"
                 onDrop={handleDrop}
@@ -202,8 +279,8 @@ export default function LeadsPage() {
               />
               <LeadColumn
                 title="Cerrado"
-                count={leadsByEstado.CERRADO.length}
-                leads={leadsByEstado.CERRADO}
+                count={activeByEstado.CERRADO.length}
+                leads={activeByEstado.CERRADO}
                 estado="CERRADO"
                 statusColor="bg-emerald-500"
                 onDrop={handleDrop}
@@ -211,8 +288,8 @@ export default function LeadsPage() {
               />
               <LeadColumn
                 title="Perdido"
-                count={leadsByEstado.PERDIDO.length}
-                leads={leadsByEstado.PERDIDO}
+                count={activeByEstado.PERDIDO.length}
+                leads={activeByEstado.PERDIDO}
                 estado="PERDIDO"
                 statusColor="bg-rose-500"
                 onDrop={handleDrop}
