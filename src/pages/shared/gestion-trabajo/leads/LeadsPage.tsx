@@ -23,18 +23,41 @@ import {
   Tag,
   X,
   ChevronDown,
+  Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 
+type EstadoKey = "NUEVO" | "CONTACTADO" | "CERRADO" | "PERDIDO";
+
+type ColumnDef = {
+  estado: EstadoKey;
+  title: string;
+  color: string;
+  active: string;
+  badge: string;
+};
+
+const ESTADO_COLUMNS: ColumnDef[] = [
+  { estado: "NUEVO",      title: "Nuevo",      color: "bg-indigo-500",  active: "bg-indigo-500 text-white border-indigo-500",   badge: "bg-indigo-50 text-indigo-700 border-indigo-200" },
+  { estado: "CONTACTADO", title: "Contactado", color: "bg-blue-500",    active: "bg-blue-500 text-white border-blue-500",       badge: "bg-blue-50 text-blue-700 border-blue-200" },
+  { estado: "CERRADO",    title: "Cerrado",    color: "bg-emerald-500", active: "bg-emerald-500 text-white border-emerald-500", badge: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  { estado: "PERDIDO",    title: "Perdido",    color: "bg-rose-500",    active: "bg-rose-500 text-white border-rose-500",       badge: "bg-rose-50 text-rose-700 border-rose-200" },
+];
+
+function diasDesde(fecha: string): number {
+  return Math.floor((Date.now() - new Date(fecha).getTime()) / (1000 * 60 * 60 * 24));
+}
+
 export default function LeadsPage() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [leadToEdit, setLeadToEdit] = useState<Lead | null>(null);
-  const [viewMode, setViewMode] = useState<"kanban" | "list">("kanban");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [isModalOpen, setIsModalOpen]   = useState(false);
+  const [leadToEdit, setLeadToEdit]     = useState<Lead | null>(null);
+  const [viewMode, setViewMode]         = useState<"kanban" | "list">("kanban");
+  const [searchQuery, setSearchQuery]   = useState("");
   const [tipoSeguroFilter, setTipoSeguroFilter] = useState<string>("");
+  const [estadoFilter, setEstadoFilter] = useState<EstadoKey | null>(null);
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
 
   const {
@@ -48,27 +71,35 @@ export default function LeadsPage() {
     error,
   } = useLeads();
 
-  // Leads filtrados por búsqueda y tipo de seguro — se recalcula instantáneamente
   const filteredByEstado = useMemo(
     () => filterByEstado(searchQuery, tipoSeguroFilter || undefined),
     [searchQuery, tipoSeguroFilter, leads]
   );
 
-  const isFiltering = searchQuery.trim() !== "" || tipoSeguroFilter !== "";
+  const isFiltering    = searchQuery.trim() !== "" || tipoSeguroFilter !== "";
   const activeByEstado = isFiltering ? filteredByEstado : leadsByEstado;
-  const totalFiltered = isFiltering
-    ? Object.values(filteredByEstado).reduce((acc, arr) => acc + arr.length, 0)
-    : leads.length;
 
-  const handleOpenModal = () => {
-    setLeadToEdit(null);
-    setIsModalOpen(true);
-  };
+  const totalFiltered = useMemo(() => {
+    if (estadoFilter) return activeByEstado[estadoFilter]?.length ?? 0;
+    return isFiltering
+      ? Object.values(filteredByEstado).reduce((a, b) => a + b.length, 0)
+      : leads.length;
+  }, [activeByEstado, estadoFilter, isFiltering, filteredByEstado, leads]);
 
-  const handleEditLead = (lead: Lead) => {
-    setLeadToEdit(lead);
-    setIsModalOpen(true);
-  };
+  const visibleColumns = estadoFilter
+    ? ESTADO_COLUMNS.filter((c) => c.estado === estadoFilter)
+    : ESTADO_COLUMNS;
+
+  const allFilteredLeads = useMemo(() => {
+    const all = Object.values(activeByEstado).flat();
+    const result = estadoFilter ? all.filter((l) => l.estado === estadoFilter) : all;
+    return [...result].sort(
+      (a, b) => new Date(b.fechaCreacion).getTime() - new Date(a.fechaCreacion).getTime()
+    );
+  }, [activeByEstado, estadoFilter]);
+
+  const handleOpenModal = () => { setLeadToEdit(null); setIsModalOpen(true); };
+  const handleEditLead  = (lead: Lead) => { setLeadToEdit(lead); setIsModalOpen(true); };
 
   const handleSubmitLead = async (data: CreateLead) => {
     if (leadToEdit) {
@@ -82,14 +113,18 @@ export default function LeadsPage() {
     await cambiarEstadoLead(leadId, nuevoEstado);
   };
 
+  const clearFilters = () => {
+    setSearchQuery("");
+    setTipoSeguroFilter("");
+    setEstadoFilter(null);
+  };
+
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-sm text-gray-500 font-medium">
-            Cargando leads...
-          </p>
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+          <p className="mt-4 text-sm text-gray-500 font-medium">Cargando leads...</p>
         </div>
       </div>
     );
@@ -112,6 +147,7 @@ export default function LeadsPage() {
                   ? "bg-gray-100 text-gray-900 shadow-sm"
                   : "text-gray-400 hover:text-gray-600"
               }`}
+              title="Vista tablero"
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
@@ -122,6 +158,7 @@ export default function LeadsPage() {
                   ? "bg-gray-100 text-gray-900 shadow-sm"
                   : "text-gray-400 hover:text-gray-600"
               }`}
+              title="Vista lista"
             >
               <List className="w-4 h-4" />
             </button>
@@ -136,57 +173,35 @@ export default function LeadsPage() {
             <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <Ban className="w-6 h-6 text-red-500" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Backend no disponible
-            </h3>
-            <p className="text-sm text-gray-600">
-              No se pudo conectar con el servidor. Por favor intenta más tarde.
-            </p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Backend no disponible</h3>
+            <p className="text-sm text-gray-600">No se pudo conectar con el servidor. Por favor intenta más tarde.</p>
           </div>
         </div>
       ) : (
-        <div className="flex-1 overflow-hidden flex flex-col p-6 space-y-6">
-          {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="flex-1 overflow-hidden flex flex-col p-6 gap-4">
+          {/* Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 shrink-0">
             <StatsCard
-              title={isFiltering ? "Resultados" : "Total Leads"}
+              title={isFiltering || estadoFilter ? "Resultados" : "Total Leads"}
               value={totalFiltered}
               icon={Users}
               color="text-blue-600"
               bg="bg-blue-50"
             />
-            <StatsCard
-              title="Nuevos"
-              value={activeByEstado.NUEVO.length}
-              icon={Target}
-              color="text-indigo-600"
-              bg="bg-indigo-50"
-            />
-            <StatsCard
-              title="Ganados"
-              value={activeByEstado.CERRADO.length}
-              icon={CheckCircle2}
-              color="text-emerald-600"
-              bg="bg-emerald-50"
-            />
-            <StatsCard
-              title="Perdidos"
-              value={activeByEstado.PERDIDO.length}
-              icon={Ban}
-              color="text-rose-600"
-              bg="bg-rose-50"
-            />
+            <StatsCard title="Nuevos"   value={activeByEstado.NUEVO.length}     icon={Target}       color="text-indigo-600"  bg="bg-indigo-50" />
+            <StatsCard title="Ganados"  value={activeByEstado.CERRADO.length}   icon={CheckCircle2} color="text-emerald-600" bg="bg-emerald-50" />
+            <StatsCard title="Perdidos" value={activeByEstado.PERDIDO.length}   icon={Ban}          color="text-rose-600"    bg="bg-rose-50" />
           </div>
 
-          {/* Filters & Search */}
-          <div className="flex items-center justify-between gap-4">
-            <div className="relative max-w-md w-full">
+          {/* Search + tipo seguro filter */}
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Buscar por nombre, email, teléfono, empresa, documento..."
-                className="pl-9 pr-9 bg-white border-gray-200 focus:border-blue-500 transition-colors h-9 text-sm rounded-md"
+                placeholder="Buscar por nombre, email, teléfono, empresa..."
+                className="pl-9 pr-9 bg-white border-gray-200 h-9 text-sm rounded-md"
               />
               {searchQuery && (
                 <button
@@ -197,24 +212,31 @@ export default function LeadsPage() {
                 </button>
               )}
             </div>
+
             <div className="relative">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setShowFilterDropdown((v) => !v)}
-                className={`text-gray-600 border-gray-200 hover:bg-white hover:text-gray-900 h-9 rounded-md ${tipoSeguroFilter ? "border-blue-400 text-blue-600 bg-blue-50" : ""}`}
+                className={`h-9 rounded-md ${
+                  tipoSeguroFilter
+                    ? "border-blue-400 text-blue-600 bg-blue-50"
+                    : "text-gray-600 border-gray-200 hover:bg-white"
+                }`}
               >
                 <Filter className="w-4 h-4 mr-2" />
                 {tipoSeguroFilter
-                  ? tipoSeguroOptions.find((o) => o.value === tipoSeguroFilter)?.label ?? "Filtros"
-                  : "Filtros"}
+                  ? tipoSeguroOptions.find((o) => o.value === tipoSeguroFilter)?.label ?? "Tipo"
+                  : "Tipo seguro"}
                 <ChevronDown className="w-3 h-3 ml-1" />
               </Button>
               {showFilterDropdown && (
                 <div className="absolute right-0 top-full mt-1 w-52 bg-white border border-gray-200 rounded-lg shadow-lg z-20 py-1">
                   <button
                     onClick={() => { setTipoSeguroFilter(""); setShowFilterDropdown(false); }}
-                    className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${!tipoSeguroFilter ? "font-semibold text-blue-600" : "text-gray-700"}`}
+                    className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${
+                      !tipoSeguroFilter ? "font-semibold text-blue-600" : "text-gray-700"
+                    }`}
                   >
                     Todos los tipos
                   </button>
@@ -222,7 +244,9 @@ export default function LeadsPage() {
                     <button
                       key={opt.value}
                       onClick={() => { setTipoSeguroFilter(opt.value); setShowFilterDropdown(false); }}
-                      className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${tipoSeguroFilter === opt.value ? "font-semibold text-blue-600" : "text-gray-700"}`}
+                      className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${
+                        tipoSeguroFilter === opt.value ? "font-semibold text-blue-600" : "text-gray-700"
+                      }`}
                     >
                       {opt.label}
                     </button>
@@ -232,81 +256,75 @@ export default function LeadsPage() {
             </div>
           </div>
 
-          {/* Resultado de búsqueda */}
-          {isFiltering && (
-            <div className="flex items-center gap-2 text-sm text-gray-500 -mt-2">
-              <span>
-                {totalFiltered === 0
-                  ? "Sin resultados"
-                  : `${totalFiltered} lead${totalFiltered !== 1 ? "s" : ""} encontrado${totalFiltered !== 1 ? "s" : ""}`}
-                {searchQuery && <span className="font-medium text-gray-700"> para "{searchQuery}"</span>}
-                {tipoSeguroFilter && (
-                  <span className="font-medium text-gray-700">
-                    {searchQuery ? " · " : " "}
-                    {tipoSeguroOptions.find((o) => o.value === tipoSeguroFilter)?.label}
-                  </span>
-                )}
-              </span>
+          {/* Estado filter tabs */}
+          <div className="flex items-center gap-2 shrink-0 flex-wrap">
+            <button
+              onClick={() => setEstadoFilter(null)}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
+                estadoFilter === null
+                  ? "bg-gray-900 text-white border-gray-900"
+                  : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+              }`}
+            >
+              Todos ({leads.length})
+            </button>
+            {ESTADO_COLUMNS.map((col) => (
               <button
-                onClick={() => { setSearchQuery(""); setTipoSeguroFilter(""); }}
-                className="text-blue-500 hover:text-blue-700 underline text-xs ml-1"
+                key={col.estado}
+                onClick={() => setEstadoFilter(estadoFilter === col.estado ? null : col.estado)}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
+                  estadoFilter === col.estado
+                    ? col.active
+                    : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                }`}
+              >
+                {col.title} ({activeByEstado[col.estado].length})
+              </button>
+            ))}
+            {(isFiltering || estadoFilter) && (
+              <button
+                onClick={clearFilters}
+                className="text-xs text-blue-500 hover:text-blue-700 underline ml-1"
               >
                 Limpiar filtros
               </button>
+            )}
+          </div>
+
+          {/* Contenido principal */}
+          {viewMode === "kanban" ? (
+            <div className="flex-1 overflow-auto min-h-0">
+              <div
+                className={`flex gap-4 h-full pb-2 ${
+                  visibleColumns.length > 1 ? "min-w-[900px]" : ""
+                }`}
+              >
+                {visibleColumns.map((col) => (
+                  <LeadColumn
+                    key={col.estado}
+                    title={col.title}
+                    count={activeByEstado[col.estado].length}
+                    leads={activeByEstado[col.estado]}
+                    estado={col.estado}
+                    statusColor={col.color}
+                    onDrop={handleDrop}
+                    onEdit={handleEditLead}
+                    single={visibleColumns.length === 1}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="flex-1 overflow-auto min-h-0">
+              <LeadList leads={allFilteredLeads} onEdit={handleEditLead} />
             </div>
           )}
-
-          {/* Kanban Board */}
-          <div className="flex-1 overflow-x-auto pb-4">
-            <div className="flex gap-4 h-full min-w-[1000px]">
-              <LeadColumn
-                title="Nuevo"
-                count={activeByEstado.NUEVO.length}
-                leads={activeByEstado.NUEVO}
-                estado="NUEVO"
-                statusColor="bg-indigo-500"
-                onDrop={handleDrop}
-                onEdit={handleEditLead}
-              />
-              <LeadColumn
-                title="Contactado"
-                count={activeByEstado.CONTACTADO.length}
-                leads={activeByEstado.CONTACTADO}
-                estado="CONTACTADO"
-                statusColor="bg-blue-500"
-                onDrop={handleDrop}
-                onEdit={handleEditLead}
-              />
-              <LeadColumn
-                title="Cerrado"
-                count={activeByEstado.CERRADO.length}
-                leads={activeByEstado.CERRADO}
-                estado="CERRADO"
-                statusColor="bg-emerald-500"
-                onDrop={handleDrop}
-                onEdit={handleEditLead}
-              />
-              <LeadColumn
-                title="Perdido"
-                count={activeByEstado.PERDIDO.length}
-                leads={activeByEstado.PERDIDO}
-                estado="PERDIDO"
-                statusColor="bg-rose-500"
-                onDrop={handleDrop}
-                onEdit={handleEditLead}
-              />
-            </div>
-          </div>
         </div>
       )}
 
-      {/* Modal de registro/edición */}
       <RegistrarLead
         isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setLeadToEdit(null);
-        }}
+        onClose={() => { setIsModalOpen(false); setLeadToEdit(null); }}
         onSubmit={handleSubmitLead}
         leadToEdit={leadToEdit}
       />
@@ -314,14 +332,13 @@ export default function LeadsPage() {
   );
 }
 
-// Minimalist Stats Card
-function StatsCard({ title, value, icon: Icon, color, bg }: any) {
+function StatsCard({ title, value, icon: Icon, color, bg }: {
+  title: string; value: number; icon: any; color: string; bg: string;
+}) {
   return (
     <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm flex items-center justify-between">
       <div>
-        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-          {title}
-        </p>
+        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{title}</p>
         <h3 className="text-xl font-bold text-gray-900 mt-1">{value}</h3>
       </div>
       <div className={`p-2 rounded-md ${bg}`}>
@@ -331,7 +348,6 @@ function StatsCard({ title, value, icon: Icon, color, bg }: any) {
   );
 }
 
-// Clean Column Component with DnD
 function LeadColumn({
   title,
   count,
@@ -340,91 +356,76 @@ function LeadColumn({
   statusColor,
   onDrop,
   onEdit,
-}: any) {
+  single,
+}: {
+  title: string;
+  count: number;
+  leads: Lead[];
+  estado: EstadoKey;
+  statusColor: string;
+  onDrop: (id: string, estado: EstadoLead) => void;
+  onEdit: (lead: Lead) => void;
+  single: boolean;
+}) {
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const dragCounter = useRef(0);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    e.stopPropagation();
     e.dataTransfer.dropEffect = "move";
   };
 
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
-    e.stopPropagation();
     dragCounter.current++;
-    if (e.dataTransfer.types.includes("text/plain")) {
-      setIsDraggingOver(true);
-    }
+    if (e.dataTransfer.types.includes("text/plain")) setIsDraggingOver(true);
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
-    e.stopPropagation();
     dragCounter.current--;
-    if (dragCounter.current === 0) {
-      setIsDraggingOver(false);
-    }
+    if (dragCounter.current === 0) setIsDraggingOver(false);
   };
 
   const handleDropEvent = (e: React.DragEvent) => {
     e.preventDefault();
-    e.stopPropagation();
     setIsDraggingOver(false);
     dragCounter.current = 0;
-
     const leadId = e.dataTransfer.getData("text/plain");
-    if (leadId && leadId !== "") {
-      onDrop(leadId, estado);
-    }
+    if (leadId) onDrop(leadId, estado as EstadoLead);
   };
 
   return (
     <div
-      className={`flex-1 flex flex-col h-full rounded-lg border transition-colors duration-200 ${
-        isDraggingOver
-          ? "bg-blue-50 border-blue-300"
-          : "bg-gray-50 border-gray-200"
-      }`}
+      className={`flex flex-col rounded-lg border transition-colors ${
+        single ? "flex-1" : "w-72 shrink-0"
+      } ${isDraggingOver ? "bg-blue-50 border-blue-300" : "bg-gray-50 border-gray-200"}`}
       onDragOver={handleDragOver}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDrop={handleDropEvent}
     >
-      <div className="px-3 py-2.5 border-b border-gray-200 bg-white rounded-t-lg flex items-center justify-between">
+      <div className="px-3 py-2.5 border-b border-gray-200 bg-white rounded-t-lg flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
           <div className={`w-2 h-2 rounded-full ${statusColor}`} />
           <h3 className="font-semibold text-gray-800 text-sm">{title}</h3>
         </div>
-        <span className="bg-gray-100 text-gray-600 text-xs font-medium px-2 py-0.5 rounded">
-          {count}
-        </span>
+        <span className="bg-gray-100 text-gray-600 text-xs font-medium px-2 py-0.5 rounded">{count}</span>
       </div>
-
-      <div className="flex-1 p-2 space-y-2 overflow-y-auto custom-scrollbar">
+      <div className="flex-1 p-2 space-y-2 overflow-y-auto">
         {leads.length === 0 ? (
-          <div className="h-24 flex flex-col items-center justify-center text-gray-400 border border-dashed border-gray-200 rounded-md m-1">
-            <p className="text-xs font-medium">Sin leads</p>
+          <div className="h-24 flex items-center justify-center border border-dashed border-gray-200 rounded-md m-1">
+            <p className="text-xs font-medium text-gray-400">Sin leads</p>
           </div>
         ) : (
-          leads.map((lead: Lead) => (
-            <LeadCard key={lead.idLead} lead={lead} onEdit={onEdit} />
-          ))
+          leads.map((lead) => <LeadCard key={lead.idLead} lead={lead} onEdit={onEdit} />)
         )}
       </div>
     </div>
   );
 }
 
-// Lead Card with DnD
-function LeadCard({
-  lead,
-  onEdit,
-}: {
-  lead: Lead;
-  onEdit: (lead: Lead) => void;
-}) {
+function LeadCard({ lead, onEdit }: { lead: Lead; onEdit: (lead: Lead) => void }) {
   const handleDragStart = (e: React.DragEvent) => {
     e.stopPropagation();
     e.dataTransfer.effectAllowed = "move";
@@ -432,24 +433,23 @@ function LeadCard({
   };
 
   const priorityConfig: Record<string, { bar: string; badge: string; label: string }> = {
-    ALTA:  { bar: "bg-red-500",    badge: "bg-red-50 text-red-700 border-red-200",     label: "Alta" },
-    MEDIA: { bar: "bg-amber-400",  badge: "bg-amber-50 text-amber-700 border-amber-200", label: "Media" },
-    BAJA:  { bar: "bg-emerald-400",badge: "bg-emerald-50 text-emerald-700 border-emerald-200", label: "Baja" },
+    ALTA:  { bar: "bg-red-500",     badge: "bg-red-50 text-red-700 border-red-200",           label: "Alta" },
+    MEDIA: { bar: "bg-amber-400",   badge: "bg-amber-50 text-amber-700 border-amber-200",     label: "Media" },
+    BAJA:  { bar: "bg-emerald-400", badge: "bg-emerald-50 text-emerald-700 border-emerald-200", label: "Baja" },
   };
 
-  const p = priorityConfig[lead.prioridad] ?? priorityConfig.MEDIA;
+  const p   = priorityConfig[lead.prioridad] ?? priorityConfig.MEDIA;
+  const dias = diasDesde(lead.fechaCreacion);
 
   return (
     <div
       draggable
       onDragStart={handleDragStart}
-      className="group relative bg-white rounded-xl border border-gray-200/80 shadow-sm hover:shadow-md transition-all duration-200 active:cursor-grabbing overflow-hidden"
+      className="group relative bg-white rounded-xl border border-gray-200/80 shadow-sm hover:shadow-md transition-all active:cursor-grabbing overflow-hidden"
     >
-      {/* Barra de prioridad izquierda */}
       <div className={`absolute left-0 top-0 bottom-0 w-1 ${p.bar} rounded-l-xl`} />
 
       <div className="pl-4 pr-3 pt-3 pb-3">
-        {/* Header: badges */}
         <div className="flex items-center justify-between mb-2.5">
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${p.badge}`}>
@@ -470,7 +470,6 @@ function LeadCard({
           </button>
         </div>
 
-        {/* Nombre */}
         <h4
           className="font-semibold text-gray-900 text-sm leading-snug mb-1 cursor-pointer hover:text-blue-600 transition-colors"
           onClick={() => onEdit(lead)}
@@ -478,7 +477,6 @@ function LeadCard({
           {lead.nombre}
         </h4>
 
-        {/* Empresa */}
         {lead.empresa && (
           <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
             <Building2 className="w-3 h-3 shrink-0" />
@@ -486,7 +484,6 @@ function LeadCard({
           </div>
         )}
 
-        {/* Contacto */}
         {(lead.email || lead.telefono) && (
           <div className="space-y-1 mb-3">
             {lead.email && (
@@ -504,7 +501,6 @@ function LeadCard({
           </div>
         )}
 
-        {/* Notas */}
         {lead.notas && (
           <div className="mb-3 px-2.5 py-2 bg-gray-50 rounded-lg border border-gray-100">
             <p className="text-[10px] text-gray-500 italic line-clamp-2 leading-relaxed">
@@ -513,7 +509,6 @@ function LeadCard({
           </div>
         )}
 
-        {/* Footer */}
         <div className="flex items-center justify-between pt-2.5 border-t border-gray-100">
           <div className="flex items-center gap-3 text-[10px] text-gray-400">
             <div className="flex items-center gap-1">
@@ -524,6 +519,10 @@ function LeadCard({
                   month: "short",
                 })}
               </span>
+            </div>
+            <div className={`flex items-center gap-1 ${dias > 7 ? "text-amber-500 font-medium" : ""}`}>
+              <Clock className="w-3 h-3" />
+              <span>{dias}d</span>
             </div>
             <div className="flex items-center gap-1">
               <Tag className="w-3 h-3" />
@@ -536,11 +535,99 @@ function LeadCard({
             onClick={(e) => e.stopPropagation()}
             className="inline-flex items-center gap-1 text-[11px] font-semibold text-white bg-[#0066CC] hover:bg-[#0052A3] px-3 py-1.5 rounded-lg transition-colors shadow-sm"
           >
-            Ver detalle
+            Ver
             <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
       </div>
+    </div>
+  );
+}
+
+function LeadList({ leads, onEdit }: { leads: Lead[]; onEdit: (lead: Lead) => void }) {
+  const estadoBadge: Record<string, string> = {
+    NUEVO:      "bg-indigo-50 text-indigo-700 border-indigo-200",
+    CONTACTADO: "bg-blue-50 text-blue-700 border-blue-200",
+    CERRADO:    "bg-emerald-50 text-emerald-700 border-emerald-200",
+    PERDIDO:    "bg-rose-50 text-rose-700 border-rose-200",
+  };
+
+  if (leads.length === 0) {
+    return (
+      <div className="h-40 flex items-center justify-center border border-dashed border-gray-200 rounded-lg bg-white">
+        <p className="text-sm text-gray-400">Sin leads para mostrar</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <table className="w-full text-sm">
+        <thead className="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Lead</th>
+            <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Estado</th>
+            <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Tipo seguro</th>
+            <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Dias</th>
+            <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Contacto</th>
+            <th className="px-4 py-3" />
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100">
+          {leads.map((lead) => {
+            const dias = diasDesde(lead.fechaCreacion);
+            return (
+              <tr key={lead.idLead} className="hover:bg-gray-50 transition-colors">
+                <td className="px-4 py-3">
+                  <p className="font-medium text-gray-900">{lead.nombre}</p>
+                  {lead.empresa && <p className="text-xs text-gray-500">{lead.empresa}</p>}
+                </td>
+                <td className="px-4 py-3">
+                  <span
+                    className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${
+                      estadoBadge[lead.estado] ?? "bg-gray-50 text-gray-600 border-gray-200"
+                    }`}
+                  >
+                    {lead.estado}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  <span className="text-[11px] px-2 py-0.5 rounded-full border bg-blue-50 text-blue-700 border-blue-200 font-medium">
+                    {lead.tipoSeguro?.replace("_", " ")}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  <span className={`text-xs font-medium ${dias > 7 ? "text-amber-600" : "text-gray-500"}`}>
+                    {dias}d
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="text-xs text-gray-500 space-y-0.5">
+                    {lead.email    && <p className="truncate max-w-[160px]">{lead.email}</p>}
+                    {lead.telefono && <p>{lead.telefono}</p>}
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-3 justify-end">
+                    <button
+                      onClick={() => onEdit(lead)}
+                      className="text-xs text-gray-500 hover:text-gray-700 font-medium"
+                    >
+                      Editar
+                    </button>
+                    <Link
+                      to={`/dashboard/gestion-trabajo/leads/${lead.idLead}`}
+                      className="text-xs font-semibold text-[#0066CC] hover:text-[#0052A3]"
+                    >
+                      Ver detalle
+                    </Link>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }
