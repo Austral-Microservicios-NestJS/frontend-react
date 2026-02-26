@@ -24,6 +24,9 @@ import {
   X,
   ChevronDown,
   Clock,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -60,6 +63,7 @@ export default function LeadsPage() {
   const [tipoSeguroFilter, setTipoSeguroFilter] = useState<string>("");
   const [estadoFilter, setEstadoFilter] = useState<EstadoKey | null>(null);
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
 
   const {
     leads,
@@ -94,10 +98,12 @@ export default function LeadsPage() {
   const allFilteredLeads = useMemo(() => {
     const all = Object.values(activeByEstado).flat();
     const result = estadoFilter ? all.filter((l) => l.estado === estadoFilter) : all;
-    return [...result].sort(
-      (a, b) => new Date(b.fechaCreacion).getTime() - new Date(a.fechaCreacion).getTime()
-    );
-  }, [activeByEstado, estadoFilter]);
+    return [...result].sort((a, b) => {
+      const timeA = new Date(a.fechaCreacion).getTime();
+      const timeB = new Date(b.fechaCreacion).getTime();
+      return sortOrder === "desc" ? timeB - timeA : timeA - timeB;
+    });
+  }, [activeByEstado, estadoFilter, sortOrder]);
 
   const handleOpenModal = () => { setLeadToEdit(null); setIsModalOpen(true); };
   const handleEditLead  = (lead: Lead) => { setLeadToEdit(lead); setIsModalOpen(true); };
@@ -118,6 +124,10 @@ export default function LeadsPage() {
     setSearchQuery("");
     setTipoSeguroFilter("");
     setEstadoFilter(null);
+  };
+
+  const toggleSortOrder = () => {
+    setSortOrder(prev => prev === "desc" ? "asc" : "desc");
   };
 
   if (isLoading) {
@@ -195,7 +205,7 @@ export default function LeadsPage() {
           </div>
 
 
-          {/* Search + tipo seguro filter */}
+          {/* Search + filters */}
           <div className="flex items-center gap-3 shrink-0">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -256,6 +266,23 @@ export default function LeadsPage() {
                 </div>
               )}
             </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleSortOrder}
+              className="h-9 rounded-md text-gray-600 border-gray-200 hover:bg-gray-50"
+              title={sortOrder === "desc" ? "Ordenar: Más recientes primero" : "Ordenar: Más antiguos primero"}
+            >
+              {sortOrder === "desc" ? (
+                <ArrowDown className="w-4 h-4 mr-2" />
+              ) : (
+                <ArrowUp className="w-4 h-4 mr-2" />
+              )}
+              <span className="text-sm">
+                {sortOrder === "desc" ? "Recientes" : "Antiguos"}
+              </span>
+            </Button>
           </div>
 
           {/* Estado filter tabs */}
