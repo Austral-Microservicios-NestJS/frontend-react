@@ -98,8 +98,8 @@ export default function LeadsPage() {
     const all = Object.values(activeByEstado).flat();
     const result = estadoFilter ? all.filter((l) => l.estado === estadoFilter) : all;
     return [...result].sort((a, b) => {
-      const timeA = new Date(a.fechaCreacion).getTime();
-      const timeB = new Date(b.fechaCreacion).getTime();
+      const timeA = new Date(a.fechaUltimoCambioEstado).getTime();
+      const timeB = new Date(b.fechaUltimoCambioEstado).getTime();
       return sortOrder === "desc" ? timeB - timeA : timeA - timeB;
     });
   }, [activeByEstado, estadoFilter, sortOrder]);
