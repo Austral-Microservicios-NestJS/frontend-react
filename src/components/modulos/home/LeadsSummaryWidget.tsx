@@ -13,8 +13,15 @@ const STATUS_CONFIG = [
     textColor: "text-indigo-600",
   },
   {
-    key: "CONTACTADO" as const,
-    label: "Contactados",
+    key: "EN_PROCESO" as const,
+    label: "En proceso",
+    color: "#3b82f6",
+    light: "#eff6ff",
+    textColor: "text-blue-600",
+  },
+  {
+    key: "COTIZADO" as const,
+    label: "Cotizados",
     color: "#f59e0b",
     light: "#fffbeb",
     textColor: "text-amber-600",
