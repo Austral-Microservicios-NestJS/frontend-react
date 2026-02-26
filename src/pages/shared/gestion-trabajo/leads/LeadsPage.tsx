@@ -24,7 +24,6 @@ import {
   X,
   ChevronDown,
   Clock,
-  ArrowUpDown,
   ArrowUp,
   ArrowDown,
 } from "lucide-react";
