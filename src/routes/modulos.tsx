@@ -144,7 +144,7 @@ export const moduleCategories = [
       },
       {
         id: 74,
-        name: "Insights",
+        name: "Radar Comercial",
         path: "/dashboard/agentes-ia/insights",
         icon: Zap,
         roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],

@@ -20,13 +20,13 @@ export const useLeads = () => {
     return allLeads;
   }, [allLeads]);
 
-  // Organizar leads por estado para el Kanban (solo 4 estados)
   const leadsByEstado = useMemo(() => {
     return {
-      NUEVO: leads.filter((lead) => lead.estado === "NUEVO"),
-      CONTACTADO: leads.filter((lead) => lead.estado === "CONTACTADO"),
-      CERRADO: leads.filter((lead) => lead.estado === "CERRADO"),
-      PERDIDO: leads.filter((lead) => lead.estado === "PERDIDO"),
+      NUEVO:      leads.filter((lead) => lead.estado === "NUEVO"),
+      EN_PROCESO: leads.filter((lead) => lead.estado === "EN_PROCESO"),
+      COTIZADO:   leads.filter((lead) => lead.estado === "COTIZADO"),
+      CERRADO:    leads.filter((lead) => lead.estado === "CERRADO"),
+      PERDIDO:    leads.filter((lead) => lead.estado === "PERDIDO"),
     };
   }, [leads]);
 
@@ -50,10 +50,11 @@ export const useLeads = () => {
   const filterByEstado = (searchQuery: string, tipoSeguroFilter?: string) => {
     const filtered = filterLeads(searchQuery, tipoSeguroFilter);
     return {
-      NUEVO: filtered.filter((l) => l.estado === "NUEVO"),
-      CONTACTADO: filtered.filter((l) => l.estado === "CONTACTADO"),
-      CERRADO: filtered.filter((l) => l.estado === "CERRADO"),
-      PERDIDO: filtered.filter((l) => l.estado === "PERDIDO"),
+      NUEVO:      filtered.filter((l) => l.estado === "NUEVO"),
+      EN_PROCESO: filtered.filter((l) => l.estado === "EN_PROCESO"),
+      COTIZADO:   filtered.filter((l) => l.estado === "COTIZADO"),
+      CERRADO:    filtered.filter((l) => l.estado === "CERRADO"),
+      PERDIDO:    filtered.filter((l) => l.estado === "PERDIDO"),
     };
   };
 

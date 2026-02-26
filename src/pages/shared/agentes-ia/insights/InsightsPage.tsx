@@ -164,7 +164,7 @@ export default function InsightsPage() {
   return (
     <>
       <Header
-        title="Insights"
+        title="Radar Comercial"
         description="Powered by Austral AI"
         isSidebarOpen={isSidebarOpen}
         onToggleSidebar={toggleSidebar}

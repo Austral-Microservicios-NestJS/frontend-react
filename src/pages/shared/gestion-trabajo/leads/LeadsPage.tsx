@@ -29,7 +29,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 
-type EstadoKey = "NUEVO" | "CONTACTADO" | "CERRADO" | "PERDIDO";
+type EstadoKey = "NUEVO" | "EN_PROCESO" | "COTIZADO" | "CERRADO" | "PERDIDO";
 
 type ColumnDef = {
   estado: EstadoKey;
@@ -41,7 +41,8 @@ type ColumnDef = {
 
 const ESTADO_COLUMNS: ColumnDef[] = [
   { estado: "NUEVO",      title: "Nuevo",      color: "bg-indigo-500",  active: "bg-indigo-500 text-white border-indigo-500",   badge: "bg-indigo-50 text-indigo-700 border-indigo-200" },
-  { estado: "CONTACTADO", title: "Contactado", color: "bg-blue-500",    active: "bg-blue-500 text-white border-blue-500",       badge: "bg-blue-50 text-blue-700 border-blue-200" },
+  { estado: "EN_PROCESO", title: "En proceso", color: "bg-blue-500",    active: "bg-blue-500 text-white border-blue-500",       badge: "bg-blue-50 text-blue-700 border-blue-200" },
+  { estado: "COTIZADO",   title: "Cotizado",   color: "bg-amber-500",   active: "bg-amber-500 text-white border-amber-500",     badge: "bg-amber-50 text-amber-700 border-amber-200" },
   { estado: "CERRADO",    title: "Cerrado",    color: "bg-emerald-500", active: "bg-emerald-500 text-white border-emerald-500", badge: "bg-emerald-50 text-emerald-700 border-emerald-200" },
   { estado: "PERDIDO",    title: "Perdido",    color: "bg-rose-500",    active: "bg-rose-500 text-white border-rose-500",       badge: "bg-rose-50 text-rose-700 border-rose-200" },
 ];
@@ -192,6 +193,7 @@ export default function LeadsPage() {
             <StatsCard title="Ganados"  value={activeByEstado.CERRADO.length}   icon={CheckCircle2} color="text-emerald-600" bg="bg-emerald-50" />
             <StatsCard title="Perdidos" value={activeByEstado.PERDIDO.length}   icon={Ban}          color="text-rose-600"    bg="bg-rose-50" />
           </div>
+
 
           {/* Search + tipo seguro filter */}
           <div className="flex items-center gap-3 shrink-0">
@@ -509,7 +511,7 @@ function LeadCard({ lead, onEdit }: { lead: Lead; onEdit: (lead: Lead) => void }
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-2.5 border-t border-gray-100">
+        <div className="pt-2.5 border-t border-gray-100 space-y-2">
           <div className="flex items-center gap-3 text-[10px] text-gray-400">
             <div className="flex items-center gap-1">
               <Calendar className="w-3 h-3" />
@@ -529,13 +531,12 @@ function LeadCard({ lead, onEdit }: { lead: Lead; onEdit: (lead: Lead) => void }
               <span className="uppercase tracking-wide">{lead.fuente?.replace(/_/g, " ")}</span>
             </div>
           </div>
-
           <Link
             to={`/dashboard/gestion-trabajo/leads/${lead.idLead}`}
             onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-1 text-[11px] font-semibold text-white bg-[#0066CC] hover:bg-[#0052A3] px-3 py-1.5 rounded-lg transition-colors shadow-sm"
+            className="flex items-center justify-center gap-1 text-[11px] font-semibold text-white bg-[#0066CC] hover:bg-[#0052A3] w-full py-1.5 rounded-lg transition-colors shadow-sm"
           >
-            Ver
+            Ver detalle
             <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
