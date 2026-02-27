@@ -342,7 +342,7 @@ export default function LeadsPage() {
             <div className="flex-1 overflow-auto min-h-0" style={{ scrollbarGutter: "stable" }}>
               <div
                 className={`flex gap-4 h-full pb-2 ${
-                  visibleColumns.length > 1 ? "min-w-[900px]" : ""
+                  visibleColumns.length > 1 ? "min-w-[700px]" : ""
                 }`}
               >
                 {visibleColumns.map((col) => (
@@ -444,7 +444,7 @@ function LeadColumn({
   return (
     <div
       className={`flex flex-col rounded-lg border transition-colors ${
-        single ? "flex-1" : "w-72 shrink-0"
+        single ? "flex-1" : "flex-1 min-w-64"
       } ${isDraggingOver ? "bg-blue-50 border-blue-300" : "bg-gray-50 border-gray-200"}`}
       onDragOver={handleDragOver}
       onDragEnter={handleDragEnter}
