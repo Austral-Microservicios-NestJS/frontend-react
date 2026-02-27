@@ -287,10 +287,10 @@ export default function LeadsPage() {
           {/* Estado filter tabs */}
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
             <button
-              onClick={() => setEstadoFilter(null)}
+              onClick={() => { setEstadoFilter(null); setViewMode("kanban"); }}
               className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
                 estadoFilter === null
-                  ? "bg-gray-900 text-white border-gray-900"
+                  ? "bg-[#003d5c] text-white border-[#003d5c]"
                   : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
               }`}
             >
@@ -299,7 +299,12 @@ export default function LeadsPage() {
             {ESTADO_COLUMNS.map((col) => (
               <button
                 key={col.estado}
-                onClick={() => setEstadoFilter(estadoFilter === col.estado ? null : col.estado)}
+                onClick={() => {
+                  const next = estadoFilter === col.estado ? null : col.estado;
+                  setEstadoFilter(next);
+                  if (next !== null) setViewMode("list");
+                  else setViewMode("kanban");
+                }}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
                   estadoFilter === col.estado
                     ? col.active
@@ -560,7 +565,7 @@ function LeadCard({ lead, onEdit }: { lead: Lead; onEdit: (lead: Lead) => void }
           <Link
             to={`/dashboard/gestion-trabajo/leads/${lead.idLead}`}
             onClick={(e) => e.stopPropagation()}
-            className="flex items-center justify-center gap-1 text-[11px] font-semibold text-white bg-[#0066CC] hover:bg-[#0052A3] w-full py-1.5 rounded-lg transition-colors shadow-sm"
+            className="inline-flex items-center gap-1 text-[11px] font-semibold text-white bg-[#0066CC] hover:bg-[#0052A3] px-3 py-1.5 rounded-lg transition-colors shadow-sm"
           >
             Ver detalle
             <ArrowRight className="w-3 h-3" />
