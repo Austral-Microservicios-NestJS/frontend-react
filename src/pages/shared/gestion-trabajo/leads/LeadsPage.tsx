@@ -94,15 +94,28 @@ export default function LeadsPage() {
     ? ESTADO_COLUMNS.filter((c) => c.estado === estadoFilter)
     : ESTADO_COLUMNS;
 
-  const allFilteredLeads = useMemo(() => {
-    const all = Object.values(activeByEstado).flat();
-    const result = estadoFilter ? all.filter((l) => l.estado === estadoFilter) : all;
-    return [...result].sort((a, b) => {
+  const sortLeads = (arr: Lead[]) =>
+    [...arr].sort((a, b) => {
       const timeA = new Date(a.fechaUltimoCambioEstado).getTime();
       const timeB = new Date(b.fechaUltimoCambioEstado).getTime();
       return sortOrder === "desc" ? timeB - timeA : timeA - timeB;
     });
-  }, [activeByEstado, estadoFilter, sortOrder]);
+
+  const sortedByEstado = useMemo(
+    () => ({
+      NUEVO:      sortLeads(activeByEstado.NUEVO),
+      EN_PROCESO: sortLeads(activeByEstado.EN_PROCESO),
+      COTIZADO:   sortLeads(activeByEstado.COTIZADO),
+      CERRADO:    sortLeads(activeByEstado.CERRADO),
+      PERDIDO:    sortLeads(activeByEstado.PERDIDO),
+    }),
+    [activeByEstado, sortOrder],
+  );
+
+  const allFilteredLeads = useMemo(() => {
+    const all = Object.values(sortedByEstado).flat();
+    return estadoFilter ? all.filter((l) => l.estado === estadoFilter) : all;
+  }, [sortedByEstado, estadoFilter]);
 
   const handleOpenModal = () => { setLeadToEdit(null); setIsModalOpen(true); };
   const handleEditLead  = (lead: Lead) => { setLeadToEdit(lead); setIsModalOpen(true); };
@@ -326,7 +339,7 @@ export default function LeadsPage() {
 
           {/* Contenido principal */}
           {viewMode === "kanban" ? (
-            <div className="flex-1 overflow-auto min-h-0">
+            <div className="flex-1 overflow-auto min-h-0" style={{ scrollbarGutter: "stable" }}>
               <div
                 className={`flex gap-4 h-full pb-2 ${
                   visibleColumns.length > 1 ? "min-w-[900px]" : ""
@@ -337,7 +350,7 @@ export default function LeadsPage() {
                     key={col.estado}
                     title={col.title}
                     count={activeByEstado[col.estado].length}
-                    leads={activeByEstado[col.estado]}
+                    leads={sortedByEstado[col.estado]}
                     estado={col.estado}
                     statusColor={col.color}
                     onDrop={handleDrop}
@@ -348,7 +361,7 @@ export default function LeadsPage() {
               </div>
             </div>
           ) : (
-            <div className="flex-1 overflow-auto min-h-0">
+            <div className="flex-1 overflow-auto min-h-0" style={{ scrollbarGutter: "stable" }}>
               <LeadList leads={allFilteredLeads} onEdit={handleEditLead} />
             </div>
           )}
