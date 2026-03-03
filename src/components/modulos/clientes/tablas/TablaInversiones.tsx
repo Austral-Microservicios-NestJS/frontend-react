@@ -118,7 +118,7 @@ export const TablaInversiones = ({
                   </button>
                 </PopoverClose>
               )}
-              {onDelete && (
+              {/* {onDelete && (
                 <PopoverClose asChild>
                   <button
                     onClick={() => onDelete(row.original)}
@@ -128,7 +128,7 @@ export const TablaInversiones = ({
                     Eliminar
                   </button>
                 </PopoverClose>
-              )}
+              )} */}
             </div>
           </PopoverContent>
         </Popover>

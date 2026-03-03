@@ -10,7 +10,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { authService } from "@/services/auth.services";
 import { Eye, EyeOff, Loader2, AlertCircle, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 
 interface LoginFormData {
   correo: string;

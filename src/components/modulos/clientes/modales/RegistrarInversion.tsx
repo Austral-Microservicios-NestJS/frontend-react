@@ -3,20 +3,13 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
-  ModalFooter,
   FormGroup,
   FormGroupDivisor,
+  SubmitButtons,
+  AppSelect,
+  AppDatePickerField,
 } from "@/components/shared";
-import {
-  Input,
-  Label,
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-  Textarea,
-} from "@/components/ui";
+import { Input, Label, Textarea } from "@/components/ui";
 import { useForm, Controller } from "react-hook-form";
 import { useEffect } from "react";
 import { monedaOptions, Moneda } from "@/types/cliente-inversion.interface";
@@ -121,28 +114,29 @@ export const RegistrarInversion = ({
                   control={control}
                   rules={{ required: true }}
                   render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecciona la moneda" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {monedaOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <AppSelect
+                      options={monedaOptions as any}
+                      placeholder="Selecciona la moneda"
+                      value={
+                        monedaOptions.find((o) => o.value === field.value) ??
+                        null
+                      }
+                      onChange={(opt) =>
+                        field.onChange((opt as any)?.value ?? null)
+                      }
+                    />
                   )}
                 />
               </FormGroup>
 
               <FormGroup>
                 <Label htmlFor="fechaGasto">Fecha del Gasto</Label>
-                <Input
+                <AppDatePickerField
+                  control={control}
+                  name="fechaGasto"
+                  rules={{ required: true }}
                   id="fechaGasto"
-                  type="date"
-                  {...register("fechaGasto", { required: true })}
+                  placeholder="Selecciona la fecha"
                 />
                 {errors.fechaGasto && (
                   <span className="text-xs text-red-500">
@@ -163,23 +157,10 @@ export const RegistrarInversion = ({
             </FormGroup>
           </ModalBody>
 
-          <ModalFooter>
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={createMutation.isPending}
-              className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50"
-              style={{ backgroundColor: "var(--austral-azul)" }}
-            >
-              {createMutation.isPending ? "Guardando..." : "Guardar"}
-            </button>
-          </ModalFooter>
+          <SubmitButtons
+            onClose={onClose}
+            isSubmitting={createMutation.isPending}
+          />
         </form>
       </Modal>
     </ModalContainer>

@@ -287,7 +287,7 @@ export const RegistrarCliente = ({
             {/* Ubicacion */}
             <FormGroup>
               <Label htmlFor="direccion" required>
-                Dirección
+                Dirección (Potenciado por Google Maps)
               </Label>
               <Controller
                 name="direccion"
