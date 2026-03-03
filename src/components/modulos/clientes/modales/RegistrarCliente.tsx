@@ -8,17 +8,10 @@ import {
   LocationInput,
   PhoneInput,
   SubmitButtons,
+  AppSelect,
+  AppDatePickerField,
 } from "@/components/shared";
-import {
-  Input,
-  Label,
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-  Checkbox,
-} from "@/components/ui";
+import { Input, Label, Checkbox } from "@/components/ui";
 import { useForm, Controller } from "react-hook-form";
 import { useEffect } from "react";
 import {
@@ -80,6 +73,7 @@ export const RegistrarCliente = ({
   });
 
   const tipoPersona = watch("tipoPersona");
+  const tipoDocumento = watch("tipoDocumento");
 
   // Resetear formulario cuando el modal se cierra
   useEffect(() => {
@@ -152,18 +146,18 @@ export const RegistrarCliente = ({
                   control={control}
                   rules={{ required: true }}
                   render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecciona el tipo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {tipoPersonaOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <AppSelect
+                      options={tipoPersonaOptions as any}
+                      placeholder="Selecciona el tipo"
+                      value={
+                        tipoPersonaOptions.find(
+                          (o) => o.value === field.value,
+                        ) ?? null
+                      }
+                      onChange={(opt) =>
+                        field.onChange((opt as any)?.value ?? null)
+                      }
+                    />
                   )}
                 />
                 {errors.tipoPersona && (
@@ -181,18 +175,18 @@ export const RegistrarCliente = ({
                   control={control}
                   rules={{ required: true }}
                   render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecciona el tipo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {tipoDocumentoOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <AppSelect
+                      options={tipoDocumentoOptions as any}
+                      placeholder="Selecciona el tipo"
+                      value={
+                        tipoDocumentoOptions.find(
+                          (o) => o.value === field.value,
+                        ) ?? null
+                      }
+                      onChange={(opt) =>
+                        field.onChange((opt as any)?.value ?? null)
+                      }
+                    />
                   )}
                 />
                 {errors.tipoDocumento && (
@@ -211,11 +205,28 @@ export const RegistrarCliente = ({
                 id="numeroDocumento"
                 type="number"
                 placeholder="Ej: 12345678"
-                {...register("numeroDocumento", { required: true })}
+                {...register("numeroDocumento", {
+                  required: "El número de documento es requerido",
+                  validate: (value) => {
+                    const strValue = String(value);
+                    if (!tipoDocumento)
+                      return "Primero seleccione el tipo de documento";
+                    if (tipoDocumento === "DNI" && strValue.length !== 8)
+                      return "El DNI debe tener 8 dígitos";
+                    if (tipoDocumento === "RUC" && strValue.length !== 11)
+                      return "El RUC debe tener 11 dígitos";
+                    if (tipoDocumento === "CE" && strValue.length < 8)
+                      return "El Carnet de Extranjería debe tener al menos 8 caracteres";
+                    if (tipoDocumento === "PASAPORTE" && strValue.length < 6)
+                      return "El Pasaporte debe tener al menos 6 caracteres";
+                    return true;
+                  },
+                })}
               />
               {errors.numeroDocumento && (
                 <span className="text-sm text-red-500">
-                  El número de documento es requerido
+                  {(errors.numeroDocumento.message as string) ||
+                    "El número de documento es requerido"}
                 </span>
               )}
             </FormGroup>
@@ -264,11 +275,12 @@ export const RegistrarCliente = ({
             )}
             <FormGroup>
               <Label htmlFor="cumpleanos">Cumpleaños / Aniversario</Label>
-              <Input
+              <AppDatePickerField
+                control={control}
+                name="cumpleanos"
                 id="cumpleanos"
                 placeholder="Ej: 1990-01-01"
-                type="date"
-                {...register("cumpleanos", { required: false })}
+                calendarProps={{ maxDate: new Date() }}
               />
             </FormGroup>
 
@@ -340,7 +352,9 @@ export const RegistrarCliente = ({
             </FormGroupDivisor>
             <FormGroupDivisor columns={3}>
               <FormGroup>
-                <Label htmlFor="telefono1" required>Telefono Principal</Label>
+                <Label htmlFor="telefono1" required>
+                  Telefono Principal
+                </Label>
                 <Controller
                   name="telefono1"
                   control={control}
