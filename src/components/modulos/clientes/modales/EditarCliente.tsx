@@ -8,17 +8,10 @@ import {
   LocationInput,
   PhoneInput,
   UpdateButtons,
+  AppSelect,
+  AppDatePickerField,
 } from "@/components/shared";
-import {
-  Input,
-  Label,
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-  Checkbox,
-} from "@/components/ui";
+import { Input, Label, Checkbox } from "@/components/ui";
 import { useForm, Controller } from "react-hook-form";
 import {
   tipoPersonaOptions,
@@ -76,6 +69,7 @@ export const EditarCliente = ({
   });
 
   const tipoPersona = watch("tipoPersona");
+  const tipoDocumento = watch("tipoDocumento");
 
   const handleFormSubmit = async (data: UpdateCliente) => {
     const dataSubmit = {
@@ -108,64 +102,88 @@ export const EditarCliente = ({
           <ModalBody>
             <FormGroupDivisor>
               <FormGroup>
-                <Label htmlFor="tipoPersona" required>Tipo de Persona</Label>
+                <Label htmlFor="tipoPersona" required>
+                  Tipo de Persona
+                </Label>
                 <Controller
                   name="tipoPersona"
                   control={control}
                   rules={{ required: true }}
                   render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecciona el tipo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {tipoPersonaOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <AppSelect
+                      options={tipoPersonaOptions as any}
+                      placeholder="Selecciona el tipo"
+                      value={
+                        tipoPersonaOptions.find(
+                          (o) => o.value === field.value,
+                        ) ?? null
+                      }
+                      onChange={(opt) =>
+                        field.onChange((opt as any)?.value ?? null)
+                      }
+                    />
                   )}
                 />
               </FormGroup>
               <FormGroup>
-                <Label htmlFor="tipoDocumento" required>Tipo de Documento</Label>
+                <Label htmlFor="tipoDocumento" required>
+                  Tipo de Documento
+                </Label>
                 <Controller
                   name="tipoDocumento"
                   control={control}
                   rules={{ required: true }}
                   render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecciona el tipo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {tipoDocumentoOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <AppSelect
+                      options={tipoDocumentoOptions as any}
+                      placeholder="Selecciona el tipo"
+                      value={
+                        tipoDocumentoOptions.find(
+                          (o) => o.value === field.value,
+                        ) ?? null
+                      }
+                      onChange={(opt) =>
+                        field.onChange((opt as any)?.value ?? null)
+                      }
+                    />
                   )}
                 />
               </FormGroup>
             </FormGroupDivisor>
 
             <FormGroup>
-              <Label htmlFor="numeroDocumento" required>Número de Documento</Label>
+              <Label htmlFor="numeroDocumento" required>
+                Número de Documento
+              </Label>
               <Input
                 id="numeroDocumento"
                 type="number"
                 placeholder="Ej: 12345678"
-                {...register("numeroDocumento", { required: true })}
+                {...register("numeroDocumento", {
+                  required: "El número de documento es requerido",
+                  validate: (value) => {
+                    const strValue = String(value);
+                    if (!tipoDocumento)
+                      return "Primero seleccione el tipo de documento";
+                    if (tipoDocumento === "DNI" && strValue.length !== 8)
+                      return "El DNI debe tener 8 dígitos";
+                    if (tipoDocumento === "RUC" && strValue.length !== 11)
+                      return "El RUC debe tener 11 dígitos";
+                    if (tipoDocumento === "CE" && strValue.length < 8)
+                      return "El Carnet de Extranjería debe tener al menos 8 caracteres";
+                    if (tipoDocumento === "PASAPORTE" && strValue.length < 6)
+                      return "El Pasaporte debe tener al menos 6 caracteres";
+                    return true;
+                  },
+                })}
               />
             </FormGroup>
 
             {tipoPersona === "JURIDICO" && (
               <FormGroup>
-                <Label htmlFor="razonSocial" required>Razón Social</Label>
+                <Label htmlFor="razonSocial" required>
+                  Razón Social
+                </Label>
                 <Input
                   id="razonSocial"
                   placeholder="Ej: Empresa SAC"
@@ -177,7 +195,9 @@ export const EditarCliente = ({
             {tipoPersona === "NATURAL" && (
               <FormGroupDivisor>
                 <FormGroup>
-                  <Label htmlFor="nombres" required>Nombres</Label>
+                  <Label htmlFor="nombres" required>
+                    Nombres
+                  </Label>
                   <Input
                     id="nombres"
                     placeholder="Ej: Juan Pedro"
@@ -185,7 +205,9 @@ export const EditarCliente = ({
                   />
                 </FormGroup>
                 <FormGroup>
-                  <Label htmlFor="apellidos" required>Apellidos</Label>
+                  <Label htmlFor="apellidos" required>
+                    Apellidos
+                  </Label>
                   <Input
                     id="apellidos"
                     placeholder="Ej: Pérez Gómez"
@@ -197,16 +219,19 @@ export const EditarCliente = ({
 
             <FormGroup>
               <Label htmlFor="cumpleanos">Cumpleaños / Aniversario</Label>
-              <Input
+              <AppDatePickerField
+                control={control}
+                name="cumpleanos"
                 id="cumpleanos"
                 placeholder="Ej: 1990-01-01"
-                type="date"
-                {...register("cumpleanos")}
+                calendarProps={{ maxDate: new Date() }}
               />
             </FormGroup>
 
             <FormGroup>
-              <Label htmlFor="direccion" required>Dirección</Label>
+              <Label htmlFor="direccion" required>
+                Dirección
+              </Label>
               <Controller
                 name="direccion"
                 control={control}
@@ -267,16 +292,15 @@ export const EditarCliente = ({
 
             <FormGroupDivisor columns={3}>
               <FormGroup>
-                <Label htmlFor="telefono1" required>Teléfono Principal</Label>
+                <Label htmlFor="telefono1" required>
+                  Teléfono Principal
+                </Label>
                 <Controller
                   name="telefono1"
                   control={control}
                   rules={{ required: true }}
                   render={({ field }) => (
-                    <PhoneInput
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
+                    <PhoneInput value={field.value} onChange={field.onChange} />
                   )}
                 />
               </FormGroup>
@@ -286,10 +310,7 @@ export const EditarCliente = ({
                   name="telefono2"
                   control={control}
                   render={({ field }) => (
-                    <PhoneInput
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
+                    <PhoneInput value={field.value} onChange={field.onChange} />
                   )}
                 />
               </FormGroup>
@@ -299,10 +320,7 @@ export const EditarCliente = ({
                   name="whatsapp"
                   control={control}
                   render={({ field }) => (
-                    <PhoneInput
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
+                    <PhoneInput value={field.value} onChange={field.onChange} />
                   )}
                 />
               </FormGroup>
@@ -342,7 +360,11 @@ export const EditarCliente = ({
             </FormGroupDivisor>
           </ModalBody>
 
-          <UpdateButtons onClose={onClose} isSubmitting={isSubmitting} isDirty={isDirty} />
+          <UpdateButtons
+            onClose={onClose}
+            isSubmitting={isSubmitting}
+            isDirty={isDirty}
+          />
         </form>
       </Modal>
     </ModalContainer>

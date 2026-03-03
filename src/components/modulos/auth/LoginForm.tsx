@@ -1,5 +1,3 @@
-
-
 import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
@@ -62,15 +60,14 @@ export default function LoginForm() {
         correo: data.correo,
         contrasena: data.contrasena,
       });
-      
+
       // Assume response contains user and token
       if (response && response.token && response.user) {
-         storeLogin(response.user, response.token);
-         navigate("/dashboard");
+        storeLogin(response.user, response.token);
+        navigate("/dashboard");
       } else {
-         throw new Error("Respuesta inválida del servidor");
+        throw new Error("Respuesta inválida del servidor");
       }
-
     } catch (error: any) {
       console.error("Error en login:", error);
       toast.error("Error al iniciar sesión", {
@@ -81,7 +78,6 @@ export default function LoginForm() {
       setLoading(false);
     }
   };
-
 
   return (
     <motion.div
@@ -136,7 +132,13 @@ export default function LoginForm() {
               type="text"
               placeholder="admin@austral.com"
               className="h-12 lg:bg-muted/30 bg-white/10 lg:backdrop-blur-none backdrop-blur-sm lg:border-input/60 border-white/20 focus:bg-background lg:text-foreground text-white placeholder:text-zinc-400 transition-all duration-300"
-              {...register("correo")}
+              {...register("correo", {
+                required: "El correo es requerido",
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "El correo debe tener un formato válido",
+                },
+              })}
               autoComplete="username"
               disabled={isLoading}
             />
@@ -167,7 +169,9 @@ export default function LoginForm() {
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 className="h-12 pr-10 lg:bg-muted/30 bg-white/10 lg:backdrop-blur-none backdrop-blur-sm lg:border-input/60 border-white/20 focus:bg-background lg:text-foreground text-white placeholder:text-zinc-400 transition-all duration-300"
-                {...register("contrasena")}
+                {...register("contrasena", {
+                  required: "La contraseña es requerida",
+                })}
                 autoComplete="current-password"
                 disabled={isLoading}
               />
@@ -214,13 +218,20 @@ export default function LoginForm() {
                 Recordarme
               </label>
             </div>
-              <Link
-                to="/forgot-password"
+            {/* <Link
+              to="/forgot-password"
               className="text-sm lg:text-primary text-zinc-300 lg:hover:text-primary/80 hover:text-white hover:underline transition-colors"
               tabIndex={isLoading ? -1 : 0}
             >
               ¿Olvidaste tu contraseña?
-            </Link>
+            </Link> */}
+            <span
+              onClick={() => toast.info("Funcionalidad en Desarrollo")}
+              className="text-sm cursor-pointer lg:text-primary text-zinc-300 lg:hover:text-primary/80 hover:text-white hover:underline transition-colors"
+              tabIndex={isLoading ? -1 : 0}
+            >
+              ¿Olvidaste tu contraseña?
+            </span>
           </motion.div>
 
           {/* Botón de envío */}

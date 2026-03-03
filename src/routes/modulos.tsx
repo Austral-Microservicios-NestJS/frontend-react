@@ -1,6 +1,7 @@
 import {
   BookUser,
   // Bot,
+  BriefcaseBusiness,
   Building2,
   FishingHook,
   FolderCog,
@@ -57,6 +58,14 @@ export const moduleCategories = [
     id: "gestion-trabajo",
     title: "Gestión de Trabajo",
     modules: [
+      {
+        id: 50,
+        name: "Gestión Comercial",
+        path: "/dashboard/gestion-trabajo/gestion-comercial",
+        icon: BriefcaseBusiness,
+        roles: [Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE],
+        type: ["CRM"] as ModuleType[],
+      },
       {
         id: 51,
         name: "Actividades",
