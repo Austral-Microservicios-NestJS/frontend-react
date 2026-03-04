@@ -13,8 +13,8 @@ const STATUS_CONFIG = [
     textColor: "text-indigo-600",
   },
   {
-    key: "EN_PROCESO" as const,
-    label: "En proceso",
+    key: "CONTACTADO" as const,
+    label: "Contactados",
     color: "#3b82f6",
     light: "#eff6ff",
     textColor: "text-blue-600",
@@ -22,9 +22,16 @@ const STATUS_CONFIG = [
   {
     key: "COTIZADO" as const,
     label: "Cotizados",
-    color: "#f59e0b",
-    light: "#fffbeb",
-    textColor: "text-amber-600",
+    color: "#8b5cf6",
+    light: "#f5f3ff",
+    textColor: "text-violet-600",
+  },
+  {
+    key: "EMITIDO" as const,
+    label: "Emitidos",
+    color: "#f97316",
+    light: "#fff7ed",
+    textColor: "text-orange-600",
   },
   {
     key: "CERRADO" as const,

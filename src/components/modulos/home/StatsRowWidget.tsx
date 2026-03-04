@@ -20,7 +20,7 @@ export const StatsRowWidget = () => {
   }).length;
 
   const leadsActivos = leads.filter(
-    (l) => l.estado === "NUEVO" || l.estado === "EN_PROCESO" || l.estado === "COTIZADO",
+    (l) => l.estado === "NUEVO" || l.estado === "CONTACTADO" || l.estado === "COTIZADO" || l.estado === "EMITIDO",
   ).length;
 
   const stats = [

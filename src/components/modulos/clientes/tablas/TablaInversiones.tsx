@@ -7,7 +7,7 @@ import {
   PopoverTrigger,
   PopoverClose,
 } from "@/components/ui/popover";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { MoreHorizontal, Pencil } from "lucide-react";
 import dayjs from "dayjs";
 
 interface TablaInversionesProps {
@@ -19,7 +19,6 @@ interface TablaInversionesProps {
 export const TablaInversiones = ({
   inversiones,
   onEdit,
-  onDelete,
 }: TablaInversionesProps) => {
   const formatCurrency = (amount: number, currency: string) => {
     return new Intl.NumberFormat("es-PE", {
