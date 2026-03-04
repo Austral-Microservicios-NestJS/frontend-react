@@ -31,7 +31,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 
-type EstadoKey = "NUEVO" | "EN_PROCESO" | "COTIZADO" | "CERRADO" | "PERDIDO";
+type EstadoKey = "NUEVO" | "CONTACTADO" | "COTIZADO" | "EMITIDO" | "CERRADO" | "PERDIDO";
 
 type ColumnDef = {
   estado: EstadoKey;
@@ -43,8 +43,9 @@ type ColumnDef = {
 
 const ESTADO_COLUMNS: ColumnDef[] = [
   { estado: "NUEVO",      title: "Nuevo",      color: "bg-indigo-500",  active: "bg-indigo-500 text-white border-indigo-500",   badge: "bg-indigo-50 text-indigo-700 border-indigo-200" },
-  { estado: "EN_PROCESO", title: "En proceso", color: "bg-blue-500",    active: "bg-blue-500 text-white border-blue-500",       badge: "bg-blue-50 text-blue-700 border-blue-200" },
-  { estado: "COTIZADO",   title: "Cotizado",   color: "bg-amber-500",   active: "bg-amber-500 text-white border-amber-500",     badge: "bg-amber-50 text-amber-700 border-amber-200" },
+  { estado: "CONTACTADO", title: "Contactado", color: "bg-blue-500",    active: "bg-blue-500 text-white border-blue-500",       badge: "bg-blue-50 text-blue-700 border-blue-200" },
+  { estado: "COTIZADO",   title: "Cotizado",   color: "bg-violet-500",  active: "bg-violet-500 text-white border-violet-500",   badge: "bg-violet-50 text-violet-700 border-violet-200" },
+  { estado: "EMITIDO",    title: "Emitido",    color: "bg-orange-500",  active: "bg-orange-500 text-white border-orange-500",   badge: "bg-orange-50 text-orange-700 border-orange-200" },
   { estado: "CERRADO",    title: "Cerrado",    color: "bg-emerald-500", active: "bg-emerald-500 text-white border-emerald-500", badge: "bg-emerald-50 text-emerald-700 border-emerald-200" },
   { estado: "PERDIDO",    title: "Perdido",    color: "bg-rose-500",    active: "bg-rose-500 text-white border-rose-500",       badge: "bg-rose-50 text-rose-700 border-rose-200" },
 ];
@@ -104,8 +105,9 @@ export default function LeadsPage() {
   const sortedByEstado = useMemo(
     () => ({
       NUEVO:      sortLeads(activeByEstado.NUEVO),
-      EN_PROCESO: sortLeads(activeByEstado.EN_PROCESO),
+      CONTACTADO: sortLeads(activeByEstado.CONTACTADO),
       COTIZADO:   sortLeads(activeByEstado.COTIZADO),
+      EMITIDO:    sortLeads(activeByEstado.EMITIDO),
       CERRADO:    sortLeads(activeByEstado.CERRADO),
       PERDIDO:    sortLeads(activeByEstado.PERDIDO),
     }),
@@ -484,8 +486,9 @@ function LeadCard({ lead, onEdit }: { lead: Lead; onEdit: (lead: Lead) => void }
     BAJA:  { bar: "bg-emerald-400", badge: "bg-emerald-50 text-emerald-700 border-emerald-200", label: "Baja" },
   };
 
-  const p   = priorityConfig[lead.prioridad] ?? priorityConfig.MEDIA;
-  const dias = diasDesde(lead.fechaCreacion);
+  const p          = priorityConfig[lead.prioridad] ?? priorityConfig.MEDIA;
+  const diasTotal  = diasDesde(lead.fechaCreacion);
+  const diasEstado = diasDesde(lead.fechaUltimoCambioEstado);
 
   return (
     <div
@@ -566,10 +569,16 @@ function LeadCard({ lead, onEdit }: { lead: Lead; onEdit: (lead: Lead) => void }
                 })}
               </span>
             </div>
-            <div className={`flex items-center gap-1 ${dias > 7 ? "text-amber-500 font-medium" : ""}`}>
+            <div className={`flex items-center gap-1 ${diasTotal > 7 ? "text-amber-500 font-medium" : ""}`}>
               <Clock className="w-3 h-3" />
-              <span>{dias}d</span>
+              <span title="Días desde creación">{diasTotal}d total</span>
             </div>
+            {diasEstado !== diasTotal && (
+              <div className={`flex items-center gap-1 ${diasEstado > 7 ? "text-amber-500 font-medium" : ""}`}>
+                <Clock className="w-3 h-3" />
+                <span title="Días en estado actual">{diasEstado}d aquí</span>
+              </div>
+            )}
             <div className="flex items-center gap-1">
               <Tag className="w-3 h-3" />
               <span className="uppercase tracking-wide">{lead.fuente?.replace(/_/g, " ")}</span>
@@ -592,8 +601,9 @@ function LeadCard({ lead, onEdit }: { lead: Lead; onEdit: (lead: Lead) => void }
 function LeadList({ leads, onEdit }: { leads: Lead[]; onEdit: (lead: Lead) => void }) {
   const estadoBadge: Record<string, string> = {
     NUEVO:      "bg-indigo-50 text-indigo-700 border-indigo-200",
-    EN_PROCESO: "bg-blue-50 text-blue-700 border-blue-200",
-    COTIZADO:   "bg-amber-50 text-amber-700 border-amber-200",
+    CONTACTADO: "bg-blue-50 text-blue-700 border-blue-200",
+    COTIZADO:   "bg-violet-50 text-violet-700 border-violet-200",
+    EMITIDO:    "bg-orange-50 text-orange-700 border-orange-200",
     CERRADO:    "bg-emerald-50 text-emerald-700 border-emerald-200",
     PERDIDO:    "bg-rose-50 text-rose-700 border-rose-200",
   };

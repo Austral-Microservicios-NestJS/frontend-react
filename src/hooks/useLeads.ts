@@ -23,8 +23,9 @@ export const useLeads = () => {
   const leadsByEstado = useMemo(() => {
     return {
       NUEVO:      leads.filter((lead) => lead.estado === "NUEVO"),
-      EN_PROCESO: leads.filter((lead) => lead.estado === "EN_PROCESO"),
+      CONTACTADO: leads.filter((lead) => lead.estado === "CONTACTADO"),
       COTIZADO:   leads.filter((lead) => lead.estado === "COTIZADO"),
+      EMITIDO:    leads.filter((lead) => lead.estado === "EMITIDO"),
       CERRADO:    leads.filter((lead) => lead.estado === "CERRADO"),
       PERDIDO:    leads.filter((lead) => lead.estado === "PERDIDO"),
     };
@@ -51,8 +52,9 @@ export const useLeads = () => {
     const filtered = filterLeads(searchQuery, tipoSeguroFilter);
     return {
       NUEVO:      filtered.filter((l) => l.estado === "NUEVO"),
-      EN_PROCESO: filtered.filter((l) => l.estado === "EN_PROCESO"),
+      CONTACTADO: filtered.filter((l) => l.estado === "CONTACTADO"),
       COTIZADO:   filtered.filter((l) => l.estado === "COTIZADO"),
+      EMITIDO:    filtered.filter((l) => l.estado === "EMITIDO"),
       CERRADO:    filtered.filter((l) => l.estado === "CERRADO"),
       PERDIDO:    filtered.filter((l) => l.estado === "PERDIDO"),
     };

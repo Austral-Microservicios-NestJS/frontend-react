@@ -139,8 +139,9 @@ export interface UpdateLead extends Partial<CreateLead> {}
 
 export enum EstadoLead {
   NUEVO = "NUEVO",
-  EN_PROCESO = "EN_PROCESO",
+  CONTACTADO = "CONTACTADO",
   COTIZADO = "COTIZADO",
+  EMITIDO = "EMITIDO",
   CERRADO = "CERRADO",
   PERDIDO = "PERDIDO",
 }
@@ -205,8 +206,9 @@ export enum TipoRiesgo {
 
 export const estadoLeadOptions = [
   { value: EstadoLead.NUEVO,      label: "Nuevo",      color: "bg-indigo-500" },
-  { value: EstadoLead.EN_PROCESO, label: "En proceso", color: "bg-blue-500" },
-  { value: EstadoLead.COTIZADO,   label: "Cotizado",   color: "bg-amber-500" },
+  { value: EstadoLead.CONTACTADO, label: "Contactado", color: "bg-blue-500" },
+  { value: EstadoLead.COTIZADO,   label: "Cotizado",   color: "bg-violet-500" },
+  { value: EstadoLead.EMITIDO,    label: "Emitido",    color: "bg-orange-500" },
   { value: EstadoLead.CERRADO,    label: "Cerrado",    color: "bg-emerald-500" },
   { value: EstadoLead.PERDIDO,    label: "Perdido",    color: "bg-rose-500" },
 ] as const;

@@ -72,8 +72,12 @@ export const RegistrarCliente = ({
     },
   });
 
-  const tipoPersona = watch("tipoPersona");
+  const tipoPersona   = watch("tipoPersona");
   const tipoDocumento = watch("tipoDocumento");
+
+  useEffect(() => {
+    setValue("numeroDocumento", "");
+  }, [tipoDocumento, setValue]);
 
   // Resetear formulario cuando el modal se cierra
   useEffect(() => {
@@ -105,9 +109,10 @@ export const RegistrarCliente = ({
   }, [isOpen, reset, initialValues, user]);
 
   const onSubmit = async (data: any) => {
+    const isNumericDoc = data.tipoDocumento === "DNI" || data.tipoDocumento === "RUC";
     const dataSubmit = {
       ...data,
-      numeroDocumento: Number(data.numeroDocumento),
+      numeroDocumento: isNumericDoc ? Number(data.numeroDocumento) : data.numeroDocumento,
       telefono1: data.telefono1 || null,
       telefono2: data.telefono2 || null,
       whatsapp: data.whatsapp || null,
@@ -203,30 +208,39 @@ export const RegistrarCliente = ({
               </Label>
               <Input
                 id="numeroDocumento"
-                type="number"
-                placeholder="Ej: 12345678"
+                type="text"
+                placeholder={
+                  tipoDocumento === "DNI"       ? "8 dígitos numéricos" :
+                  tipoDocumento === "RUC"       ? "11 dígitos (empieza con 10 o 20)" :
+                  tipoDocumento === "CE"        ? "9 a 12 caracteres" :
+                  tipoDocumento === "PASAPORTE" ? "6 a 20 caracteres" :
+                  "Número de documento"
+                }
                 {...register("numeroDocumento", {
                   required: "El número de documento es requerido",
                   validate: (value) => {
-                    const strValue = String(value);
-                    if (!tipoDocumento)
-                      return "Primero seleccione el tipo de documento";
-                    if (tipoDocumento === "DNI" && strValue.length !== 8)
-                      return "El DNI debe tener 8 dígitos";
-                    if (tipoDocumento === "RUC" && strValue.length !== 11)
-                      return "El RUC debe tener 11 dígitos";
-                    if (tipoDocumento === "CE" && strValue.length < 8)
-                      return "El Carnet de Extranjería debe tener al menos 8 caracteres";
-                    if (tipoDocumento === "PASAPORTE" && strValue.length < 6)
-                      return "El Pasaporte debe tener al menos 6 caracteres";
+                    const v = String(value).trim();
+                    if (!tipoDocumento) return "Primero seleccione el tipo de documento";
+                    if (tipoDocumento === "DNI") {
+                      if (!/^\d{8}$/.test(v)) return "El DNI debe tener exactamente 8 dígitos numéricos";
+                    }
+                    if (tipoDocumento === "RUC") {
+                      if (!/^\d{11}$/.test(v)) return "El RUC debe tener exactamente 11 dígitos numéricos";
+                      if (!v.startsWith("10") && !v.startsWith("20")) return "El RUC debe empezar con 10 (persona natural) o 20 (empresa)";
+                    }
+                    if (tipoDocumento === "CE") {
+                      if (v.length < 9 || v.length > 12) return "El Carnet de Extranjería debe tener entre 9 y 12 caracteres";
+                    }
+                    if (tipoDocumento === "PASAPORTE") {
+                      if (v.length < 6 || v.length > 20) return "El Pasaporte debe tener entre 6 y 20 caracteres";
+                    }
                     return true;
                   },
                 })}
               />
               {errors.numeroDocumento && (
                 <span className="text-sm text-red-500">
-                  {(errors.numeroDocumento.message as string) ||
-                    "El número de documento es requerido"}
+                  {errors.numeroDocumento.message as string}
                 </span>
               )}
             </FormGroup>
@@ -258,8 +272,11 @@ export const RegistrarCliente = ({
                   <Input
                     id="nombres"
                     placeholder="Ej: Juan Pedro"
-                    {...register("nombres", { required: true })}
+                    {...register("nombres", { required: "Los nombres son requeridos" })}
                   />
+                  {errors.nombres && (
+                    <span className="text-sm text-red-500">{errors.nombres.message as string}</span>
+                  )}
                 </FormGroup>
                 <FormGroup>
                   <Label htmlFor="apellidos" required>
@@ -268,8 +285,11 @@ export const RegistrarCliente = ({
                   <Input
                     id="apellidos"
                     placeholder="Ej: Pérez Gómez"
-                    {...register("apellidos", { required: true })}
+                    {...register("apellidos", { required: "Los apellidos son requeridos" })}
                   />
+                  {errors.apellidos && (
+                    <span className="text-sm text-red-500">{errors.apellidos.message as string}</span>
+                  )}
                 </FormGroup>
               </FormGroupDivisor>
             )}
