@@ -26,6 +26,7 @@ import {
   Clock,
   ArrowUp,
   ArrowDown,
+  MessageCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -344,7 +345,7 @@ export default function LeadsPage() {
             <div className="flex-1 overflow-auto min-h-0" style={{ scrollbarGutter: "stable" }}>
               <div
                 className={`flex gap-4 h-full pb-2 ${
-                  visibleColumns.length > 1 ? "min-w-[700px]" : ""
+                  visibleColumns.length > 1 ? "min-w-max" : ""
                 }`}
               >
                 {visibleColumns.map((col) => (
@@ -584,14 +585,31 @@ function LeadCard({ lead, onEdit }: { lead: Lead; onEdit: (lead: Lead) => void }
               <span className="uppercase tracking-wide">{lead.fuente?.replace(/_/g, " ")}</span>
             </div>
           </div>
-          <Link
-            to={`/dashboard/gestion-trabajo/leads/${lead.idLead}`}
-            onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-1 text-[11px] font-semibold text-white bg-[#0066CC] hover:bg-[#0052A3] px-3 py-1.5 rounded-lg transition-colors shadow-sm"
-          >
-            Ver detalle
-            <ArrowRight className="w-3 h-3" />
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              to={`/dashboard/gestion-trabajo/leads/${lead.idLead}`}
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1 text-[11px] font-semibold text-white bg-[#0066CC] hover:bg-[#0052A3] px-3 py-1.5 rounded-lg transition-colors shadow-sm"
+            >
+              Ver detalle
+              <ArrowRight className="w-3 h-3" />
+            </Link>
+            {lead.telefono && (
+              <a
+                href={`https://wa.me/${lead.telefono.replace(/\D/g, "")}?text=${encodeURIComponent(
+                  `Hola ${lead.nombre}, te contactamos de Austral Corredores de Seguros para cotizarte un seguro${lead.tipoSeguro ? ` de ${lead.tipoSeguro.replace(/_/g, " ").toLowerCase()}` : ""}. ¿Cuándo podemos hablar?`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1 text-[11px] font-semibold text-white bg-[#25D366] hover:bg-[#1ebe5b] px-3 py-1.5 rounded-lg transition-colors shadow-sm"
+                title="Cotizar por WhatsApp"
+              >
+                <MessageCircle className="w-3 h-3" />
+                Cotizar
+              </a>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -677,6 +695,20 @@ function LeadList({ leads, onEdit }: { leads: Lead[]; onEdit: (lead: Lead) => vo
                     >
                       Ver detalle
                     </Link>
+                    {lead.telefono && (
+                      <a
+                        href={`https://wa.me/${lead.telefono.replace(/\D/g, "")}?text=${encodeURIComponent(
+                          `Hola ${lead.nombre}, te contactamos de Austral Corredores de Seguros para cotizarte un seguro${lead.tipoSeguro ? ` de ${lead.tipoSeguro.replace(/_/g, " ").toLowerCase()}` : ""}. ¿Cuándo podemos hablar?`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-[#25D366] hover:text-[#1ebe5b]"
+                        title="Cotizar por WhatsApp"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        Cotizar
+                      </a>
+                    )}
                   </div>
                 </td>
               </tr>
