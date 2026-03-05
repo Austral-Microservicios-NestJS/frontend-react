@@ -19,15 +19,31 @@ export const TasksWidget = () => {
   const today = dayjs();
   const nextWeek = today.add(7, "day");
 
-  const pendingTasks = tareas
-    .filter((t) => t.estado !== "COMPLETADA")
+  const allPending = tareas.filter((t) => t.estado !== "COMPLETADA");
+
+  const pendingTasks = allPending
     .filter((t) => dayjs(t.fechaVencimiento).isBefore(nextWeek))
     .sort((a, b) => dayjs(a.fechaVencimiento).diff(dayjs(b.fechaVencimiento)))
     .slice(0, 3);
 
-  const overdueCount = pendingTasks.filter((t) =>
+  const allOverdue = allPending.filter((t) =>
     dayjs(t.fechaVencimiento).isBefore(today, "day"),
-  ).length;
+  );
+  const overdueCount = allOverdue.length;
+
+  const oldestOverdueDays =
+    overdueCount > 0
+      ? today.diff(
+          dayjs(
+            allOverdue.reduce((oldest, t) =>
+              dayjs(t.fechaVencimiento).isBefore(dayjs(oldest.fechaVencimiento))
+                ? t
+                : oldest,
+            ).fechaVencimiento,
+          ),
+          "day",
+        )
+      : 0;
 
   if (isLoading) {
     return (
@@ -154,16 +170,23 @@ export const TasksWidget = () => {
         <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <CheckSquare className="w-3.5 h-3.5 text-[#003d5c]" />
-            <span className="text-sm text-gray-400">Próximas</span>
             <span className="text-sm font-bold text-[#003d5c]">
-              {pendingTasks.length}
+              {allPending.length}
+            </span>
+            <span className="text-sm text-gray-400">
+              {allPending.length === 1 ? "pendiente" : "pendientes"}
             </span>
           </div>
           {overdueCount > 0 && (
-            <div className="flex items-center gap-1 bg-rose-50 text-rose-600 px-2 py-0.5 rounded-full">
-              <AlertCircle className="w-3 h-3" />
-              <span className="text-xs font-semibold">
-                {overdueCount} {overdueCount === 1 ? "vencida" : "vencidas"}
+            <div className="flex flex-col items-end gap-0.5">
+              <div className="flex items-center gap-1 bg-rose-50 text-rose-600 px-2 py-0.5 rounded-full">
+                <AlertCircle className="w-3 h-3" />
+                <span className="text-xs font-semibold">
+                  {overdueCount} {overdueCount === 1 ? "vencida" : "vencidas"}
+                </span>
+              </div>
+              <span className="text-[10px] text-rose-400 font-medium pr-1">
+                más antigua: {oldestOverdueDays}d de atraso
               </span>
             </div>
           )}

@@ -13,12 +13,15 @@ import {
 } from "@/components/shared";
 import { Input, Label, Checkbox } from "@/components/ui";
 import { useForm, Controller } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   tipoPersonaOptions,
   tipoDocumentoOptions,
 } from "@/types/cliente.interface";
+import type { Cliente } from "@/types/cliente.interface";
 import type { User } from "@/store/auth.store";
+import { clienteService } from "@/services/cliente.service";
+import { AlertCircle } from "lucide-react";
 
 interface RegistrarClienteProps {
   isOpen: boolean;
@@ -75,14 +78,46 @@ export const RegistrarCliente = ({
   const tipoPersona   = watch("tipoPersona");
   const tipoDocumento = watch("tipoDocumento");
 
+  const [clienteExistente, setClienteExistente] = useState<Cliente | null>(null);
+  const [checkingDoc, setCheckingDoc] = useState(false);
+
   useEffect(() => {
     setValue("numeroDocumento", "");
+    setClienteExistente(null);
   }, [tipoDocumento, setValue]);
+
+  const handleDocumentoBlur = async (numero: string) => {
+    if (!numero || numero.trim().length < 6) return;
+    setCheckingDoc(true);
+    try {
+      const found = await clienteService.findByDocumento(numero.trim());
+      setClienteExistente(found);
+      if (found) {
+        // Auto-llenar los campos con los datos del cliente encontrado
+        setValue("tipoPersona", found.tipoPersona);
+        setValue("nombres", found.nombres ?? "");
+        setValue("apellidos", found.apellidos ?? "");
+        setValue("razonSocial", found.razonSocial ?? "");
+        setValue("emailNotificaciones", found.emailNotificaciones ?? "");
+        setValue("telefono1", found.telefono1 ?? "");
+        setValue("telefono2", found.telefono2 ?? "");
+        setValue("whatsapp", found.whatsapp ?? "");
+        setValue("cumpleanos", found.cumpleanos ?? "");
+        setValue("direccion", found.direccion ?? "");
+        setValue("distrito", found.distrito ?? "");
+        setValue("provincia", found.provincia ?? "");
+        setValue("departamento", found.departamento ?? "");
+      }
+    } finally {
+      setCheckingDoc(false);
+    }
+  };
 
   // Resetear formulario cuando el modal se cierra
   useEffect(() => {
     if (!isOpen) {
       reset();
+      setClienteExistente(null);
     } else if (isOpen && initialValues) {
       reset({
         tipoPersona: "",
@@ -236,12 +271,39 @@ export const RegistrarCliente = ({
                     }
                     return true;
                   },
+                  onBlur: (e) => handleDocumentoBlur(e.target.value),
                 })}
               />
+              {checkingDoc && (
+                <span className="text-xs text-gray-400">Verificando documento...</span>
+              )}
               {errors.numeroDocumento && (
                 <span className="text-sm text-red-500">
                   {errors.numeroDocumento.message as string}
                 </span>
+              )}
+              {!checkingDoc && clienteExistente && (
+                <div className="flex items-start gap-2 mt-1 p-3 bg-amber-50 border border-amber-300 rounded-lg">
+                  <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+                  <div className="text-sm text-amber-800 leading-snug">
+                    <p className="font-semibold">
+                      ⚠️ Este prospecto ya está registrado en el sistema
+                    </p>
+                    <p className="mt-0.5">
+                      <span className="font-medium">
+                        {clienteExistente.tipoPersona === "JURIDICO"
+                          ? clienteExistente.razonSocial
+                          : `${clienteExistente.nombres ?? ""} ${clienteExistente.apellidos ?? ""}`.trim()}
+                      </span>{" "}
+                      se encuentra asignado a otro asesor de Austral.
+                    </p>
+                    <p className="mt-1 text-amber-700">
+                      Para trabajar con este cliente necesitarás la{" "}
+                      <span className="font-semibold">carta de nombramiento</span>.
+                      Se ha notificado al asesor responsable.
+                    </p>
+                  </div>
+                </div>
               )}
             </FormGroup>
 

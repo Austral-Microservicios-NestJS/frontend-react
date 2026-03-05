@@ -106,6 +106,16 @@ export const clienteService = {
     }
   },
 
+  // Buscar cliente por número de documento (DNI, RUC, CE, Pasaporte)
+  findByDocumento: async (numero: string): Promise<Cliente | null> => {
+    try {
+      const { data } = await api.get(`/clientes/documento/${encodeURIComponent(numero)}`);
+      return data ?? null;
+    } catch {
+      return null;
+    }
+  },
+
   downloadTemplate: async (): Promise<void> => {
     const response = await api.get("/clientes/plantilla/excel", {
       responseType: "blob",
