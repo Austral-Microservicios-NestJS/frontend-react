@@ -25,7 +25,9 @@ import {
   MapPin,
   Hash,
   UserPlus,
+  Download,
 } from "lucide-react";
+import * as XLSX from "xlsx";
 import days from "dayjs";
 import { useEffect, useState } from "react";
 
@@ -1601,7 +1603,34 @@ export default function LeadDetail() {
             {/* Detalle SCTR */}
             {detalleSCTR && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b border-gray-100">Detalle SCTR</h3>
+                <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-100">
+                  <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide">Detalle SCTR</h3>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const data = [
+                        ["Campo", "Valor"],
+                        ["Razón Social",            detalleSCTR.razonSocial ?? ""],
+                        ["RUC",                     detalleSCTR.rucEmpresa ?? ""],
+                        ["Número de Trabajadores",  detalleSCTR.numeroTrabajadores ?? ""],
+                        ["Planilla Mensual (S/)",    detalleSCTR.planillaMensual ?? ""],
+                        ["Actividad / Giro",        detalleSCTR.actividadEconomica ?? ""],
+                        ["Cobertura",               detalleSCTR.tipoRiesgo ?? ""],
+                      ];
+                      const ws = XLSX.utils.aoa_to_sheet(data);
+                      ws["!cols"] = [{ wch: 28 }, { wch: 45 }];
+                      const wb = XLSX.utils.book_new();
+                      XLSX.utils.book_append_sheet(wb, ws, "Ficha SCTR");
+                      const nombre = (detalleSCTR.razonSocial || detalleSCTR.rucEmpresa || "cliente").replace(/[^a-zA-Z0-9]/g, "_").substring(0, 30);
+                      XLSX.writeFile(wb, `ficha_sctr_${nombre}.xlsx`);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
+                    title="Descargar ficha SCTR en Excel"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    Descargar Excel
+                  </button>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <p className="text-xs font-semibold text-gray-500 mb-0.5">RUC Empresa</p>
@@ -1686,6 +1715,34 @@ export default function LeadDetail() {
                         }
                         className="p-1 text-gray-500 hover:text-gray-800"
                         title="Copiar número de trabajadores"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Planilla mensual (S/)</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        value={detalleSCTR.planillaMensual ?? ""}
+                        onChange={(e) =>
+                          setDetalleSCTR((d: any) => ({
+                            ...d,
+                            planillaMensual: e.target.value ? Number(e.target.value) : undefined,
+                          }))
+                        }
+                        placeholder="0.00"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigator.clipboard.writeText(String(detalleSCTR.planillaMensual ?? ""))
+                        }
+                        className="p-1 text-gray-500 hover:text-gray-800"
+                        title="Copiar planilla mensual"
                       >
                         <Copy className="w-4 h-4" />
                       </button>
