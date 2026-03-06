@@ -1,6 +1,7 @@
 import {
   Mail, Phone, Building2, DollarSign, Briefcase, Car, Heart, Shield,
-  Users, Clock, Tag, Stethoscope, FileText, HardHat, Activity
+  Users, Clock, Tag, Stethoscope, FileText, HardHat, Activity,
+  Wrench, Home, Layers, HeartPulse
 } from "lucide-react";
 import type { Lead, PrioridadLead, TipoSeguro } from "@/types/lead.interface";
 import { prioridadLeadOptions, fuenteLeadOptions, tipoSeguroOptions } from "@/types/lead.interface";
@@ -35,7 +36,7 @@ export const LeadCard = ({ lead, onEdit }: LeadCardProps) => {
     const option = tipoSeguroOptions.find((t) => t.value === tipo);
 
     // Mapear iconos según tipo
-    const iconMap = {
+    const iconMap: Record<string, typeof FileText> = {
       AUTO: Car,
       SALUD: Stethoscope,
       VIDA: Heart,
@@ -43,6 +44,11 @@ export const LeadCard = ({ lead, onEdit }: LeadCardProps) => {
       VIDA_LEY: FileText,
       EPS: Activity,
       SOAT: Shield,
+      FOLA: Briefcase,
+      TREA: Wrench,
+      HOGAR: Home,
+      MULTIRRIESGO: Layers,
+      ACCIDENTE: HeartPulse,
       OTRO: FileText,
     };
 

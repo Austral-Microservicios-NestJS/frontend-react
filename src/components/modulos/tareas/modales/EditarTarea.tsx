@@ -25,7 +25,6 @@ import {
   type Tarea,
   type UpdateTarea,
 } from "@/types/tarea.interface";
-import dayjs from "dayjs";
 
 interface EditarTareaProps {
   isOpen: boolean;
