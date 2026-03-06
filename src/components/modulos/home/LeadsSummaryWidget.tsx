@@ -1,8 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { useLeads } from "@/hooks/useLeads";
-import { Users, ArrowRight, TrendingUp, Flame } from "lucide-react";
+import { Users, ArrowRight, TrendingUp, Flame, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import dayjs from "dayjs";
 
 const STATUS_CONFIG = [
   {
@@ -79,6 +80,21 @@ export const LeadsSummaryWidget = () => {
       : "0.0";
 
   const hotLeads = leadsByEstado.NUEVO.length;
+
+  const today = dayjs();
+  const stuckLeads = [...leadsByEstado.NUEVO, ...leadsByEstado.CONTACTADO].filter(
+    (lead) => lead.fechaUltimoCambioEstado &&
+      today.diff(dayjs(lead.fechaUltimoCambioEstado.substring(0, 10)), "day") > 7,
+  );
+  const stuckCount = stuckLeads.length;
+  const oldestStuckDays =
+    stuckCount > 0
+      ? Math.max(
+          ...stuckLeads.map((l) =>
+            today.diff(dayjs(l.fechaUltimoCambioEstado.substring(0, 10)), "day"),
+          ),
+        )
+      : 0;
 
   if (isLoading) {
     return (
@@ -201,14 +217,26 @@ export const LeadsSummaryWidget = () => {
               {tasaConversion}%
             </span>
           </div>
-          {hotLeads > 0 && (
+          {stuckCount > 0 ? (
+            <div className="flex flex-col items-end gap-0.5">
+              <div className="flex items-center gap-1 bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full">
+                <AlertTriangle className="w-3 h-3" />
+                <span className="text-xs font-semibold">
+                  {stuckCount} {stuckCount === 1 ? "estancado" : "estancados"}
+                </span>
+              </div>
+              <span className="text-[10px] text-orange-400 font-medium pr-1">
+                más antiguo: {oldestStuckDays}d sin avanzar
+              </span>
+            </div>
+          ) : hotLeads > 0 ? (
             <div className="flex items-center gap-1 bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full">
               <Flame className="w-3 h-3" />
               <span className="text-xs font-semibold">
                 {hotLeads} {hotLeads === 1 ? "nuevo" : "nuevos"}
               </span>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </Card>

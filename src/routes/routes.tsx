@@ -1,7 +1,7 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 
 // Importar roles
-import { Roles } from "@/utils/roles";
+import { Roles, RoleGroups } from "@/utils/roles";
 
 // Componente de protección de rutas
 import ProtectedRoute from "@/routes/ProtectedRoute";
@@ -11,7 +11,6 @@ import { Sidebar } from "@/components/sidebar/Sidebar";
 import LoginPage from "@/pages/auth/login/LoginPage";
 import Home from "@/pages/shared/home/Home";
 import CompaniasPage from "@/pages/admin/maestros/companias/CompaniasPage";
-import ActividadesPage from "@/pages/shared/gestion-trabajo/actividades/ActividadesPage";
 import TareasPage from "@/pages/shared/gestion-trabajo/tareas/TareasPage";
 import ObservacionPage from "@/pages/shared/gestion-trabajo/observacion/ObservacionPage";
 import ClientesPage from "@/pages/shared/gestion-trabajo/clientes/ClientesPage";
@@ -34,8 +33,6 @@ import ClientePolizasPage from "@/pages/shared/gestion-trabajo/clientes/[id]/pol
 import ClienteInversionesPage from "@/pages/shared/gestion-trabajo/clientes/[id]/inversiones/ClienteInversionesPage";
 import PolizaSiniestrosPage from "@/pages/shared/gestion-trabajo/clientes/[id]/polizas/[polizaId]/siniestros/PolizaSiniestrosPage";
 import RamoProductosPage from "@/pages/admin/maestros/ramos/[id]/productos/RamoProductosPage";
-
-import GestionComercialPage from "@/pages/shared/gestion-trabajo/gestion-comercial/GestionComercialPage";
 
 // Componentes de Broker
 import AgentesPage from "@/pages/broker/agentes/AgentesPage";
@@ -82,9 +79,7 @@ const router = createBrowserRouter([
       {
         path: "general/mapa",
         element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
+          <ProtectedRoute requiredRoles={RoleGroups.TODOS_CRM}>
             <MapaPage />
           </ProtectedRoute>
         ),
@@ -92,20 +87,12 @@ const router = createBrowserRouter([
       // Seccion de gestion de trabajo - Modulos compartidos
       {
         path: "gestion-trabajo/actividades",
-        element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
-            <ActividadesPage />
-          </ProtectedRoute>
-        ),
+        element: <Navigate to="/dashboard/gestion-trabajo/tareas" replace />,
       },
       {
         path: "gestion-trabajo/tareas",
         element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
+          <ProtectedRoute requiredRoles={RoleGroups.TODOS_CRM}>
             <TareasPage />
           </ProtectedRoute>
         ),
@@ -113,9 +100,7 @@ const router = createBrowserRouter([
       {
         path: "gestion-trabajo/observaciones",
         element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
+          <ProtectedRoute requiredRoles={RoleGroups.TODOS_CRM}>
             <ObservacionPage />
           </ProtectedRoute>
         ),
@@ -123,9 +108,7 @@ const router = createBrowserRouter([
       {
         path: "gestion-trabajo/clientes",
         element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
+          <ProtectedRoute requiredRoles={RoleGroups.TODOS_CRM}>
             <ClientesPage />
           </ProtectedRoute>
         ),
@@ -133,9 +116,7 @@ const router = createBrowserRouter([
       {
         path: "gestion-trabajo/clientes/:id/polizas",
         element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
+          <ProtectedRoute requiredRoles={RoleGroups.SIN_VENDEDOR}>
             <ClientePolizasPage />
           </ProtectedRoute>
         ),
@@ -143,9 +124,7 @@ const router = createBrowserRouter([
       {
         path: "gestion-trabajo/clientes/:id/inversiones",
         element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
+          <ProtectedRoute requiredRoles={RoleGroups.SIN_VENDEDOR}>
             <ClienteInversionesPage />
           </ProtectedRoute>
         ),
@@ -153,9 +132,7 @@ const router = createBrowserRouter([
       {
         path: "gestion-trabajo/clientes/:id/polizas/:polizaId/siniestros",
         element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
+          <ProtectedRoute requiredRoles={RoleGroups.SIN_VENDEDOR}>
             <PolizaSiniestrosPage />
           </ProtectedRoute>
         ),
@@ -163,9 +140,7 @@ const router = createBrowserRouter([
       {
         path: "gestion-trabajo/leads",
         element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
+          <ProtectedRoute requiredRoles={RoleGroups.CON_REFERENCIADOR}>
             <LeadsPage />
           </ProtectedRoute>
         ),
@@ -173,9 +148,7 @@ const router = createBrowserRouter([
       {
         path: "gestion-trabajo/leads/:id",
         element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
+          <ProtectedRoute requiredRoles={RoleGroups.CON_REFERENCIADOR}>
             <LeadDetail />
           </ProtectedRoute>
         ),
@@ -183,30 +156,20 @@ const router = createBrowserRouter([
       {
         path: "gestion-trabajo/polizas",
         element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
+          <ProtectedRoute requiredRoles={RoleGroups.SIN_VENDEDOR}>
             <PolizasPage />
           </ProtectedRoute>
         ),
       },
       {
         path: "gestion-trabajo/gestion-comercial",
-        element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
-            <GestionComercialPage />
-          </ProtectedRoute>
-        ),
+        element: <Navigate to="/dashboard/gestion-trabajo/tareas" replace />,
       },
       // Seccion de Control y Seguimiento
       {
         path: "control-seguimiento/siniestros",
         element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
+          <ProtectedRoute requiredRoles={RoleGroups.SIN_VENDEDOR}>
             <SiniestrosPage />
           </ProtectedRoute>
         ),
@@ -214,9 +177,7 @@ const router = createBrowserRouter([
       {
         path: "control-seguimiento/comisiones",
         element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
+          <ProtectedRoute requiredRoles={RoleGroups.SIN_VENDEDOR}>
             <ComisionesPage />
           </ProtectedRoute>
         ),
@@ -224,9 +185,7 @@ const router = createBrowserRouter([
       {
         path: "control-seguimiento/cobranzas",
         element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
+          <ProtectedRoute requiredRoles={RoleGroups.SIN_VENDEDOR}>
             <CobranzasPage />
           </ProtectedRoute>
         ),
@@ -236,7 +195,7 @@ const router = createBrowserRouter([
       {
         path: "admin/maestros/companias",
         element: (
-          <ProtectedRoute requiredRoles={[Roles.ADMINISTRADOR]}>
+          <ProtectedRoute requiredRoles={RoleGroups.SOLO_ADMIN}>
             <CompaniasPage />
           </ProtectedRoute>
         ),
@@ -244,7 +203,7 @@ const router = createBrowserRouter([
       {
         path: "admin/maestros/ramos",
         element: (
-          <ProtectedRoute requiredRoles={[Roles.ADMINISTRADOR]}>
+          <ProtectedRoute requiredRoles={RoleGroups.SOLO_ADMIN}>
             <RamosPage />
           </ProtectedRoute>
         ),
@@ -252,7 +211,7 @@ const router = createBrowserRouter([
       {
         path: "admin/maestros/ramos/:id/productos",
         element: (
-          <ProtectedRoute requiredRoles={[Roles.ADMINISTRADOR]}>
+          <ProtectedRoute requiredRoles={RoleGroups.SOLO_ADMIN}>
             <RamoProductosPage />
           </ProtectedRoute>
         ),
@@ -260,7 +219,7 @@ const router = createBrowserRouter([
       {
         path: "admin/maestros/usuarios",
         element: (
-          <ProtectedRoute requiredRoles={[Roles.ADMINISTRADOR]}>
+          <ProtectedRoute requiredRoles={[Roles.ADMIN_GENERAL, Roles.BROKER_JURIDICO]}>
             <UsuariosPage />
           </ProtectedRoute>
         ),
@@ -271,7 +230,7 @@ const router = createBrowserRouter([
       {
         path: "broker/agentes",
         element: (
-          <ProtectedRoute requiredRoles={[Roles.BROKER]}>
+          <ProtectedRoute requiredRoles={RoleGroups.SOLO_BROKER_JURIDICO}>
             <AgentesPage />
           </ProtectedRoute>
         ),
@@ -281,9 +240,7 @@ const router = createBrowserRouter([
       {
         path: "agentes-ia/austral-ai",
         element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
+          <ProtectedRoute requiredRoles={RoleGroups.TODOS_CRM}>
             <AustralAIPage />
           </ProtectedRoute>
         ),
@@ -291,19 +248,15 @@ const router = createBrowserRouter([
       {
         path: "agentes-ia/insights",
         element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
+          <ProtectedRoute requiredRoles={RoleGroups.TODOS_CRM}>
             <InsightsPage />
           </ProtectedRoute>
         ),
       },
       {
-        path: "agentes-ia/documentos", // Modulo principal, desde aqui se accede a los modulos de documentos especificos
+        path: "agentes-ia/documentos",
         element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
+          <ProtectedRoute requiredRoles={RoleGroups.TODOS_CRM}>
             <AgentesDocumentosPage />
           </ProtectedRoute>
         ),
@@ -311,9 +264,7 @@ const router = createBrowserRouter([
       {
         path: "agentes-ia/agente-dni",
         element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
+          <ProtectedRoute requiredRoles={RoleGroups.TODOS_CRM}>
             <AgenteDniPage />
           </ProtectedRoute>
         ),
@@ -321,9 +272,7 @@ const router = createBrowserRouter([
       {
         path: "agentes-ia/agente-facturas",
         element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
+          <ProtectedRoute requiredRoles={RoleGroups.TODOS_CRM}>
             <AgenteFacturaPage />
           </ProtectedRoute>
         ),
@@ -331,19 +280,17 @@ const router = createBrowserRouter([
       {
         path: "agentes-ia/agente-polizas",
         element: (
-          <ProtectedRoute
-            requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER, Roles.AGENTE]}
-          >
+          <ProtectedRoute requiredRoles={RoleGroups.TODOS_CRM}>
             <AgentePolizaPage />
           </ProtectedRoute>
         ),
       },
 
-      // Seccion de informacion extra solo de vista para Brokers y Agentes
+      // Seccion de informacion extra solo de vista para Brokers
       {
         path: "informacion-extra/companias",
         element: (
-          <ProtectedRoute requiredRoles={[Roles.BROKER, Roles.AGENTE]}>
+          <ProtectedRoute requiredRoles={RoleGroups.BROKERS_E_INFO}>
             <CompaniasExtraPage />
           </ProtectedRoute>
         ),

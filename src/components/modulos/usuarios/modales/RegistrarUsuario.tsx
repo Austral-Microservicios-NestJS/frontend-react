@@ -18,6 +18,7 @@ import {
 } from "@/components/ui";
 import { useForm, Controller } from "react-hook-form";
 import type { User } from "@/store/auth.store";
+import { Roles } from "@/utils/roles";
 import {
   tipoDocumentoOptions,
   type CreateUsuario,
@@ -41,9 +42,12 @@ export const RegistrarUsuario = ({
   user,
   addUsuario,
 }: RegistrarUsuarioProps) => {
-  const isBroker = user?.rol?.nombreRol?.toUpperCase() === "BROKER";
-  const availableRoles = isBroker
-    ? roles.filter((role) => role.nombreRol?.toUpperCase() === "VENDEDOR")
+  // BROKER_JURIDICO solo puede crear usuarios de su red (BROKER_NATURAL, VENDEDOR, REFERENCIADOR)
+  const isBrokerJuridico = user?.rol?.nombreRol === Roles.BROKER_JURIDICO;
+  const availableRoles = isBrokerJuridico
+    ? roles.filter((role) =>
+        [Roles.BROKER_NATURAL, Roles.VENDEDOR, Roles.REFERENCIADOR].includes(role.nombreRol)
+      )
     : roles;
   const {
     register,

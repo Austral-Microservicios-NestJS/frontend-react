@@ -22,12 +22,12 @@ export const TasksWidget = () => {
   const allPending = tareas.filter((t) => t.estado !== "COMPLETADA");
 
   const pendingTasks = allPending
-    .filter((t) => dayjs(t.fechaVencimiento).isBefore(nextWeek))
-    .sort((a, b) => dayjs(a.fechaVencimiento).diff(dayjs(b.fechaVencimiento)))
+    .filter((t) => dayjs(t.fechaVencimiento.substring(0, 10)).isBefore(nextWeek))
+    .sort((a, b) => dayjs(a.fechaVencimiento.substring(0, 10)).diff(dayjs(b.fechaVencimiento.substring(0, 10))))
     .slice(0, 3);
 
   const allOverdue = allPending.filter((t) =>
-    dayjs(t.fechaVencimiento).isBefore(today, "day"),
+    dayjs(t.fechaVencimiento.substring(0, 10)).isBefore(today, "day"),
   );
   const overdueCount = allOverdue.length;
 
@@ -36,10 +36,10 @@ export const TasksWidget = () => {
       ? today.diff(
           dayjs(
             allOverdue.reduce((oldest, t) =>
-              dayjs(t.fechaVencimiento).isBefore(dayjs(oldest.fechaVencimiento))
+              dayjs(t.fechaVencimiento.substring(0, 10)).isBefore(dayjs(oldest.fechaVencimiento.substring(0, 10)))
                 ? t
                 : oldest,
-            ).fechaVencimiento,
+            ).fechaVencimiento.substring(0, 10),
           ),
           "day",
         )
@@ -115,7 +115,7 @@ export const TasksWidget = () => {
               );
             }
 
-            const dueDate = dayjs(tarea.fechaVencimiento);
+            const dueDate = dayjs(tarea.fechaVencimiento.substring(0, 10));
             const isOverdue = dueDate.isBefore(today, "day");
             const isToday = dueDate.isSame(today, "day");
             const cfg =

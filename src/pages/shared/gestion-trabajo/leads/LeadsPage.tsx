@@ -4,7 +4,7 @@ import { useSidebar } from "@/hooks/useSidebar";
 import { RegistrarLead } from "@/components/modulos/leads/modales/RegistrarLead";
 import { useLeads } from "@/hooks/useLeads";
 import type { Lead, CreateLead } from "@/types/lead.interface";
-import { EstadoLead, tipoSeguroOptions } from "@/types/lead.interface";
+import { EstadoLead, TipoSeguro, tipoSeguroOptions } from "@/types/lead.interface";
 import {
   LayoutGrid,
   List,
@@ -53,6 +53,14 @@ const ESTADO_COLUMNS: ColumnDef[] = [
 
 function diasDesde(fecha: string): number {
   return Math.floor((Date.now() - new Date(fecha).getTime()) / (1000 * 60 * 60 * 24));
+}
+
+function getDisplayTipoSeguro(lead: Lead): string {
+  if (lead.tipoSeguro !== TipoSeguro.OTRO) {
+    return lead.tipoSeguro.replace(/_/g, " ").toLowerCase();
+  }
+  const match = lead.notas?.match(/^\[Tipo: (.+?)\]/);
+  return match ? match[1] : "otro tipo de seguro";
 }
 
 export default function LeadsPage() {
@@ -597,7 +605,7 @@ function LeadCard({ lead, onEdit }: { lead: Lead; onEdit: (lead: Lead) => void }
             {lead.telefono && (
               <a
                 href={`https://wa.me/${lead.telefono.replace(/\D/g, "")}?text=${encodeURIComponent(
-                  `Hola ${lead.nombre}, te contactamos de Austral Corredores de Seguros para cotizarte un seguro${lead.tipoSeguro ? ` de ${lead.tipoSeguro.replace(/_/g, " ").toLowerCase()}` : ""}. ¿Cuándo podemos hablar?`
+                  `Hola ${lead.nombre}, te contactamos de Austral Corredores de Seguros para cotizarte un seguro de ${getDisplayTipoSeguro(lead)}. ¿Cuándo podemos hablar?`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -698,7 +706,7 @@ function LeadList({ leads, onEdit }: { leads: Lead[]; onEdit: (lead: Lead) => vo
                     {lead.telefono && (
                       <a
                         href={`https://wa.me/${lead.telefono.replace(/\D/g, "")}?text=${encodeURIComponent(
-                          `Hola ${lead.nombre}, te contactamos de Austral Corredores de Seguros para cotizarte un seguro${lead.tipoSeguro ? ` de ${lead.tipoSeguro.replace(/_/g, " ").toLowerCase()}` : ""}. ¿Cuándo podemos hablar?`
+                          `Hola ${lead.nombre}, te contactamos de Austral Corredores de Seguros para cotizarte un seguro de ${getDisplayTipoSeguro(lead)}. ¿Cuándo podemos hablar?`
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"

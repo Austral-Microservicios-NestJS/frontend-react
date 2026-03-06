@@ -50,7 +50,7 @@ export const EditarTarea = ({
       asunto: tarea.asunto,
       descripcion: tarea.descripcion || "",
       tipoTarea: tarea.tipoTarea,
-      fechaVencimiento: dayjs(tarea.fechaVencimiento).format("YYYY-MM-DD"),
+      fechaVencimiento: tarea.fechaVencimiento.substring(0, 10),
       prioridad: tarea.prioridad,
       estado: tarea.estado,
     },

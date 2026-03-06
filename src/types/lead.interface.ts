@@ -174,6 +174,10 @@ export enum TipoSeguro {
   VIDA_LEY = "VIDA_LEY",
   EPS = "EPS",
   SOAT = "SOAT",
+  TREA = "TREA",
+  HOGAR = "HOGAR",
+  MULTIRRIESGO = "MULTIRRIESGO",
+  ACCIDENTE = "ACCIDENTE",
   OTRO = "OTRO",
 }
 
@@ -234,12 +238,16 @@ export const fuenteLeadOptions = [
 ] as const;
 
 export const tipoSeguroOptions = [
-  { value: TipoSeguro.AUTO, label: "Seguro de Auto" },
-  { value: TipoSeguro.SALUD, label: "Seguro de Salud" },
-  { value: TipoSeguro.VIDA, label: "Seguro de Vida" },
-  { value: TipoSeguro.SCTR, label: "SCTR" },
-  { value: TipoSeguro.VIDA_LEY, label: "Vida Ley" },
-  { value: TipoSeguro.EPS, label: "EPS" },
-  { value: TipoSeguro.SOAT, label: "SOAT" },
-  { value: TipoSeguro.OTRO, label: "Otro" },
+  { value: TipoSeguro.AUTO,         label: "Seguro de Auto" },
+  { value: TipoSeguro.SALUD,        label: "Seguro de Salud" },
+  { value: TipoSeguro.VIDA,         label: "Seguro de Vida" },
+  { value: TipoSeguro.SCTR,         label: "SCTR" },
+  { value: TipoSeguro.VIDA_LEY,     label: "Vida Ley" },
+  { value: TipoSeguro.EPS,          label: "EPS" },
+  { value: TipoSeguro.SOAT,         label: "SOAT" },
+  { value: TipoSeguro.TREA,         label: "TREA (Todo Riesgo Equipo Contratistas)" },
+  { value: TipoSeguro.HOGAR,        label: "Hogar" },
+  { value: TipoSeguro.MULTIRRIESGO, label: "Multirriesgo" },
+  { value: TipoSeguro.ACCIDENTE,    label: "Accidentes Personales" },
+  { value: TipoSeguro.OTRO,         label: "Otro" },
 ] as const;

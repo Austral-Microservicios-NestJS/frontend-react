@@ -12,6 +12,7 @@ import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { clienteService } from "@/services/cliente.service";
 import type { Cliente, UpdateCliente } from "@/types/cliente.interface";
+import { Roles } from "@/utils/roles";
 
 export default function ClientesPage() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
@@ -25,10 +26,21 @@ export default function ClientesPage() {
   >(undefined);
   const { user } = useAuthStore();
 
-  // Obtener clientes con paginación
-  const { data, isLoading } = clienteService.useGetAll({ page, limit });
-  const clientes = data?.data || [];
-  const meta = data?.meta || { total: 0, totalPages: 0, page: 1, limit: 30 };
+  const rol = user?.rol?.nombreRol;
+  const isAdmin = rol === Roles.ADMIN_GENERAL;
+  const isBrokerJuridico = rol === Roles.BROKER_JURIDICO;
+
+  // Always call both hooks (React rules — no conditional hooks)
+  const { data: allData, isLoading: allLoading } = clienteService.useGetAll({ page, limit });
+  const { data: ownClientes, isLoading: ownLoading } = clienteService.useGetByUsuario(
+    !isAdmin ? (user?.idUsuario || "") : "",
+    // BROKER_JURIDICO pasa su rol para que el backend devuelva clientes de toda su red
+    isBrokerJuridico ? "BROKER_JURIDICO" : undefined,
+  );
+
+  const isLoading = isAdmin ? allLoading : ownLoading;
+  const clientes: Cliente[] = isAdmin ? (allData?.data || []) : (ownClientes || []);
+  const meta = allData?.meta || { total: 0, totalPages: 0, page: 1, limit: 30 };
 
   const { addCliente, updateCliente, importarClientes } = useClientes();
   const location = useLocation();
@@ -105,13 +117,13 @@ export default function ClientesPage() {
         <TablaClientes
           clientes={clientes}
           onEdit={handleEdit}
-          serverPagination={{
+          serverPagination={isAdmin ? {
             currentPage: page,
             totalPages: meta.totalPages,
             totalRecords: meta.total,
             onPageChange: setPage,
             isLoading: false,
-          }}
+          } : undefined}
         />
       )}
 

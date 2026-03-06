@@ -70,7 +70,7 @@ export const TareasGrid = ({ tareas, onEdit, onDelete }: Props) => {
   };
 
   const isVencida = (fechaVencimiento: string) => {
-    return new Date(fechaVencimiento) < new Date();
+    return new Date(fechaVencimiento.substring(0, 10) + "T12:00:00") < new Date();
   };
 
   return (
@@ -131,7 +131,7 @@ export const TareasGrid = ({ tareas, onEdit, onDelete }: Props) => {
                 }`}
               >
                 Vence:{" "}
-                {new Date(tarea.fechaVencimiento).toLocaleDateString("es-PE")}
+                {new Date(tarea.fechaVencimiento.substring(0, 10) + "T12:00:00").toLocaleDateString("es-PE")}
                 {vencida && tarea.estado !== "COMPLETADA" && (
                   <span className="ml-2 text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded-full">
                     Vencida
@@ -150,7 +150,7 @@ export const TareasGrid = ({ tareas, onEdit, onDelete }: Props) => {
               </div>
 
               <div className="text-xs text-gray-400">
-                {new Date(tarea.fechaCreacion).toLocaleDateString("es-PE")}
+                {new Date(tarea.fechaCreacion.substring(0, 10) + "T12:00:00").toLocaleDateString("es-PE")}
               </div>
             </div>
           </div>

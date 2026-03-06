@@ -3,22 +3,30 @@ import { toast } from "sonner";
 import { leadService } from "@/services/lead.service";
 import type { CreateLead, UpdateLead, EstadoLead } from "@/types/lead.interface";
 import { useAuthStore } from "@/store/auth.store";
+import { Roles } from "@/utils/roles";
 
 export const useLeads = () => {
-  const { } = useAuthStore();
+  const { user } = useAuthStore();
   const { data: allLeads = [], isLoading, error } = leadService.useGetAll();
   const createMutation = leadService.useCreate();
   const updateMutation = leadService.useUpdate();
   const deleteMutation = leadService.useDelete();
 
-  // Validar que allLeads sea un array
+  const rol = user?.rol?.nombreRol;
+  // VENDEDOR y REFERENCIADOR solo ven los leads asignados a ellos
+  const isLimitedRole = rol === Roles.VENDEDOR || rol === Roles.REFERENCIADOR;
+
+  // Validar que allLeads sea un array y filtrar por rol si corresponde
   const leads = useMemo(() => {
     if (!Array.isArray(allLeads)) {
       console.warn("allLeads no es un array:", allLeads);
       return [];
     }
+    if (isLimitedRole) {
+      return allLeads.filter((lead) => lead.asignadoA === user?.nombreUsuario);
+    }
     return allLeads;
-  }, [allLeads]);
+  }, [allLeads, isLimitedRole, user?.nombreUsuario]);
 
   const leadsByEstado = useMemo(() => {
     return {

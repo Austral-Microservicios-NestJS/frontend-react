@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Car, Stethoscope, Heart, HardHat, FileText, Activity, Shield } from "lucide-react";
+import { Car, Stethoscope, Heart, HardHat, FileText, Activity, Shield, Wrench, Home, Layers, HeartPulse } from "lucide-react";
 import {
   Modal,
   ModalBody,
@@ -43,6 +43,8 @@ export const RegistrarLead = ({
   onSubmit,
   leadToEdit,
 }: RegistrarLeadProps) => {
+  const [otroSeguro, setOtroSeguro] = useState("");
+
   const {
     register,
     handleSubmit,
@@ -72,8 +74,18 @@ export const RegistrarLead = ({
       setValue("prioridad", leadToEdit.prioridad);
       setValue("tipoSeguro", leadToEdit.tipoSeguro);
       setValue("valorEstimado", leadToEdit.valorEstimado || "");
-      setValue("notas", leadToEdit.notas || "");
+      // Extract otroSeguro from notas if present
+      const notasVal = leadToEdit.notas || "";
+      const match = notasVal.match(/^\[Tipo: (.+?)\]\n?/);
+      if (match) {
+        setOtroSeguro(match[1]);
+        setValue("notas", notasVal.replace(/^\[Tipo: .+?\]\n?/, ""));
+      } else {
+        setOtroSeguro("");
+        setValue("notas", notasVal);
+      }
     } else {
+      setOtroSeguro("");
       reset({
         estado: EstadoLead.NUEVO,
         prioridad: PrioridadLead.MEDIA,
@@ -85,8 +97,12 @@ export const RegistrarLead = ({
 
   const handleFormSubmit = async (data: CreateLead) => {
     try {
+      if (data.tipoSeguro === TipoSeguro.OTRO && otroSeguro.trim()) {
+        data.notas = `[Tipo: ${otroSeguro.trim()}]\n${data.notas || ""}`.trimEnd();
+      }
       await onSubmit(data);
       reset();
+      setOtroSeguro("");
       onClose();
     } catch (error) {
       console.error("Error al guardar lead:", error);
@@ -95,6 +111,7 @@ export const RegistrarLead = ({
 
   const handleClose = () => {
     reset();
+    setOtroSeguro("");
     onClose();
   };
 
@@ -106,14 +123,18 @@ export const RegistrarLead = ({
   // Mapear iconos para tipos de seguro
   const getTipoSeguroIcon = (tipo: string) => {
     const iconMap: Record<string, any> = {
-      AUTO: Car,
-      SALUD: Stethoscope,
-      VIDA: Heart,
-      SCTR: HardHat,
-      VIDA_LEY: FileText,
-      EPS: Activity,
-      SOAT: Shield,
-      OTRO: FileText,
+      AUTO:         Car,
+      SALUD:        Stethoscope,
+      VIDA:         Heart,
+      SCTR:         HardHat,
+      VIDA_LEY:     FileText,
+      EPS:          Activity,
+      SOAT:         Shield,
+      TREA:         Wrench,
+      HOGAR:        Home,
+      MULTIRRIESGO: Layers,
+      ACCIDENTE:    HeartPulse,
+      OTRO:         FileText,
     };
     return iconMap[tipo] || FileText;
   };
@@ -219,6 +240,18 @@ export const RegistrarLead = ({
                   </SelectContent>
                 </Select>
               </div>
+
+              {tipoSeguro === TipoSeguro.OTRO && (
+                <div className="md:col-span-2">
+                  <Label htmlFor="otroSeguro">Especifica el tipo de seguro</Label>
+                  <Input
+                    id="otroSeguro"
+                    placeholder="Especifica el tipo de seguro"
+                    value={otroSeguro}
+                    onChange={(e) => setOtroSeguro(e.target.value)}
+                  />
+                </div>
+              )}
 
               <div>
                 <Label htmlFor="fuente">
