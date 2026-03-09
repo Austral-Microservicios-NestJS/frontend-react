@@ -270,17 +270,26 @@ export const LeadCard = ({ lead, onEdit }: LeadCardProps) => {
         </div>
 
         {/* Botón de Cotizar */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            // TODO: Implementar lógica de cotización
-            console.log("Cotizar lead:", lead.idLead);
-          }}
-          className="w-full bg-[#0066CC] hover:bg-[#0052A3] text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
-        >
-          <DollarSign className="w-4 h-4" />
-          <span>Cotizar</span>
-        </button>
+        {(() => {
+          const inactivo = ['COTIZADO', 'EMITIDO', 'CERRADO', 'PERDIDO'].includes(lead.estado);
+          return (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!inactivo) console.log("Cotizar lead:", lead.idLead);
+              }}
+              disabled={inactivo}
+              className={`w-full text-sm font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-sm ${
+                inactivo
+                  ? "bg-rose-100 text-rose-400 cursor-not-allowed"
+                  : "bg-[#0066CC] hover:bg-[#0052A3] text-white hover:shadow-md"
+              }`}
+            >
+              <DollarSign className="w-4 h-4" />
+              <span>Cotizar</span>
+            </button>
+          );
+        })()}
       </div>
 
     </div>
