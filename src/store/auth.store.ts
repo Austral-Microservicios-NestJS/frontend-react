@@ -2,6 +2,13 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import Cookies from 'js-cookie';
 
+const LEGACY_ROLE_MAP: Record<string, string> = {
+  'ADMIN_GENERAL':   'ADMINISTRADOR',
+  'BROKER_JURIDICO': 'BROKER',
+  'BROKER_NATURAL':  'EJECUTIVO_CUENTA',
+  'VENDEDOR':        'PROMOTOR_VENTA',
+};
+
 export interface User {
     idUsuario: string;
     correo: string;
@@ -34,11 +41,16 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             login: (user, token) => {
                 Cookies.set('auth-token', token, {
-                    expires: 7, // 7 días (js-cookie uses days)
+                    expires: 7,
                     path: '/',
                     sameSite: 'lax',
                 });
-                set({ user, isAuthenticated: true });
+                // Normalizar rol legacy en el momento del login
+                const rol = user.rol;
+                const normalizedUser = rol && LEGACY_ROLE_MAP[rol.nombreRol]
+                    ? { ...user, rol: { ...rol, nombreRol: LEGACY_ROLE_MAP[rol.nombreRol] } }
+                    : user;
+                set({ user: normalizedUser, isAuthenticated: true });
             },
             logout: () => {
                 Cookies.remove('auth-token');
@@ -49,12 +61,17 @@ export const useAuthStore = create<AuthState>()(
                 const token = Cookies.get('auth-token');
                 const state = get();
 
-                // Si hay token pero no hay usuario en el estado, significa que se recargó la página
-                // El estado persistido de Zustand debería tener el usuario
                 if (token && state.user) {
-                    set({ isAuthenticated: true });
+                    // Normalizar nombre de rol legacy si es necesario
+                    const rol = state.user.rol;
+                    const normalizedRol = rol && LEGACY_ROLE_MAP[rol.nombreRol]
+                        ? { ...rol, nombreRol: LEGACY_ROLE_MAP[rol.nombreRol] }
+                        : rol;
+                    set({
+                        user: { ...state.user, rol: normalizedRol },
+                        isAuthenticated: true,
+                    });
                 } else if (!token) {
-                    // Si no hay token, limpiar el estado
                     set({ user: null, isAuthenticated: false });
                 }
             },
