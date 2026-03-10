@@ -27,15 +27,17 @@ export default function ClientesPage() {
   const { user } = useAuthStore();
 
   const rol = user?.rol?.nombreRol;
-  const isAdmin = rol === Roles.ADMIN_GENERAL;
-  const isBrokerJuridico = rol === Roles.BROKER_JURIDICO;
+  // ADMINISTRADOR usa paginación server-side con todos los clientes
+  const isAdmin = rol === Roles.ADMINISTRADOR;
+  // EJECUTIVO_CUENTA y BROKER también ven todos los clientes via useGetByUsuario con rol
+  const isNivelAlto = rol === Roles.EJECUTIVO_CUENTA || rol === Roles.BROKER;
 
   // Always call both hooks (React rules — no conditional hooks)
   const { data: allData, isLoading: allLoading } = clienteService.useGetAll({ page, limit });
   const { data: ownClientes, isLoading: ownLoading } = clienteService.useGetByUsuario(
     !isAdmin ? (user?.idUsuario || "") : "",
-    // BROKER_JURIDICO pasa su rol para que el backend devuelva clientes de toda su red
-    isBrokerJuridico ? "BROKER_JURIDICO" : undefined,
+    // EJECUTIVO_CUENTA y BROKER pasan su rol para que el backend devuelva todos los clientes
+    isNivelAlto ? rol : undefined,
   );
 
   const isLoading = isAdmin ? allLoading : ownLoading;

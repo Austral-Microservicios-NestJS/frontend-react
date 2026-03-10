@@ -219,7 +219,7 @@ const router = createBrowserRouter([
       {
         path: "admin/maestros/usuarios",
         element: (
-          <ProtectedRoute requiredRoles={[Roles.ADMIN_GENERAL, Roles.BROKER_JURIDICO]}>
+          <ProtectedRoute requiredRoles={[Roles.ADMINISTRADOR, Roles.BROKER]}>
             <UsuariosPage />
           </ProtectedRoute>
         ),
@@ -230,7 +230,7 @@ const router = createBrowserRouter([
       {
         path: "broker/agentes",
         element: (
-          <ProtectedRoute requiredRoles={RoleGroups.SOLO_BROKER_JURIDICO}>
+          <ProtectedRoute requiredRoles={[Roles.BROKER]}>
             <AgentesPage />
           </ProtectedRoute>
         ),

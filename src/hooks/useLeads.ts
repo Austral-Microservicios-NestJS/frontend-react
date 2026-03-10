@@ -13,8 +13,11 @@ export const useLeads = () => {
   const deleteMutation = leadService.useDelete();
 
   const rol = user?.rol?.nombreRol;
-  // VENDEDOR y REFERENCIADOR solo ven los leads asignados a ellos
-  const isLimitedRole = rol === Roles.VENDEDOR || rol === Roles.REFERENCIADOR;
+  // PROMOTOR_VENTA, PUNTO_VENTA y REFERENCIADOR solo ven los leads asignados a ellos
+  const isLimitedRole =
+    rol === Roles.PROMOTOR_VENTA ||
+    rol === Roles.PUNTO_VENTA ||
+    rol === Roles.REFERENCIADOR;
 
   // Validar que allLeads sea un array y filtrar por rol si corresponde
   const leads = useMemo(() => {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Car, Stethoscope, Heart, HardHat, FileText, Activity, Shield, Wrench, Home, Layers, HeartPulse } from "lucide-react";
+import { Car, Stethoscope, Heart, HardHat, FileText, Activity, Shield, Wrench, Home, Layers, HeartPulse, Truck, Globe, Scale, Droplets, Receipt, Hammer, Umbrella } from "lucide-react";
 import {
   Modal,
   ModalBody,
@@ -57,7 +57,7 @@ export const RegistrarLead = ({
       estado: EstadoLead.NUEVO,
       prioridad: PrioridadLead.MEDIA,
       fuente: FuenteLead.FORMULARIO_WEB,
-      tipoSeguro: TipoSeguro.AUTO,
+      tipoSeguro: TipoSeguro.VEHICULAR,
     },
   });
 
@@ -90,7 +90,7 @@ export const RegistrarLead = ({
         estado: EstadoLead.NUEVO,
         prioridad: PrioridadLead.MEDIA,
         fuente: FuenteLead.FORMULARIO_WEB,
-        tipoSeguro: TipoSeguro.AUTO,
+        tipoSeguro: TipoSeguro.VEHICULAR,
       });
     }
   }, [leadToEdit, setValue, reset]);
@@ -123,18 +123,29 @@ export const RegistrarLead = ({
   // Mapear iconos para tipos de seguro
   const getTipoSeguroIcon = (tipo: string) => {
     const iconMap: Record<string, any> = {
-      AUTO:         Car,
-      SALUD:        Stethoscope,
-      VIDA:         Heart,
-      SCTR:         HardHat,
-      VIDA_LEY:     FileText,
-      EPS:          Activity,
-      SOAT:         Shield,
-      TREA:         Wrench,
-      HOGAR:        Home,
-      MULTIRRIESGO: Layers,
-      ACCIDENTE:    HeartPulse,
-      OTRO:         FileText,
+      // Nuevo esquema
+      VEHICULAR:               Car,
+      SALUD:                   Stethoscope,
+      EPS:                     Activity,
+      SCTR_PENSION:            HardHat,
+      SCTR_SALUD:              HardHat,
+      VIDA_LEY:                FileText,
+      SOAT:                    Shield,
+      ACCIDENTES:              HeartPulse,
+      HOGAR:                   Home,
+      MULTIRRIESGO:            Layers,
+      TREC:                    Hammer,
+      CAR:                     Wrench,
+      EAR:                     Wrench,
+      FOLA:                    Umbrella,
+      RESPONSABILIDAD_CIVIL:   Scale,
+      RC_HIDROCARBUROS:        Droplets,
+      TRANSPORTE_NACIONAL:     Truck,
+      TRANSPORTE_INTERNACIONAL:Globe,
+      CARTA_FIANZA:            Receipt,
+      OTRO:                    FileText,
+      // Legacy
+      AUTO: Car, VIDA: Heart, SCTR: HardHat, ACCIDENTE: HeartPulse, TREA: Wrench,
     };
     return iconMap[tipo] || FileText;
   };

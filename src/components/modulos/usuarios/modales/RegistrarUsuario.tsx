@@ -42,11 +42,11 @@ export const RegistrarUsuario = ({
   user,
   addUsuario,
 }: RegistrarUsuarioProps) => {
-  // BROKER_JURIDICO solo puede crear usuarios de su red (BROKER_NATURAL, VENDEDOR, REFERENCIADOR)
-  const isBrokerJuridico = user?.rol?.nombreRol === Roles.BROKER_JURIDICO;
-  const availableRoles = isBrokerJuridico
+  // BROKER solo puede crear usuarios de su red (PROMOTOR_VENTA, REFERENCIADOR, PUNTO_VENTA)
+  const isBroker = user?.rol?.nombreRol === Roles.BROKER;
+  const availableRoles = isBroker
     ? roles.filter((role) =>
-        [Roles.BROKER_NATURAL, Roles.VENDEDOR, Roles.REFERENCIADOR].includes(role.nombreRol)
+        [Roles.PROMOTOR_VENTA, Roles.REFERENCIADOR, Roles.PUNTO_VENTA].includes(role.nombreRol)
       )
     : roles;
   const {

@@ -1,7 +1,8 @@
 import {
-  Mail, Phone, Building2, DollarSign, Briefcase, Car, Heart, Shield,
+  Mail, Phone, Building2, DollarSign, Briefcase, Car, Shield,
   Users, Clock, Tag, Stethoscope, FileText, HardHat, Activity,
-  Wrench, Home, Layers, HeartPulse
+  Wrench, Home, Layers, HeartPulse, Truck, Globe, Scale,
+  Droplets, Receipt, Hammer
 } from "lucide-react";
 import type { Lead, PrioridadLead, TipoSeguro } from "@/types/lead.interface";
 import { prioridadLeadOptions, fuenteLeadOptions, tipoSeguroOptions } from "@/types/lead.interface";
@@ -35,21 +36,35 @@ export const LeadCard = ({ lead, onEdit }: LeadCardProps) => {
   const getTipoSeguroInfo = (tipo: TipoSeguro) => {
     const option = tipoSeguroOptions.find((t) => t.value === tipo);
 
-    // Mapear iconos según tipo
+    // Mapear iconos según tipo de seguro
     const iconMap: Record<string, typeof FileText> = {
-      AUTO: Car,
-      SALUD: Stethoscope,
-      VIDA: Heart,
-      SCTR: HardHat,
-      VIDA_LEY: FileText,
-      EPS: Activity,
-      SOAT: Shield,
-      FOLA: Briefcase,
-      TREA: Wrench,
-      HOGAR: Home,
-      MULTIRRIESGO: Layers,
-      ACCIDENTE: HeartPulse,
+      // Personas
+      VEHICULAR:             Car,
+      SALUD:                 Stethoscope,
+      EPS:                   Activity,
+      SCTR_PENSION:          HardHat,
+      SCTR_SALUD:            Stethoscope,
+      VIDA_LEY:              FileText,
+      SOAT:                  Shield,
+      ACCIDENTES:            HeartPulse,
+      // Patrimoniales
+      HOGAR:                 Home,
+      MULTIRRIESGO:          Layers,
+      TREC:                  Wrench,
+      CAR:                   Hammer,
+      EAR:                   Building2,
+      FOLA:                  Briefcase,
+      // Responsabilidades
+      RESPONSABILIDAD_CIVIL: Scale,
+      RC_HIDROCARBUROS:      Droplets,
+      // Transportes y fianzas
+      TRANSPORTE_NACIONAL:      Truck,
+      TRANSPORTE_INTERNACIONAL: Globe,
+      CARTA_FIANZA:             Receipt,
+      // General
       OTRO: FileText,
+      // Legacy
+      AUTO: Car, SCTR: HardHat, ACCIDENTE: HeartPulse, TREA: Wrench,
     };
 
     return {

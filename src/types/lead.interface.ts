@@ -82,7 +82,7 @@ export interface DetalleVida {
   edad: number;
   ocupacion: string;
   sumaAsegurada: string;
-  beneficiarios: any; // JSON object
+  beneficiarios: any;
   fuma: boolean;
   disponible: boolean;
   fechaCreacion: string;
@@ -138,72 +138,88 @@ export interface UpdateLead extends Partial<CreateLead> {}
 // ==================== ENUMS ====================
 
 export enum EstadoLead {
-  NUEVO = "NUEVO",
+  NUEVO      = "NUEVO",
   CONTACTADO = "CONTACTADO",
-  COTIZADO = "COTIZADO",
-  EMITIDO = "EMITIDO",
-  CERRADO = "CERRADO",
-  PERDIDO = "PERDIDO",
+  COTIZADO   = "COTIZADO",
+  EMITIDO    = "EMITIDO",
+  CERRADO    = "CERRADO",
+  PERDIDO    = "PERDIDO",
 }
 
 export enum PrioridadLead {
-  ALTA = "ALTA",
+  ALTA  = "ALTA",
   MEDIA = "MEDIA",
-  BAJA = "BAJA",
+  BAJA  = "BAJA",
 }
 
 export enum FuenteLead {
-  FORMULARIO_WEB = "FORMULARIO_WEB",
+  FORMULARIO_WEB    = "FORMULARIO_WEB",
   FORMULARIO_GOOGLE = "FORMULARIO_GOOGLE",
   LLAMADA_TELEFONICA = "LLAMADA_TELEFONICA",
-  EMAIL = "EMAIL",
-  WHATSAPP = "WHATSAPP",
-  FACEBOOK = "FACEBOOK",
-  INSTAGRAM = "INSTAGRAM",
-  LINKEDIN = "LINKEDIN",
-  REFERIDO = "REFERIDO",
-  EVENTO = "EVENTO",
-  OTRO = "OTRO",
+  EMAIL             = "EMAIL",
+  WHATSAPP          = "WHATSAPP",
+  FACEBOOK          = "FACEBOOK",
+  INSTAGRAM         = "INSTAGRAM",
+  LINKEDIN          = "LINKEDIN",
+  REFERIDO          = "REFERIDO",
+  EVENTO            = "EVENTO",
+  OTRO              = "OTRO",
 }
 
 export enum TipoSeguro {
-  AUTO = "AUTO",
-  SALUD = "SALUD",
-  VIDA = "VIDA",
-  SCTR = "SCTR",
-  VIDA_LEY = "VIDA_LEY",
-  EPS = "EPS",
-  SOAT = "SOAT",
-  TREA = "TREA",
-  HOGAR = "HOGAR",
-  MULTIRRIESGO = "MULTIRRIESGO",
-  ACCIDENTE = "ACCIDENTE",
+  // Seguros de personas
+  VEHICULAR             = "VEHICULAR",
+  SALUD                 = "SALUD",
+  EPS                   = "EPS",
+  SCTR_PENSION          = "SCTR_PENSION",
+  SCTR_SALUD            = "SCTR_SALUD",
+  VIDA_LEY              = "VIDA_LEY",
+  SOAT                  = "SOAT",
+  ACCIDENTES            = "ACCIDENTES",
+
+  // Seguros patrimoniales
+  HOGAR                 = "HOGAR",
+  MULTIRRIESGO          = "MULTIRRIESGO",
+  TREC                  = "TREC",         // Todo Riesgo Equipo Contratistas
+  CAR                   = "CAR",           // Contractor's All Risk
+  EAR                   = "EAR",           // Erection All Risk
+  FOLA                  = "FOLA",
+
+  // Responsabilidades
+  RESPONSABILIDAD_CIVIL = "RESPONSABILIDAD_CIVIL",
+  RC_HIDROCARBUROS      = "RC_HIDROCARBUROS",
+
+  // Transportes y fianzas
+  TRANSPORTE_NACIONAL      = "TRANSPORTE_NACIONAL",
+  TRANSPORTE_INTERNACIONAL = "TRANSPORTE_INTERNACIONAL",
+  CARTA_FIANZA             = "CARTA_FIANZA",
+
   OTRO = "OTRO",
 }
 
 export enum UsoVehiculo {
   PARTICULAR = "PARTICULAR",
-  COMERCIAL = "COMERCIAL",
-  TAXI = "TAXI",
-  CARGA = "CARGA",
+  COMERCIAL  = "COMERCIAL",
+  TAXI       = "TAXI",
+  CARGA      = "CARGA",
 }
 
 export enum Genero {
   MASCULINO = "MASCULINO",
-  FEMENINO = "FEMENINO",
-  OTRO = "OTRO",
+  FEMENINO  = "FEMENINO",
+  OTRO      = "OTRO",
 }
 
 export enum TipoCobertura {
-  BASICO = "BASICO",
-  INTERMEDIO = "INTERMEDIO",
-  COMPLETO = "COMPLETO",
+  BASICO      = "BASICO",
+  INTERMEDIO  = "INTERMEDIO",
+  COMPLETO    = "COMPLETO",
 }
 
 export enum TipoRiesgo {
-  BAJO = "BAJO",
+  BAJO  = "BAJO",
   MEDIO = "MEDIO",
-  ALTO = "ALTO",
+  ALTO  = "ALTO",
 }
 
 // ==================== OPTIONS PARA SELECTORES ====================
@@ -218,36 +234,49 @@ export const estadoLeadOptions = [
 ] as const;
 
 export const prioridadLeadOptions = [
-  { value: PrioridadLead.ALTA, label: "Alta", color: "bg-red-500" },
+  { value: PrioridadLead.ALTA,  label: "Alta",  color: "bg-red-500" },
   { value: PrioridadLead.MEDIA, label: "Media", color: "bg-yellow-500" },
-  { value: PrioridadLead.BAJA, label: "Baja", color: "bg-green-500" },
+  { value: PrioridadLead.BAJA,  label: "Baja",  color: "bg-green-500" },
 ] as const;
 
 export const fuenteLeadOptions = [
-  { value: FuenteLead.FORMULARIO_WEB, label: "Formulario Web" },
-  { value: FuenteLead.FORMULARIO_GOOGLE, label: "Formulario Google" },
+  { value: FuenteLead.FORMULARIO_WEB,     label: "Formulario Web" },
+  { value: FuenteLead.FORMULARIO_GOOGLE,  label: "Formulario Google" },
   { value: FuenteLead.LLAMADA_TELEFONICA, label: "Llamada Telefónica" },
-  { value: FuenteLead.EMAIL, label: "Email" },
-  { value: FuenteLead.WHATSAPP, label: "WhatsApp" },
-  { value: FuenteLead.FACEBOOK, label: "Facebook" },
-  { value: FuenteLead.INSTAGRAM, label: "Instagram" },
-  { value: FuenteLead.LINKEDIN, label: "LinkedIn" },
-  { value: FuenteLead.REFERIDO, label: "Referido" },
-  { value: FuenteLead.EVENTO, label: "Evento" },
-  { value: FuenteLead.OTRO, label: "Otro" },
+  { value: FuenteLead.EMAIL,              label: "Email" },
+  { value: FuenteLead.WHATSAPP,           label: "WhatsApp" },
+  { value: FuenteLead.FACEBOOK,           label: "Facebook" },
+  { value: FuenteLead.INSTAGRAM,          label: "Instagram" },
+  { value: FuenteLead.LINKEDIN,           label: "LinkedIn" },
+  { value: FuenteLead.REFERIDO,           label: "Referido" },
+  { value: FuenteLead.EVENTO,             label: "Evento" },
+  { value: FuenteLead.OTRO,               label: "Otro" },
 ] as const;
 
 export const tipoSeguroOptions = [
-  { value: TipoSeguro.AUTO,         label: "Seguro de Auto" },
-  { value: TipoSeguro.SALUD,        label: "Seguro de Salud" },
-  { value: TipoSeguro.VIDA,         label: "Seguro de Vida" },
-  { value: TipoSeguro.SCTR,         label: "SCTR" },
-  { value: TipoSeguro.VIDA_LEY,     label: "Vida Ley" },
-  { value: TipoSeguro.EPS,          label: "EPS" },
-  { value: TipoSeguro.SOAT,         label: "SOAT" },
-  { value: TipoSeguro.TREA,         label: "TREA (Todo Riesgo Equipo Contratistas)" },
-  { value: TipoSeguro.HOGAR,        label: "Hogar" },
-  { value: TipoSeguro.MULTIRRIESGO, label: "Multirriesgo" },
-  { value: TipoSeguro.ACCIDENTE,    label: "Accidentes Personales" },
-  { value: TipoSeguro.OTRO,         label: "Otro" },
+  // Personas
+  { value: TipoSeguro.VEHICULAR,             label: "Vehicular",                         group: "Personas" },
+  { value: TipoSeguro.SALUD,                 label: "Salud",                             group: "Personas" },
+  { value: TipoSeguro.EPS,                   label: "EPS",                               group: "Personas" },
+  { value: TipoSeguro.SCTR_PENSION,          label: "SCTR Pensión",                      group: "Personas" },
+  { value: TipoSeguro.SCTR_SALUD,            label: "SCTR Salud",                        group: "Personas" },
+  { value: TipoSeguro.VIDA_LEY,              label: "Vida Ley",                          group: "Personas" },
+  { value: TipoSeguro.SOAT,                  label: "SOAT",                              group: "Personas" },
+  { value: TipoSeguro.ACCIDENTES,            label: "Accidentes Personales",             group: "Personas" },
+  // Patrimoniales
+  { value: TipoSeguro.HOGAR,                 label: "Hogar",                             group: "Patrimoniales" },
+  { value: TipoSeguro.MULTIRRIESGO,          label: "Multiriesgo",                       group: "Patrimoniales" },
+  { value: TipoSeguro.TREC,                  label: "TREC (Todo Riesgo Equipo Contratistas)", group: "Patrimoniales" },
+  { value: TipoSeguro.CAR,                   label: "CAR (Contractor's All Risk)",       group: "Patrimoniales" },
+  { value: TipoSeguro.EAR,                   label: "EAR (Erection All Risk)",           group: "Patrimoniales" },
+  { value: TipoSeguro.FOLA,                  label: "FOLA",                              group: "Patrimoniales" },
+  // Responsabilidades
+  { value: TipoSeguro.RESPONSABILIDAD_CIVIL, label: "Responsabilidad Civil",             group: "Responsabilidades" },
+  { value: TipoSeguro.RC_HIDROCARBUROS,      label: "RC Hidrocarburos",                  group: "Responsabilidades" },
+  // Transportes y fianzas
+  { value: TipoSeguro.TRANSPORTE_NACIONAL,      label: "Transporte Nacional",            group: "Transporte" },
+  { value: TipoSeguro.TRANSPORTE_INTERNACIONAL, label: "Transporte Internacional",       group: "Transporte" },
+  { value: TipoSeguro.CARTA_FIANZA,             label: "Carta Fianza",                   group: "Transporte" },
+  // General
+  { value: TipoSeguro.OTRO,                  label: "Otro",                              group: "General" },
 ] as const;

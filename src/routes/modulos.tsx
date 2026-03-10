@@ -194,8 +194,8 @@ export const moduleCategories = [
         name: "Usuarios",
         path: "/dashboard/admin/maestros/usuarios",
         icon: User,
-        // ADMIN_GENERAL y BROKER_JURIDICO pueden gestionar usuarios de su equipo
-        roles: [Roles.ADMIN_GENERAL, Roles.BROKER_JURIDICO],
+        // ADMINISTRADOR y BROKER pueden gestionar usuarios de su equipo
+        roles: [Roles.ADMINISTRADOR, Roles.BROKER],
         type: ["CRM", "ERP"] as ModuleType[],
       },
     ],
@@ -209,8 +209,8 @@ export const moduleCategories = [
         name: "Mi Equipo",
         path: "/dashboard/broker/agentes",
         icon: User,
-        // BROKER_JURIDICO gestiona su equipo (BROKER_NATURAL, VENDEDOR, REFERENCIADOR)
-        roles: RoleGroups.SOLO_BROKER_JURIDICO,
+        // BROKER gestiona su equipo (PROMOTOR_VENTA, REFERENCIADOR, PUNTO_VENTA)
+        roles: [Roles.BROKER],
         type: ["CRM"] as ModuleType[],
       },
     ],
