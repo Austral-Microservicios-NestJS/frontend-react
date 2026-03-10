@@ -46,7 +46,7 @@ export const RegistrarUsuario = ({
   const isBroker = user?.rol?.nombreRol === Roles.BROKER;
   const availableRoles = isBroker
     ? roles.filter((role) =>
-        [Roles.PROMOTOR_VENTA, Roles.REFERENCIADOR, Roles.PUNTO_VENTA].includes(role.nombreRol)
+        ([Roles.PROMOTOR_VENTA, Roles.REFERENCIADOR, Roles.PUNTO_VENTA] as string[]).includes(role.nombreRol)
       )
     : roles;
   const {

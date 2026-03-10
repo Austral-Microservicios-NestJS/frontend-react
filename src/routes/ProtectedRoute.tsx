@@ -4,14 +4,14 @@ import { useAuthStore } from "@/store/auth.store";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRoles?: string[];
+  requiredRoles?: readonly string[];
 }
 
 const ProtectedRoute = ({ children, requiredRoles = [] }: ProtectedRouteProps) => {
   const { isAuthenticated, isLoading: loading, user } = useAuthStore();
   const location = useLocation();
 
-  const hasRole = (roles: string[]) => {
+  const hasRole = (roles: readonly string[]) => {
      if (!user || !user.rol) return false;
      return roles.includes(user.rol.nombreRol);
   };

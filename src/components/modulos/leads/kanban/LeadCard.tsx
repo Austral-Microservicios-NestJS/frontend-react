@@ -2,7 +2,7 @@ import {
   Mail, Phone, Building2, DollarSign, Briefcase, Car, Shield,
   Users, Clock, Tag, Stethoscope, FileText, HardHat, Activity,
   Wrench, Home, Layers, HeartPulse, Truck, Globe, Scale,
-  Droplets, Receipt, Hammer
+  Droplets, Receipt, Hammer, Heart
 } from "lucide-react";
 import type { Lead, PrioridadLead, TipoSeguro } from "@/types/lead.interface";
 import { prioridadLeadOptions, fuenteLeadOptions, tipoSeguroOptions } from "@/types/lead.interface";

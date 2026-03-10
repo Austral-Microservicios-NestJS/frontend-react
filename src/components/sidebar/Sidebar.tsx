@@ -27,7 +27,7 @@ export const Sidebar = () => {
       ...category,
       modules: category.modules.filter(
         (module) =>
-          module.roles.includes(userRole) && module.type.includes(viewMode)
+          (module.roles as readonly string[]).includes(userRole) && module.type.includes(viewMode)
       ),
     }))
     .filter((category) => category.modules.length > 0);

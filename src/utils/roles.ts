@@ -54,4 +54,18 @@ export const RoleGroups = {
     Roles.BROKER,
     Roles.PUNTO_VENTA,
   ],
+
+  // Sin vendedor (PROMOTOR_VENTA/REFERENCIADOR excluidos) — alias para compatibilidad
+  SIN_VENDEDOR: [
+    Roles.ADMINISTRADOR,
+    Roles.EJECUTIVO_CUENTA,
+    Roles.BROKER,
+    Roles.PUNTO_VENTA,
+  ],
+
+  // Brokers e info — BROKER y EJECUTIVO_CUENTA (vista de compañías/productos)
+  BROKERS_E_INFO: [
+    Roles.BROKER,
+    Roles.EJECUTIVO_CUENTA,
+  ],
 } as const;
