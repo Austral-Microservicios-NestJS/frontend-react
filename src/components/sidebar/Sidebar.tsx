@@ -4,6 +4,8 @@ import { LogOut, Settings, Users, Building2, ChevronDown } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { useSidebarStore } from "@/store/sidebar.store";
 import { moduleCategories } from "@/routes/modulos";
+import { useSessionTimeout } from "@/hooks/useSessionTimeout";
+import { SessionWarningModal } from "@/components/shared/SessionWarningModal";
 
 // useSidebar hook moved to @/hooks/useSidebar.ts to fix HMR
 
@@ -47,6 +49,9 @@ export const Sidebar = () => {
     navigate("/");
   };
 
+  // Session timeout
+  const { showWarning, minutesLeft, extendSession, logoutNow } = useSessionTimeout();
+
   // Función para navegar a un módulo
   const navigateToModule = (path: any) => {
     navigate(path);
@@ -57,6 +62,14 @@ export const Sidebar = () => {
   };
 
   return (
+    <>
+    {showWarning && (
+      <SessionWarningModal
+        minutesLeft={minutesLeft}
+        onExtend={extendSession}
+        onLogout={logoutNow}
+      />
+    )}
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       {/* Sidebar */}
       {isSidebarOpen && (
@@ -310,5 +323,6 @@ export const Sidebar = () => {
         </div>
       </main>
     </div>
+    </>
   );
 };

@@ -31,6 +31,16 @@ api.interceptors.response.use(
     },
     (error) => {
         console.error('API Error:', error.response?.data || error.message);
+
+        // Si el token expiró o es inválido, limpiar sesión y redirigir al login
+        if (error.response?.status === 401) {
+            Cookies.remove('auth-token');
+            localStorage.removeItem('auth-storage');
+            if (window.location.pathname !== '/') {
+                window.location.href = '/';
+            }
+        }
+
         return Promise.reject(error);
     }
 );

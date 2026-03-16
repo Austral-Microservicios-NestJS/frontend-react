@@ -27,10 +27,12 @@ interface AuthState {
     user: User | null;
     isAuthenticated: boolean;
     isLoading: boolean;
+    lastActivity: number;
     login: (user: User, token: string) => void;
     logout: () => void;
     setLoading: (loading: boolean) => void;
     initializeAuth: () => void;
+    updateActivity: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -39,30 +41,30 @@ export const useAuthStore = create<AuthState>()(
             user: null,
             isAuthenticated: false,
             isLoading: false,
+            lastActivity: Date.now(),
             login: (user, token) => {
                 Cookies.set('auth-token', token, {
-                    expires: 7,
+                    expires: 1,         // 1 día — el JWT de 8h controla la auth real
                     path: '/',
                     sameSite: 'lax',
                 });
-                // Normalizar rol legacy en el momento del login
                 const rol = user.rol;
                 const normalizedUser = rol && LEGACY_ROLE_MAP[rol.nombreRol]
                     ? { ...user, rol: { ...rol, nombreRol: LEGACY_ROLE_MAP[rol.nombreRol] } }
                     : user;
-                set({ user: normalizedUser, isAuthenticated: true });
+                set({ user: normalizedUser, isAuthenticated: true, lastActivity: Date.now() });
             },
             logout: () => {
                 Cookies.remove('auth-token');
-                set({ user: null, isAuthenticated: false });
+                set({ user: null, isAuthenticated: false, lastActivity: 0 });
             },
             setLoading: (loading) => set({ isLoading: loading }),
+            updateActivity: () => set({ lastActivity: Date.now() }),
             initializeAuth: () => {
                 const token = Cookies.get('auth-token');
                 const state = get();
 
                 if (token && state.user) {
-                    // Normalizar nombre de rol legacy si es necesario
                     const rol = state.user.rol;
                     const normalizedRol = rol && LEGACY_ROLE_MAP[rol.nombreRol]
                         ? { ...rol, nombreRol: LEGACY_ROLE_MAP[rol.nombreRol] }
@@ -82,6 +84,7 @@ export const useAuthStore = create<AuthState>()(
             partialize: (state) => ({
                 user: state.user,
                 isAuthenticated: state.isAuthenticated,
+                lastActivity: state.lastActivity,
             }),
         }
     )
