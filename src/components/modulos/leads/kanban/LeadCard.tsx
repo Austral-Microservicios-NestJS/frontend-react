@@ -1,8 +1,7 @@
 import {
   Mail, Phone, Building2, DollarSign, Briefcase, Car, Shield,
   Users, Clock, Tag, Stethoscope, FileText, HardHat, Activity,
-  Wrench, Home, Layers, HeartPulse, Truck, Globe, Scale,
-  Droplets, Receipt, Hammer, Heart
+  Wrench, Layers, Globe, Scale, Receipt, Heart
 } from "lucide-react";
 import type { Lead, PrioridadLead, TipoSeguro } from "@/types/lead.interface";
 import { prioridadLeadOptions, fuenteLeadOptions, tipoSeguroOptions } from "@/types/lead.interface";
@@ -36,86 +35,28 @@ export const LeadCard = ({ lead, onEdit }: LeadCardProps) => {
   const getTipoSeguroInfo = (tipo: TipoSeguro) => {
     const option = tipoSeguroOptions.find((t) => t.value === tipo);
 
-    // Mapear iconos según tipo de seguro
+    // Mapear iconos según tipo de seguro (tipos activos en CRM)
     const iconMap: Record<string, typeof FileText> = {
-      // Vehículos
-      VEHICULAR: Car,
-      SOAT:      Shield,
-      // Personas y salud
-      SALUD:                   Stethoscope,
-      EPS:                     Activity,
-      SCTR_PENSION:            HardHat,
-      SCTR_SALUD:              Stethoscope,
-      VIDA_LEY:                FileText,
-      VIDA:                    Heart,
-      ACCIDENTES:              HeartPulse,
-      ACCIDENTES_ESPECTACULOS: HeartPulse,
-      MASCOTAS:                Heart,
-      SEPELIO:                 FileText,
-      ESTUDIANTIL:             FileText,
-      SEGURO_VIAJE:            Globe,
-      DESGRAVAMEN:             FileText,
-      BANCA_SEGURO:            Briefcase,
-      // Patrimoniales
-      HOGAR:                  Home,
-      MULTIRRIESGO:           Layers,
-      TREC:                   Wrench,
-      CAR:                    Hammer,
-      EAR:                    Building2,
-      FOLA:                   Briefcase,
-      ROBO:                   Shield,
-      DESHONESTIDAD:          FileText,
-      CASCOS:                 Globe,
-      TRES_D:                 Building2,
-      CAR_SCTR_MULTIFAMILIAR: Building2,
-      // Responsabilidad Civil
-      RESPONSABILIDAD_CIVIL:              Scale,
-      RC_PROFESIONAL:                     Scale,
-      RC_HIDROCARBUROS:                   Droplets,
-      D_Y_O:                              Briefcase,
-      LUCRO_CESANTE:                      FileText,
-      EXTORSION_SECUESTRO:                Shield,
-      RC_RESIDUOS_SOLIDOS:               Scale,
-      RC_ALMACENAMIENTO_HIDROCARBUROS:   Droplets,
-      RC_TRANSPORTE_HIDROCARBUROS:       Droplets,
-      RC_GAS_LICUADO_AUTOMOTOR:          Droplets,
-      RC_COMERCIALIZACION_COMBUSTIBLES:  Droplets,
-      RC_TRANSPORTE_RESIDUOS_PELIGROSOS: Truck,
-      RC_GAS_LICUADO_GLP:                Droplets,
-      RC_INSTALADORAS_GAS_NATURAL:       Wrench,
-      RC_TALLERES_GAS_NATURAL:           Wrench,
-      RC_VENTA_GAS_NATURAL:              Droplets,
-      RC_DISTRIBUCION_GAS_NATURAL:       Droplets,
-      RC_CONSTRUCCION_GAS_NATURAL:       Hammer,
-      RC_DISTRIBUCION_GAS_DANOS:         Droplets,
-      RC_TRANSPORTADOR_CARRETERA:        Truck,
-      RC_PROPIETARIO_VEHICULO:           Car,
-      RC_ESPECTACULOS_DEPORTIVOS:        Scale,
-      RC_CANES_PELIGROSOS:               Scale,
-      RC_AGD:                            Briefcase,
-      // Transporte
-      TRANSPORTE_NACIONAL:      Truck,
-      TRANSPORTE_INTERNACIONAL: Globe,
-      TRASLADO:                 Truck,
-      // Garantías y crédito
-      CARTA_FIANZA: Receipt,
-      CAUCION:      Receipt,
-      CREDITO:      Receipt,
-      // Energía e industria
-      ENERGY_OIL_GAS:    Droplets,
-      ENERGIA_RENOVABLE: Activity,
-      PARAMETRICOS:      FileText,
-      SEGURO_AGRICOLA:   FileText,
-      SEGURO_PECUARIO:   FileText,
-      // Tecnología
-      CYBER: Shield,
-      // Especiales
-      SEGUROS_OBLIGATORIOS: FileText,
-      SEGUROS_ESPECIALES:   FileText,
-      GENERAL:              FileText,
+      VEHICULAR:            Car,
+      SOAT:                 Shield,
+      EPS:                  Activity,
+      SALUD:                Stethoscope,
+      SCTR_PENSION:         HardHat,
+      SCTR_SALUD:           HardHat,
+      VIDA_LEY:             Users,
+      SEGURO_VIAJE:         Globe,
+      MULTIRRIESGO:         Layers,
+      TREC:                 Wrench,
+      CAR:                  Building2,
+      EAR:                  Building2,
+      TRES_D:               Receipt,
+      FOLA:                 Briefcase,
+      RESPONSABILIDAD_CIVIL: Scale,
+      CARTA_FIANZA:         Receipt,
+      CAUCION:              Receipt,
       OTRO:                 FileText,
       // Legacy
-      AUTO: Car, SCTR: HardHat, ACCIDENTE: HeartPulse, TREA: Wrench,
+      AUTO: Car, SCTR: HardHat, ACCIDENTE: Activity, TREA: Wrench,
     };
 
     return {

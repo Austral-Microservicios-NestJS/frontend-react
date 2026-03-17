@@ -314,90 +314,33 @@ export const fuenteLeadOptions = [
 
 export const tipoSeguroOptions = [
   // Vehículos
-  { value: TipoSeguro.VEHICULAR, label: "Vehicular",   group: "Vehículos" },
-  { value: TipoSeguro.SOAT,      label: "SOAT",        group: "Vehículos" },
+  { value: TipoSeguro.VEHICULAR,           label: "Vehicular",            group: "Vehículos" },
+  { value: TipoSeguro.SOAT,               label: "SOAT",                 group: "Vehículos" },
 
-  // Personas y salud
-  { value: TipoSeguro.SALUD,                   label: "Salud",                                      group: "Personas y Salud" },
-  { value: TipoSeguro.EPS,                     label: "EPS",                                        group: "Personas y Salud" },
-  { value: TipoSeguro.SCTR_PENSION,            label: "SCTR Pensión",                               group: "Personas y Salud" },
-  { value: TipoSeguro.SCTR_SALUD,              label: "SCTR Salud",                                 group: "Personas y Salud" },
-  { value: TipoSeguro.VIDA_LEY,                label: "Vida Ley",                                   group: "Personas y Salud" },
-  { value: TipoSeguro.VIDA,                    label: "Vida",                                       group: "Personas y Salud" },
-  { value: TipoSeguro.ACCIDENTES,              label: "Accidentes Personales",                      group: "Personas y Salud" },
-  { value: TipoSeguro.ACCIDENTES_ESPECTACULOS, label: "Accidentes — Espectáculos públicos",         group: "Personas y Salud" },
-  { value: TipoSeguro.MASCOTAS,                label: "Mascotas",                                   group: "Personas y Salud" },
-  { value: TipoSeguro.SEPELIO,                 label: "Sepelio",                                    group: "Personas y Salud" },
-  { value: TipoSeguro.ESTUDIANTIL,             label: "Estudiantil",                                group: "Personas y Salud" },
-  { value: TipoSeguro.SEGURO_VIAJE,            label: "Seguro de Viaje",                            group: "Personas y Salud" },
-  { value: TipoSeguro.DESGRAVAMEN,             label: "Desgravamen",                                group: "Personas y Salud" },
-  { value: TipoSeguro.BANCA_SEGURO,            label: "Banca Seguro",                               group: "Personas y Salud" },
+  // Personas y Salud
+  { value: TipoSeguro.EPS,                label: "EPS",                  group: "Personas y Salud" },
+  { value: TipoSeguro.SALUD,              label: "Salud",                group: "Personas y Salud" },
+  { value: TipoSeguro.SCTR_PENSION,       label: "SCTR Pensión",         group: "Personas y Salud" },
+  { value: TipoSeguro.SCTR_SALUD,         label: "SCTR Salud",           group: "Personas y Salud" },
+  { value: TipoSeguro.VIDA_LEY,           label: "Vida Ley",             group: "Personas y Salud" },
+  { value: TipoSeguro.SEGURO_VIAJE,       label: "Viaje",                group: "Personas y Salud" },
 
   // Patrimoniales
-  { value: TipoSeguro.HOGAR,                  label: "Hogar",                                       group: "Patrimoniales" },
-  { value: TipoSeguro.MULTIRRIESGO,           label: "Multiriesgo",                                 group: "Patrimoniales" },
-  { value: TipoSeguro.TREC,                   label: "TREC (Todo Riesgo Equipo Contratistas)",      group: "Patrimoniales" },
-  { value: TipoSeguro.CAR,                    label: "CAR (Contractor's All Risk)",                 group: "Patrimoniales" },
-  { value: TipoSeguro.EAR,                    label: "EAR (Erection All Risk)",                     group: "Patrimoniales" },
-  { value: TipoSeguro.FOLA,                   label: "FOLA",                                        group: "Patrimoniales" },
-  { value: TipoSeguro.ROBO,                   label: "Robo",                                        group: "Patrimoniales" },
-  { value: TipoSeguro.DESHONESTIDAD,          label: "Deshonestidad",                               group: "Patrimoniales" },
-  { value: TipoSeguro.CASCOS,                 label: "Cascos",                                      group: "Patrimoniales" },
-  { value: TipoSeguro.TRES_D,                 label: "3D",                                          group: "Patrimoniales" },
-  { value: TipoSeguro.CAR_SCTR_MULTIFAMILIAR, label: "CAR y SCTR — Edificación Multifamiliar",     group: "Patrimoniales" },
+  { value: TipoSeguro.MULTIRRIESGO,       label: "Multiriesgo",          group: "Patrimoniales" },
+  { value: TipoSeguro.TREC,              label: "TREC",                 group: "Patrimoniales" },
+  { value: TipoSeguro.CAR,               label: "CAR",                  group: "Patrimoniales" },
+  { value: TipoSeguro.EAR,               label: "EAR",                  group: "Patrimoniales" },
+  { value: TipoSeguro.TRES_D,            label: "3D",                   group: "Patrimoniales" },
+  { value: TipoSeguro.FOLA,              label: "FOLA",                 group: "Patrimoniales" },
 
-  // Responsabilidad Civil — General
-  { value: TipoSeguro.RESPONSABILIDAD_CIVIL, label: "Responsabilidad Civil",            group: "Responsabilidad Civil" },
-  { value: TipoSeguro.RC_PROFESIONAL,        label: "RC Profesional",                   group: "Responsabilidad Civil" },
-  { value: TipoSeguro.RC_HIDROCARBUROS,      label: "RC Hidrocarburos",                 group: "Responsabilidad Civil" },
-  { value: TipoSeguro.D_Y_O,                 label: "D&O (Directors & Officers)",       group: "Responsabilidad Civil" },
-  { value: TipoSeguro.LUCRO_CESANTE,         label: "Lucro Cesante",                    group: "Responsabilidad Civil" },
-  { value: TipoSeguro.EXTORSION_SECUESTRO,   label: "Extorsión y Secuestro",            group: "Responsabilidad Civil" },
+  // Responsabilidad Civil
+  { value: TipoSeguro.RESPONSABILIDAD_CIVIL, label: "Responsabilidad Civil", group: "Responsabilidad Civil" },
 
-  // Responsabilidad Civil — Regulatorios SBS
-  { value: TipoSeguro.RC_RESIDUOS_SOLIDOS,              label: "RC — Gestión integral de residuos sólidos",                    group: "RC Regulatorio SBS" },
-  { value: TipoSeguro.RC_ALMACENAMIENTO_HIDROCARBUROS,  label: "RC — Almacenamiento de hidrocarburos",                         group: "RC Regulatorio SBS" },
-  { value: TipoSeguro.RC_TRANSPORTE_HIDROCARBUROS,      label: "RC — Transporte de hidrocarburos",                             group: "RC Regulatorio SBS" },
-  { value: TipoSeguro.RC_GAS_LICUADO_AUTOMOTOR,         label: "RC — Venta de gas licuado para uso automotor",                 group: "RC Regulatorio SBS" },
-  { value: TipoSeguro.RC_COMERCIALIZACION_COMBUSTIBLES, label: "RC — Comercialización de combustibles líquidos",               group: "RC Regulatorio SBS" },
-  { value: TipoSeguro.RC_TRANSPORTE_RESIDUOS_PELIGROSOS,label: "RC — Transporte de residuos y materiales peligrosos",          group: "RC Regulatorio SBS" },
-  { value: TipoSeguro.RC_GAS_LICUADO_GLP,               label: "RC — Comercialización de Gas Licuado de Petróleo (GLP)",       group: "RC Regulatorio SBS" },
-  { value: TipoSeguro.RC_INSTALADORAS_GAS_NATURAL,      label: "RC y Daños — Instaladoras de gas natural por red de ductos",   group: "RC Regulatorio SBS" },
-  { value: TipoSeguro.RC_TALLERES_GAS_NATURAL,          label: "RC — Talleres instaladores de gas natural vehicular",          group: "RC Regulatorio SBS" },
-  { value: TipoSeguro.RC_VENTA_GAS_NATURAL,             label: "RC — Venta al público de gas natural vehicular",               group: "RC Regulatorio SBS" },
-  { value: TipoSeguro.RC_DISTRIBUCION_GAS_NATURAL,      label: "RC — Distribución de Gas Natural",                             group: "RC Regulatorio SBS" },
-  { value: TipoSeguro.RC_CONSTRUCCION_GAS_NATURAL,      label: "RC — Proyección, diseño y construcción de redes de gas natural",group: "RC Regulatorio SBS" },
-  { value: TipoSeguro.RC_DISTRIBUCION_GAS_DANOS,        label: "RC y Daños — Distribución de Gas Natural",                     group: "RC Regulatorio SBS" },
-  { value: TipoSeguro.RC_TRANSPORTADOR_CARRETERA,       label: "RC — Transportador por carretera en viaje internacional",      group: "RC Regulatorio SBS" },
-  { value: TipoSeguro.RC_PROPIETARIO_VEHICULO,          label: "RC — Propietario de vehículo automotor / transporte nacional",  group: "RC Regulatorio SBS" },
-  { value: TipoSeguro.RC_ESPECTACULOS_DEPORTIVOS,       label: "RC — Organización de espectáculos deportivos",                 group: "RC Regulatorio SBS" },
-  { value: TipoSeguro.RC_CANES_PELIGROSOS,              label: "RC — Propietarios de canes potencialmente peligrosos",         group: "RC Regulatorio SBS" },
-  { value: TipoSeguro.RC_AGD,                           label: "RC — Almacenes Generales de Depósito (AGD)",                   group: "RC Regulatorio SBS" },
+  // Garantías
+  { value: TipoSeguro.CARTA_FIANZA,      label: "Carta Fianza",         group: "Garantías" },
+  { value: TipoSeguro.CAUCION,           label: "Caución",              group: "Garantías" },
 
-  // Transporte y logística
-  { value: TipoSeguro.TRANSPORTE_NACIONAL,      label: "Transporte Nacional",      group: "Transporte" },
-  { value: TipoSeguro.TRANSPORTE_INTERNACIONAL, label: "Transporte Internacional", group: "Transporte" },
-  { value: TipoSeguro.TRASLADO,                 label: "Traslado",                 group: "Transporte" },
+  // Otro
+  { value: TipoSeguro.OTRO,              label: "Otro",                 group: "Otro" },
 
-  // Garantías y crédito
-  { value: TipoSeguro.CARTA_FIANZA, label: "Carta Fianza", group: "Garantías y Crédito" },
-  { value: TipoSeguro.CAUCION,      label: "Caución",      group: "Garantías y Crédito" },
-  { value: TipoSeguro.CREDITO,      label: "Crédito",      group: "Garantías y Crédito" },
-
-  // Energía e industria
-  { value: TipoSeguro.ENERGY_OIL_GAS,    label: "Energy / Oil & Gas",    group: "Energía e Industria" },
-  { value: TipoSeguro.ENERGIA_RENOVABLE, label: "Energía Renovable",     group: "Energía e Industria" },
-  { value: TipoSeguro.PARAMETRICOS,      label: "Paramétricos",          group: "Energía e Industria" },
-  { value: TipoSeguro.SEGURO_AGRICOLA,   label: "Seguro Agrícola",       group: "Energía e Industria" },
-  { value: TipoSeguro.SEGURO_PECUARIO,   label: "Seguro Pecuario",       group: "Energía e Industria" },
-
-  // Tecnología
-  { value: TipoSeguro.CYBER, label: "Cyber", group: "Tecnología" },
-
-  // Especiales
-  { value: TipoSeguro.SEGUROS_OBLIGATORIOS, label: "Seguros Obligatorios", group: "Especiales" },
-  { value: TipoSeguro.SEGUROS_ESPECIALES,   label: "Seguros Especiales",   group: "Especiales" },
-  { value: TipoSeguro.GENERAL,              label: "General",              group: "Especiales" },
-
-  { value: TipoSeguro.OTRO, label: "Otro", group: "General" },
 ] as const;
