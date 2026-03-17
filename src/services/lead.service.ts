@@ -84,6 +84,27 @@ export const leadService = {
     await api.delete(`/leads/${id}`);
   },
 
+  // ==================== DETALLE ENDPOINTS ====================
+
+  updateDetalleAuto: async (id: string, data: Record<string, any>): Promise<void> => {
+    await api.patch(`/leads/${id}/detalle-auto`, data);
+  },
+  updateDetalleSoat: async (id: string, data: Record<string, any>): Promise<void> => {
+    await api.patch(`/leads/${id}/detalle-soat`, data);
+  },
+  updateDetalleSalud: async (id: string, data: Record<string, any>): Promise<void> => {
+    await api.patch(`/leads/${id}/detalle-salud`, data);
+  },
+  updateDetalleSCTR: async (id: string, data: Record<string, any>): Promise<void> => {
+    await api.patch(`/leads/${id}/detalle-sctr`, data);
+  },
+  updateDetalleVida: async (id: string, data: Record<string, any>): Promise<void> => {
+    await api.patch(`/leads/${id}/detalle-vida`, data);
+  },
+  updateDetalleVidaLey: async (id: string, data: Record<string, any>): Promise<void> => {
+    await api.patch(`/leads/${id}/detalle-vida-ley`, data);
+  },
+
   // Búsqueda server-side por texto (nombre, email, teléfono, empresa, documento)
   search: async (query: string): Promise<Lead[]> => {
     try {

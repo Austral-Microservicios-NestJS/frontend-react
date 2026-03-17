@@ -131,11 +131,11 @@ export default function LeadsPage() {
   const handleOpenModal = () => { setLeadToEdit(null); setIsModalOpen(true); };
   const handleEditLead  = (lead: Lead) => { setLeadToEdit(lead); setIsModalOpen(true); };
 
-  const handleSubmitLead = async (data: CreateLead) => {
+  const handleSubmitLead = async (data: CreateLead): Promise<Lead | void> => {
     if (leadToEdit) {
       await updateLead(leadToEdit.idLead, data);
     } else {
-      await addLead(data);
+      return await addLead(data);
     }
   };
 

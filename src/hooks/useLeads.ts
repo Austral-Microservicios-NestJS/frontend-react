@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { toast } from "sonner";
 import { leadService } from "@/services/lead.service";
-import type { CreateLead, UpdateLead, EstadoLead } from "@/types/lead.interface";
+import type { Lead, CreateLead, UpdateLead, EstadoLead } from "@/types/lead.interface";
 import { useAuthStore } from "@/store/auth.store";
 import { Roles } from "@/utils/roles";
 
@@ -71,10 +71,11 @@ export const useLeads = () => {
     };
   };
 
-  const addLead = async (leadData: CreateLead) => {
+  const addLead = async (leadData: CreateLead): Promise<Lead> => {
     try {
-      await createMutation.mutateAsync(leadData);
+      const newLead = await createMutation.mutateAsync(leadData);
       toast.success("Lead registrado exitosamente");
+      return newLead;
     } catch (error) {
       console.error("Error al crear lead:", error);
       toast.error("Error al registrar el lead");

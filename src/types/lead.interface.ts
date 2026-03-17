@@ -10,6 +10,7 @@ export interface Lead {
   fuente: FuenteLead;
   estado: EstadoLead;
   valorEstimado?: string;
+  comision?: string;
   notas?: string;
   asignadoA?: string;
   prioridad: PrioridadLead;
@@ -128,9 +129,17 @@ export interface CreateLead {
   fuente: FuenteLead;
   estado?: EstadoLead;
   valorEstimado?: string;
+  comision?: string;
   notas?: string;
   prioridad?: PrioridadLead;
   tipoSeguro: TipoSeguro;
+  // Detail sub-objects (sent with initial create when filled from the form)
+  detalleAuto?: Partial<Omit<DetalleAuto, 'idDetalleAuto' | 'idLead' | 'disponible' | 'fechaCreacion' | 'fechaModificacion'>>;
+  detalleSoat?: Partial<Omit<DetalleSoat, 'idDetalleSoat' | 'idLead' | 'disponible' | 'fechaCreacion' | 'fechaModificacion'>>;
+  detalleSalud?: Partial<Omit<DetalleSalud, 'idDetalleSalud' | 'idLead' | 'disponible' | 'fechaCreacion' | 'fechaModificacion'>>;
+  detalleSCTR?: Partial<Omit<DetalleSCTR, 'idDetalleSCTR' | 'idLead' | 'disponible' | 'fechaCreacion' | 'fechaModificacion'>>;
+  detalleVida?: Partial<Omit<DetalleVida, 'idDetalleVida' | 'idLead' | 'disponible' | 'fechaCreacion' | 'fechaModificacion'>>;
+  detalleVidaLey?: Partial<Omit<DetalleVidaLey, 'idDetalleVidaLey' | 'idLead' | 'disponible' | 'fechaCreacion' | 'fechaModificacion'>>;
 }
 
 export interface UpdateLead extends Partial<CreateLead> {}
@@ -299,7 +308,7 @@ export const prioridadLeadOptions = [
 ] as const;
 
 export const fuenteLeadOptions = [
-  { value: FuenteLead.FORMULARIO_WEB,     label: "Formulario Web" },
+  { value: FuenteLead.FORMULARIO_WEB,     label: "CRM" },
   { value: FuenteLead.FORMULARIO_GOOGLE,  label: "Formulario Google" },
   { value: FuenteLead.LLAMADA_TELEFONICA, label: "Llamada Telefónica" },
   { value: FuenteLead.EMAIL,              label: "Email" },

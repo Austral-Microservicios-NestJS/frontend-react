@@ -26,6 +26,9 @@ import {
   Hash,
   UserPlus,
   Download,
+  Save,
+  DollarSign,
+  Percent,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import days from "dayjs";
@@ -54,9 +57,9 @@ export default function LeadDetail() {
   const [leadState, setLeadState] = useState<any | null>(null);
   const [isConsultaModalOpen, setIsConsultaModalOpen] = useState(false);
   const [isRegistrarClienteOpen, setIsRegistrarClienteOpen] = useState(false);
-  const [leadInitialValues, setLeadInitialValues] = useState<
-    Partial<any> | undefined
-  >(undefined);
+  const [leadInitialValues, setLeadInitialValues] = useState<Partial<any> | undefined>(undefined);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Consulta AI de placa - se activa si hay placa en detalleAuto o detalleSoat
   const placaRaw = detalleAuto?.placa || detalleSoat?.placa;
@@ -113,6 +116,52 @@ export default function LeadDetail() {
     setIsRegistrarClienteOpen(true);
   };
 
+  const handleSaveChanges = async () => {
+    if (!leadState || !id) return;
+    setIsSaving(true);
+    try {
+      await leadService.update(id, {
+        nombre: leadState.nombre,
+        email: leadState.email,
+        telefono: leadState.telefono,
+        empresa: leadState.empresa,
+        cargo: leadState.cargo,
+        fuente: leadState.fuente,
+        estado: leadState.estado,
+        prioridad: leadState.prioridad,
+        tipoSeguro: leadState.tipoSeguro,
+        valorEstimado: leadState.valorEstimado,
+        comision: leadState.comision,
+        notas: leadState.notas,
+      });
+      // Save detail sub-objects if present
+      if (detalleAuto) {
+        try { await leadService.updateDetalleAuto(id, detalleAuto); } catch { /* endpoint may not exist yet */ }
+      }
+      if (detalleSoat) {
+        try { await leadService.updateDetalleSoat(id, detalleSoat); } catch { /* endpoint may not exist yet */ }
+      }
+      if (detalleSalud) {
+        try { await leadService.updateDetalleSalud(id, detalleSalud); } catch { /* endpoint may not exist yet */ }
+      }
+      if (detalleSCTR) {
+        try { await leadService.updateDetalleSCTR(id, detalleSCTR); } catch { /* endpoint may not exist yet */ }
+      }
+      if (detalleVida) {
+        try { await leadService.updateDetalleVida(id, detalleVida); } catch { /* endpoint may not exist yet */ }
+      }
+      if (detalleVidaLey) {
+        try { await leadService.updateDetalleVidaLey(id, detalleVidaLey); } catch { /* endpoint may not exist yet */ }
+      }
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2500);
+    } catch (error) {
+      console.error("Error al guardar cambios:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <>
       <Header
@@ -142,6 +191,14 @@ export default function LeadDetail() {
           >
             <UserPlus className="w-4 h-4" />
             Registrar Cliente
+          </button>
+          <button
+            onClick={handleSaveChanges}
+            disabled={isSaving}
+            className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 ${saveSuccess ? "bg-emerald-600" : "bg-gray-700 hover:bg-gray-800"}`}
+          >
+            <Save className="w-4 h-4" />
+            {isSaving ? "Guardando..." : saveSuccess ? "Guardado" : "Guardar cambios"}
           </button>
         </div>
       </Header>
@@ -1808,6 +1865,55 @@ export default function LeadDetail() {
                         <Copy className="w-4 h-4" />
                       </button>
                     </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Cotización — visible cuando hay valorEstimado o comisión, o cuando el estado lo permite */}
+            {(leadState?.valorEstimado || leadState?.comision || ['CONTACTADO', 'COTIZADO', 'EMITIDO'].includes(leadState?.estado)) && (
+              <div className="bg-white rounded-lg shadow-sm border border-violet-200 p-4">
+                <div className="flex items-center gap-2 mb-3 pb-2 border-b border-violet-100">
+                  <DollarSign className="w-4 h-4 text-violet-600" />
+                  <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide">Cotización</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Prima estimada (S/)</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={leadState?.valorEstimado ?? ""}
+                        onChange={(e) => setLeadState((s: any) => ({ ...s, valorEstimado: e.target.value }))}
+                        placeholder="0.00"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-violet-400 transition-colors"
+                      />
+                      <button type="button" onClick={() => navigator.clipboard.writeText(leadState?.valorEstimado ?? "")} className="p-1 text-gray-500 hover:text-gray-800" title="Copiar prima">
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5 flex items-center gap-1">
+                      <Percent className="w-3 h-3" /> Comisión (%)
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={leadState?.comision ?? ""}
+                        onChange={(e) => setLeadState((s: any) => ({ ...s, comision: e.target.value }))}
+                        placeholder="12.5"
+                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-violet-400 transition-colors"
+                      />
+                      <button type="button" onClick={() => navigator.clipboard.writeText(leadState?.comision ?? "")} className="p-1 text-gray-500 hover:text-gray-800" title="Copiar comisión">
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                    {leadState?.valorEstimado && leadState?.comision && (
+                      <p className="text-xs text-violet-600 mt-1 font-medium">
+                        Comisión: S/ {(parseFloat(leadState.valorEstimado || "0") * parseFloat(leadState.comision || "0") / 100).toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
