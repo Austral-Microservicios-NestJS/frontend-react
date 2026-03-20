@@ -8,10 +8,13 @@ import {
   ModalHeader,
 } from "@/components/shared";
 import { RegistrarCliente } from "@/components/modulos/clientes/modales/RegistrarCliente";
+import { RegistrarPoliza } from "@/components/modulos/polizas/modales/RegistrarPoliza";
 import { useSidebar } from "@/hooks/useSidebar";
 import { leadService } from "@/services/lead.service";
+import { polizaApi } from "@/services/poliza.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useClientes } from "@/hooks/useCliente";
+import { usePolizas } from "@/hooks/usePolizas";
 import {
   ArrowLeft,
   Copy,
@@ -27,8 +30,7 @@ import {
   UserPlus,
   Download,
   Save,
-  DollarSign,
-  Percent,
+  FileCheck,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import days from "dayjs";
@@ -47,6 +49,8 @@ export default function LeadDetail() {
   const { addCliente } = useClientes();
 
   const { data: lead, isLoading } = leadService.useGetById(id || "");
+  const { addPoliza } = usePolizas();
+  const { data: polizasCliente = [] } = polizaApi.useGetAllByCliente(leadState?.idCliente || "");
 
   const [detalleVidaLey, setDetalleVidaLey] = useState<any | null>(null);
   const [detalleAuto, setDetalleAuto] = useState<any | null>(null);
@@ -57,6 +61,7 @@ export default function LeadDetail() {
   const [leadState, setLeadState] = useState<any | null>(null);
   const [isConsultaModalOpen, setIsConsultaModalOpen] = useState(false);
   const [isRegistrarClienteOpen, setIsRegistrarClienteOpen] = useState(false);
+  const [isRegistrarPolizaOpen, setIsRegistrarPolizaOpen] = useState(false);
   const [leadInitialValues, setLeadInitialValues] = useState<Partial<any> | undefined>(undefined);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -116,6 +121,25 @@ export default function LeadDetail() {
     setIsRegistrarClienteOpen(true);
   };
 
+  // Crea cliente y vincula su id al lead
+  const handleAddClienteAndLink = async (clienteData: any) => {
+    const newCliente = await addCliente(clienteData);
+    if (newCliente?.idCliente && id) {
+      await leadService.update(id, { idCliente: newCliente.idCliente });
+      setLeadState((s: any) => ({ ...s, idCliente: newCliente.idCliente }));
+    }
+  };
+
+  const handleRegistrarPoliza = async (data: any) => {
+    await addPoliza(data);
+    // Marcar lead como CERRADO después de emitir la póliza
+    if (id) {
+      await leadService.update(id, { estado: "CERRADO" as any });
+      setLeadState((s: any) => ({ ...s, estado: "CERRADO" }));
+    }
+    setIsRegistrarPolizaOpen(false);
+  };
+
   const handleSaveChanges = async () => {
     if (!leadState || !id) return;
     setIsSaving(true);
@@ -132,6 +156,7 @@ export default function LeadDetail() {
         tipoSeguro: leadState.tipoSeguro,
         valorEstimado: leadState.valorEstimado,
         comision: leadState.comision,
+        idCliente: leadState.idCliente,
         notas: leadState.notas,
       });
       // Save detail sub-objects if present
@@ -190,8 +215,17 @@ export default function LeadDetail() {
             style={{ backgroundColor: "var(--austral-azul)" }}
           >
             <UserPlus className="w-4 h-4" />
-            Registrar Cliente
+            {leadState?.idCliente ? "Cliente Vinculado ✓" : "Registrar Cliente"}
           </button>
+          {leadState?.idCliente && (
+            <button
+              onClick={() => setIsRegistrarPolizaOpen(true)}
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-white rounded-lg transition-colors bg-emerald-600 hover:bg-emerald-700"
+            >
+              <FileCheck className="w-4 h-4" />
+              Registrar Póliza
+            </button>
+          )}
           <button
             onClick={handleSaveChanges}
             disabled={isSaving}
@@ -1870,52 +1904,75 @@ export default function LeadDetail() {
               </div>
             )}
 
-            {/* Cotización — visible cuando hay valorEstimado o comisión, o cuando el estado lo permite */}
-            {(leadState?.valorEstimado || leadState?.comision || ['CONTACTADO', 'COTIZADO', 'EMITIDO'].includes(leadState?.estado)) && (
-              <div className="bg-white rounded-lg shadow-sm border border-violet-200 p-4">
-                <div className="flex items-center gap-2 mb-3 pb-2 border-b border-violet-100">
-                  <DollarSign className="w-4 h-4 text-violet-600" />
-                  <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide">Cotización</h3>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs font-semibold text-gray-500 mb-0.5">Prima estimada (S/)</p>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={leadState?.valorEstimado ?? ""}
-                        onChange={(e) => setLeadState((s: any) => ({ ...s, valorEstimado: e.target.value }))}
-                        placeholder="0.00"
-                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-violet-400 transition-colors"
-                      />
-                      <button type="button" onClick={() => navigator.clipboard.writeText(leadState?.valorEstimado ?? "")} className="p-1 text-gray-500 hover:text-gray-800" title="Copiar prima">
-                        <Copy className="w-4 h-4" />
-                      </button>
-                    </div>
+            {/* Pólizas vinculadas — visible cuando el lead tiene cliente registrado */}
+            {leadState?.idCliente && (
+              <div className="bg-white rounded-lg shadow-sm border border-orange-200 p-4">
+                <div className="flex items-center justify-between mb-3 pb-2 border-b border-orange-100">
+                  <div className="flex items-center gap-2">
+                    <FileCheck className="w-4 h-4 text-orange-600" />
+                    <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide">Pólizas Emitidas</h3>
                   </div>
-                  <div>
-                    <p className="text-xs font-semibold text-gray-500 mb-0.5 flex items-center gap-1">
-                      <Percent className="w-3 h-3" /> Comisión (%)
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={leadState?.comision ?? ""}
-                        onChange={(e) => setLeadState((s: any) => ({ ...s, comision: e.target.value }))}
-                        placeholder="12.5"
-                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-violet-400 transition-colors"
-                      />
-                      <button type="button" onClick={() => navigator.clipboard.writeText(leadState?.comision ?? "")} className="p-1 text-gray-500 hover:text-gray-800" title="Copiar comisión">
-                        <Copy className="w-4 h-4" />
-                      </button>
-                    </div>
-                    {leadState?.valorEstimado && leadState?.comision && (
-                      <p className="text-xs text-violet-600 mt-1 font-medium">
-                        Comisión: S/ {(parseFloat(leadState.valorEstimado || "0") * parseFloat(leadState.comision || "0") / 100).toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </p>
-                    )}
-                  </div>
+                  <button
+                    onClick={() => setIsRegistrarPolizaOpen(true)}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
+                  >
+                    <FileCheck className="w-3 h-3" /> Nueva Póliza
+                  </button>
                 </div>
+                {polizasCliente.length === 0 ? (
+                  <p className="text-sm text-gray-400 italic">No hay pólizas registradas para este cliente aún.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {polizasCliente.map((poliza: any) => (
+                      <div key={poliza.id || poliza.idPoliza} className="border border-gray-100 rounded-lg p-3 bg-gray-50">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                          <div>
+                            <p className="text-xs font-semibold text-gray-500">N° Póliza</p>
+                            <p className="font-medium text-gray-800">{poliza.numeroPoliza}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-gray-500">Estado</p>
+                            <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${poliza.estado === 'VIGENTE' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}>
+                              {poliza.estado}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-gray-500">Prima Total</p>
+                            <p className="font-medium text-gray-800">
+                              {poliza.primaTotal
+                                ? `${poliza.moneda} ${parseFloat(poliza.primaTotal).toLocaleString("es-PE", { minimumFractionDigits: 2 })}`
+                                : "—"}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-gray-500">Comisión Agente</p>
+                            <p className="font-medium text-violet-700">{poliza.comisionAgente}%</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-gray-500">Vigencia Inicio</p>
+                            <p className="text-gray-700">{poliza.vigenciaInicio?.substring(0, 10)}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-gray-500">Vigencia Fin</p>
+                            <p className="text-gray-700">{poliza.vigenciaFin?.substring(0, 10)}</p>
+                          </div>
+                          {poliza.compania?.nombreComercial && (
+                            <div>
+                              <p className="text-xs font-semibold text-gray-500">Compañía</p>
+                              <p className="text-gray-700">{poliza.compania.nombreComercial}</p>
+                            </div>
+                          )}
+                          {poliza.ramo?.nombre && (
+                            <div>
+                              <p className="text-xs font-semibold text-gray-500">Ramo</p>
+                              <p className="text-gray-700">{poliza.ramo.nombre}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -2097,11 +2154,33 @@ export default function LeadDetail() {
             setIsRegistrarClienteOpen(false);
             setLeadInitialValues(undefined);
           }}
-          addCliente={addCliente}
+          addCliente={handleAddClienteAndLink}
           user={user}
           initialValues={leadInitialValues}
           presentation="drawer"
           size="lg"
+        />
+      )}
+
+      {user && leadState?.idCliente && (
+        <RegistrarPoliza
+          isOpen={isRegistrarPolizaOpen}
+          onClose={() => setIsRegistrarPolizaOpen(false)}
+          addPoliza={handleRegistrarPoliza}
+          idCliente={leadState.idCliente}
+          idUsuario={user.idUsuario}
+          cliente={{
+            idCliente: leadState.idCliente,
+            tipoPersona: "NATURAL" as any,
+            nombres: leadState.nombre ?? "",
+            apellidos: "",
+            tipoDocumento: "DNI" as any,
+            emailNotificaciones: leadState.email ?? "",
+            telefono1: leadState.telefono ?? "",
+            recibirNotificaciones: false,
+            registradoPor: user.idUsuario,
+            activo: true,
+          } as any}
         />
       )}
     </>

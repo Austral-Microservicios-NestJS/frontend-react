@@ -87,22 +87,25 @@ export const leadService = {
   // ==================== DETALLE ENDPOINTS ====================
 
   updateDetalleAuto: async (id: string, data: Record<string, any>): Promise<void> => {
-    await api.patch(`/leads/${id}/detalle-auto`, data);
+    await api.post(`/leads/${id}/detalle-auto`, data);
   },
   updateDetalleSoat: async (id: string, data: Record<string, any>): Promise<void> => {
-    await api.patch(`/leads/${id}/detalle-soat`, data);
+    await api.post(`/leads/${id}/detalle-soat`, data);
   },
   updateDetalleSalud: async (id: string, data: Record<string, any>): Promise<void> => {
-    await api.patch(`/leads/${id}/detalle-salud`, data);
+    await api.post(`/leads/${id}/detalle-salud`, data);
   },
   updateDetalleSCTR: async (id: string, data: Record<string, any>): Promise<void> => {
-    await api.patch(`/leads/${id}/detalle-sctr`, data);
+    await api.post(`/leads/${id}/detalle-sctr`, data);
   },
   updateDetalleVida: async (id: string, data: Record<string, any>): Promise<void> => {
-    await api.patch(`/leads/${id}/detalle-vida`, data);
+    await api.post(`/leads/${id}/detalle-vida`, data);
   },
   updateDetalleVidaLey: async (id: string, data: Record<string, any>): Promise<void> => {
-    await api.patch(`/leads/${id}/detalle-vida-ley`, data);
+    await api.post(`/leads/${id}/detalle-vida-ley`, data);
+  },
+  updateDetalleFola: async (id: string, data: Record<string, any>): Promise<void> => {
+    await api.post(`/leads/${id}/detalle-fola`, data);
   },
 
   // Búsqueda server-side por texto (nombre, email, teléfono, empresa, documento)
@@ -131,8 +134,9 @@ export const leadService = {
     return useQuery({
       queryKey: [QUERY_KEY],
       queryFn: leadService.getAll,
-      retry: false, // No reintentar si falla
-      refetchOnWindowFocus: false, // No refetch al hacer foco
+      retry: false,
+      refetchOnWindowFocus: true,
+      refetchInterval: 30000, // Auto-refresh cada 30s para mostrar leads del chatbot
     });
   },
 

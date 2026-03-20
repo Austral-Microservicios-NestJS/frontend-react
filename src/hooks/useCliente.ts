@@ -44,8 +44,9 @@ export const useClientes = () => {
 
   const addCliente = async (clienteData: CreateCliente) => {
     try {
-      await createMutation.mutateAsync(clienteData);
+      const newCliente = await createMutation.mutateAsync(clienteData);
       toast.success("Cliente creado exitosamente");
+      return newCliente;
     } catch (error) {
       toast.error("Error al crear el cliente");
       throw error;

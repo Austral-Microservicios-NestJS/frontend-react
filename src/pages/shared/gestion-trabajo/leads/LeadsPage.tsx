@@ -43,12 +43,11 @@ type ColumnDef = {
 };
 
 const ESTADO_COLUMNS: ColumnDef[] = [
-  { estado: "NUEVO",      title: "Nuevo",      color: "bg-indigo-500",  active: "bg-indigo-500 text-white border-indigo-500",   badge: "bg-indigo-50 text-indigo-700 border-indigo-200" },
-  { estado: "CONTACTADO", title: "Contactado", color: "bg-blue-500",    active: "bg-blue-500 text-white border-blue-500",       badge: "bg-blue-50 text-blue-700 border-blue-200" },
-  { estado: "COTIZADO",   title: "Cotizado",   color: "bg-violet-500",  active: "bg-violet-500 text-white border-violet-500",   badge: "bg-violet-50 text-violet-700 border-violet-200" },
-  { estado: "EMITIDO",    title: "Emitido",    color: "bg-orange-500",  active: "bg-orange-500 text-white border-orange-500",   badge: "bg-orange-50 text-orange-700 border-orange-200" },
-  { estado: "CERRADO",    title: "Cerrado",    color: "bg-emerald-500", active: "bg-emerald-500 text-white border-emerald-500", badge: "bg-emerald-50 text-emerald-700 border-emerald-200" },
-  { estado: "PERDIDO",    title: "Perdido",    color: "bg-rose-500",    active: "bg-rose-500 text-white border-rose-500",       badge: "bg-rose-50 text-rose-700 border-rose-200" },
+  { estado: "NUEVO",    title: "Nuevo",    color: "bg-indigo-500",  active: "bg-indigo-500 text-white border-indigo-500",   badge: "bg-indigo-50 text-indigo-700 border-indigo-200" },
+  { estado: "COTIZADO", title: "Cotizado", color: "bg-violet-500",  active: "bg-violet-500 text-white border-violet-500",   badge: "bg-violet-50 text-violet-700 border-violet-200" },
+  { estado: "EMITIDO",  title: "Emitido",  color: "bg-orange-500",  active: "bg-orange-500 text-white border-orange-500",   badge: "bg-orange-50 text-orange-700 border-orange-200" },
+  { estado: "CERRADO",  title: "Cerrado",  color: "bg-emerald-500", active: "bg-emerald-500 text-white border-emerald-500", badge: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  { estado: "PERDIDO",  title: "Perdido",  color: "bg-rose-500",    active: "bg-rose-500 text-white border-rose-500",       badge: "bg-rose-50 text-rose-700 border-rose-200" },
 ];
 
 function diasDesde(fecha: string): number {

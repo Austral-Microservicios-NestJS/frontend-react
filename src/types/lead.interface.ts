@@ -11,6 +11,7 @@ export interface Lead {
   estado: EstadoLead;
   valorEstimado?: string;
   comision?: string;
+  idCliente?: string;
   notas?: string;
   asignadoA?: string;
   prioridad: PrioridadLead;
@@ -130,6 +131,7 @@ export interface CreateLead {
   estado?: EstadoLead;
   valorEstimado?: string;
   comision?: string;
+  idCliente?: string;
   notas?: string;
   prioridad?: PrioridadLead;
   tipoSeguro: TipoSeguro;

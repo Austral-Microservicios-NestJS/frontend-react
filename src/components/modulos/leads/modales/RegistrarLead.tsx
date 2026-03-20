@@ -83,7 +83,6 @@ export const RegistrarLead = ({
       setValue("prioridad", leadToEdit.prioridad);
       setValue("tipoSeguro", leadToEdit.tipoSeguro);
       setValue("valorEstimado", leadToEdit.valorEstimado || "");
-      setValue("comision", leadToEdit.comision || "");
       // Extract otroSeguro from notas if present
       const notasVal = leadToEdit.notas || "";
       const match = notasVal.match(/^\[Tipo: (.+?)\]\n?/);
@@ -629,17 +628,6 @@ export const RegistrarLead = ({
                     {...register("valorEstimado")}
                     placeholder="1500.00"
                   />
-                </div>
-
-                <div>
-                  <Label htmlFor="comision">Comisión (%)</Label>
-                  <Input
-                    id="comision"
-                    type="text"
-                    {...register("comision")}
-                    placeholder="12.5"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Porcentaje de comisión sobre la prima</p>
                 </div>
 
                 <div className="md:col-span-2">
