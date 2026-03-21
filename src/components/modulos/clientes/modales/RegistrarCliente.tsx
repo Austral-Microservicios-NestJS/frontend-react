@@ -26,7 +26,7 @@ import { AlertCircle } from "lucide-react";
 interface RegistrarClienteProps {
   isOpen: boolean;
   onClose: () => void;
-  addCliente: (data: any) => Promise<void>;
+  addCliente: (data: any) => Promise<any>;
   user: User;
   initialValues?: Partial<any>;
   presentation?: "center" | "drawer";

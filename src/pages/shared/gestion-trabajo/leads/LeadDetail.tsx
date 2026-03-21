@@ -50,7 +50,7 @@ export default function LeadDetail() {
 
   const { data: lead, isLoading } = leadService.useGetById(id || "");
   const { addPoliza } = usePolizas();
-  const { data: polizasCliente = [] } = polizaApi.useGetAllByCliente(leadState?.idCliente || "");
+  const { data: polizasCliente = [] } = polizaApi.useGetAllByCliente((lead as any)?.idCliente || "");
 
   const [detalleVidaLey, setDetalleVidaLey] = useState<any | null>(null);
   const [detalleAuto, setDetalleAuto] = useState<any | null>(null);
