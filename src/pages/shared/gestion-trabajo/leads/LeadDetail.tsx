@@ -12,6 +12,7 @@ import { RegistrarPoliza } from "@/components/modulos/polizas/modales/RegistrarP
 import { useSidebar } from "@/hooks/useSidebar";
 import { leadService } from "@/services/lead.service";
 import { polizaApi } from "@/services/poliza.service";
+import { clienteService } from "@/services/cliente.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useClientes } from "@/hooks/useCliente";
 import { usePolizas } from "@/hooks/usePolizas";
@@ -50,7 +51,9 @@ export default function LeadDetail() {
 
   const { data: lead, isLoading } = leadService.useGetById(id || "");
   const { addPoliza } = usePolizas();
-  const { data: polizasCliente = [] } = polizaApi.useGetAllByCliente((lead as any)?.idCliente || "");
+  const idClienteVinculado = (lead as any)?.idCliente || "";
+  const { data: polizasCliente = [] } = polizaApi.useGetAllByCliente(idClienteVinculado);
+  const { data: clienteVinculado } = clienteService.useGetById(idClienteVinculado);
 
   const [detalleVidaLey, setDetalleVidaLey] = useState<any | null>(null);
   const [detalleAuto, setDetalleAuto] = useState<any | null>(null);
@@ -2162,25 +2165,14 @@ export default function LeadDetail() {
         />
       )}
 
-      {user && leadState?.idCliente && (
+      {user && (
         <RegistrarPoliza
           isOpen={isRegistrarPolizaOpen}
           onClose={() => setIsRegistrarPolizaOpen(false)}
           addPoliza={handleRegistrarPoliza}
-          idCliente={leadState.idCliente}
+          idCliente={idClienteVinculado}
           idUsuario={user.idUsuario}
-          cliente={{
-            idCliente: leadState.idCliente,
-            tipoPersona: "NATURAL" as any,
-            nombres: leadState.nombre ?? "",
-            apellidos: "",
-            tipoDocumento: "DNI" as any,
-            emailNotificaciones: leadState.email ?? "",
-            telefono1: leadState.telefono ?? "",
-            recibirNotificaciones: false,
-            registradoPor: user.idUsuario,
-            activo: true,
-          } as any}
+          cliente={clienteVinculado}
         />
       )}
     </>
