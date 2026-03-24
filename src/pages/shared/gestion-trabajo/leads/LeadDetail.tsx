@@ -1915,12 +1915,6 @@ export default function LeadDetail() {
                     <FileCheck className="w-4 h-4 text-orange-600" />
                     <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide">Pólizas Emitidas</h3>
                   </div>
-                  <button
-                    onClick={() => setIsRegistrarPolizaOpen(true)}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
-                  >
-                    <FileCheck className="w-3 h-3" /> Nueva Póliza
-                  </button>
                 </div>
                 {polizasCliente.length === 0 ? (
                   <p className="text-sm text-gray-400 italic">No hay pólizas registradas para este cliente aún.</p>

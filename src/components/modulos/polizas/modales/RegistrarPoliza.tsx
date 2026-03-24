@@ -326,8 +326,9 @@ export const RegistrarPoliza = ({
       ...data,
       idBroker: data.idBroker || undefined,
       idAgente: data.idAgente || undefined,
+      comisionBroker: isNaN(data.comisionBroker) ? 0 : data.comisionBroker,
+      comisionAgente: isNaN(data.comisionAgente) ? 0 : data.comisionAgente,
     };
-    console.log(dataToSend);
     await addPoliza(dataToSend);
     onClose();
   };
