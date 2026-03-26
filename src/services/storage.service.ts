@@ -2,15 +2,18 @@ import { api } from "@/config/api-client";
 
 export const storageService = {
   /**
-   * Sube un archivo al servidor y devuelve la URL pública
+   * Sube un archivo al servidor y devuelve la URL publica
    * @param file - Archivo a subir
-   * @returns URL pública del archivo subido
+   * @param folder - Carpeta destino (default: 'observaciones')
+   * @returns URL publica del archivo subido
    */
-  uploadFile: async (file: File): Promise<string> => {
+  uploadFile: async (file: File, folder?: string): Promise<string> => {
     const formData = new FormData();
     formData.append("file", file);
 
-    const { data } = await api.post("/storage/upload", formData, {
+    const params = folder ? `?folder=${encodeURIComponent(folder)}` : "";
+
+    const { data } = await api.post(`/storage/upload${params}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

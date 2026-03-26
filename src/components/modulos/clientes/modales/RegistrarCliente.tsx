@@ -13,15 +13,17 @@ import {
 } from "@/components/shared";
 import { Input, Label, Checkbox } from "@/components/ui";
 import { useForm, Controller } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   tipoPersonaOptions,
   tipoDocumentoOptions,
+  TipoDocumentoArchivo,
 } from "@/types/cliente.interface";
 import type { Cliente } from "@/types/cliente.interface";
 import type { User } from "@/store/auth.store";
 import { clienteService } from "@/services/cliente.service";
-import { AlertCircle } from "lucide-react";
+import { storageService } from "@/services/storage.service";
+import { AlertCircle, Upload, FileText, X } from "lucide-react";
 
 interface RegistrarClienteProps {
   isOpen: boolean;
@@ -80,6 +82,9 @@ export const RegistrarCliente = ({
 
   const [clienteExistente, setClienteExistente] = useState<Cliente | null>(null);
   const [checkingDoc, setCheckingDoc] = useState(false);
+  const [cartaFile, setCartaFile] = useState<File | null>(null);
+  const [uploadingCarta, setUploadingCarta] = useState(false);
+  const cartaInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setValue("numeroDocumento", "");
@@ -118,6 +123,7 @@ export const RegistrarCliente = ({
     if (!isOpen) {
       reset();
       setClienteExistente(null);
+      setCartaFile(null);
     } else if (isOpen && initialValues) {
       reset({
         tipoPersona: "",
@@ -145,6 +151,23 @@ export const RegistrarCliente = ({
 
   const onSubmit = async (data: any) => {
     const isNumericDoc = data.tipoDocumento === "DNI" || data.tipoDocumento === "RUC";
+
+    // Subir carta de nombramiento si existe
+    const documentos: any[] = [];
+    if (cartaFile) {
+      setUploadingCarta(true);
+      try {
+        const url = await storageService.uploadFile(cartaFile, "documentos-clientes");
+        documentos.push({
+          tipoDocumento: TipoDocumentoArchivo.CARTA_NOMBRAMIENTO,
+          urlArchivo: url,
+          descripcion: `Carta de Nombramiento - ${cartaFile.name}`,
+        });
+      } finally {
+        setUploadingCarta(false);
+      }
+    }
+
     const dataSubmit = {
       ...data,
       numeroDocumento: isNumericDoc ? Number(data.numeroDocumento) : data.numeroDocumento,
@@ -153,6 +176,8 @@ export const RegistrarCliente = ({
       whatsapp: data.whatsapp || null,
       emailNotificaciones: data.emailNotificaciones || null,
       cumpleanos: data.cumpleanos || null,
+      contactos: [],
+      documentos,
     };
 
     await addCliente(dataSubmit);
@@ -504,9 +529,52 @@ export const RegistrarCliente = ({
                 </div>
               </FormGroup>
             </FormGroupDivisor>
+
+            {/* Carta de Nombramiento */}
+            <FormGroup>
+              <Label htmlFor="cartaNombramiento">Carta de Nombramiento</Label>
+              <div className="mt-1">
+                {!cartaFile ? (
+                  <button
+                    type="button"
+                    onClick={() => cartaInputRef.current?.click()}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-blue-400 hover:text-blue-500 transition-colors"
+                  >
+                    <Upload className="w-4 h-4" />
+                    Subir carta de nombramiento (PDF, DOC, DOCX)
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-3 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <FileText className="w-5 h-5 text-blue-600 shrink-0" />
+                    <span className="text-sm text-blue-800 truncate flex-1">{cartaFile.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => setCartaFile(null)}
+                      className="p-1 hover:bg-blue-100 rounded"
+                    >
+                      <X className="w-4 h-4 text-blue-600" />
+                    </button>
+                  </div>
+                )}
+                <input
+                  ref={cartaInputRef}
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) setCartaFile(file);
+                    e.target.value = "";
+                  }}
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Opcional. Documento firmado por el cliente designando a AI Corredores como su corredor.
+                </p>
+              </div>
+            </FormGroup>
           </ModalBody>
 
-          <SubmitButtons onClose={onClose} isSubmitting={isSubmitting} />
+          <SubmitButtons onClose={onClose} isSubmitting={isSubmitting || uploadingCarta} />
         </form>
       </Modal>
     </ModalContainer>

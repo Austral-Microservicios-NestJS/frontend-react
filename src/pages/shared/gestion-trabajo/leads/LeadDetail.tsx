@@ -13,6 +13,7 @@ import { useSidebar } from "@/hooks/useSidebar";
 import { leadService } from "@/services/lead.service";
 import { polizaApi } from "@/services/poliza.service";
 import { clienteService } from "@/services/cliente.service";
+import { clienteDocumentoApi } from "@/services/cliente-documento.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useClientes } from "@/hooks/useCliente";
 import { usePolizas } from "@/hooks/usePolizas";
@@ -54,6 +55,7 @@ export default function LeadDetail() {
   const idClienteVinculado = (lead as any)?.idCliente || "";
   const { data: polizasCliente = [] } = polizaApi.useGetAllByCliente(idClienteVinculado);
   const { data: clienteVinculado } = clienteService.useGetById(idClienteVinculado);
+  const { data: documentosCliente = [] } = clienteDocumentoApi.useGetByCliente(idClienteVinculado);
 
   const [detalleVidaLey, setDetalleVidaLey] = useState<any | null>(null);
   const [detalleAuto, setDetalleAuto] = useState<any | null>(null);
@@ -1903,6 +1905,39 @@ export default function LeadDetail() {
                       </button>
                     </div>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Documentos del cliente — carta de nombramiento */}
+            {leadState?.idCliente && documentosCliente.length > 0 && (
+              <div className="bg-white rounded-lg shadow-sm border border-blue-200 p-4">
+                <div className="flex items-center gap-2 mb-3 pb-2 border-b border-blue-100">
+                  <FileText className="w-4 h-4 text-blue-600" />
+                  <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide">Documentos del Cliente</h3>
+                </div>
+                <div className="space-y-2">
+                  {documentosCliente.map((doc: any) => (
+                    <div key={doc.idDocumento} className="flex items-center justify-between px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-blue-500" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-800">
+                            {doc.tipoDocumento === "CARTA_NOMBRAMIENTO" ? "Carta de Nombramiento" : doc.tipoDocumento}
+                          </p>
+                          {doc.descripcion && <p className="text-xs text-gray-500">{doc.descripcion}</p>}
+                        </div>
+                      </div>
+                      <a
+                        href={doc.urlArchivo}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors"
+                      >
+                        <Download className="w-3 h-3" /> Descargar
+                      </a>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

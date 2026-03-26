@@ -27,6 +27,7 @@ export enum TipoDocumentoArchivo {
   DNI_POSTERIOR = "DNI_POSTERIOR",
   RUC_FICHA = "RUC_FICHA",
   CONSTANCIA_SITUACION = "CONSTANCIA_SITUACION",
+  CARTA_NOMBRAMIENTO = "CARTA_NOMBRAMIENTO",
   OTRO = "OTRO",
 }
 
@@ -36,7 +37,11 @@ export const tipoDocumentoArchivoOptions = [
   { value: TipoDocumentoArchivo.RUC_FICHA, label: "RUC" },
   {
     value: TipoDocumentoArchivo.CONSTANCIA_SITUACION,
-    label: "Constancia de Situación",
+    label: "Constancia de Situacion",
+  },
+  {
+    value: TipoDocumentoArchivo.CARTA_NOMBRAMIENTO,
+    label: "Carta de Nombramiento",
   },
   { value: TipoDocumentoArchivo.OTRO, label: "Otro" },
 ] as const;
