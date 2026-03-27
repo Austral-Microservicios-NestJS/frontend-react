@@ -1,4 +1,5 @@
 import LoginForm from "@/components/modulos/auth/LoginForm";
+import { motion } from "framer-motion";
 
 export default function LoginPage() {
   return (
@@ -50,8 +51,27 @@ export default function LoginPage() {
           <div className="lg:hidden text-center text-xs text-zinc-400 mt-8">
             <p>© {new Date().getFullYear()} Austral Corredores de Seguros</p>
           </div>
+
         </div>
       </div>
+
+      {/* Powered by Hannahlab - fixed bottom-left */}
+      <motion.p
+        initial={{ opacity: 0, x: -16 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 1, duration: 0.6, ease: "easeOut" }}
+        className="fixed bottom-4 left-5 text-xs tracking-wide text-zinc-400 z-50 select-none"
+      >
+        Powered by{" "}
+        <a
+          href="https://www.hannahlab.com/inicio"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold hover:text-zinc-200 transition-colors duration-200"
+        >
+          Hannahlab
+        </a>
+      </motion.p>
     </div>
   );
 }
