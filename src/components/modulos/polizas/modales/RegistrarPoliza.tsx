@@ -322,13 +322,19 @@ export const RegistrarPoliza = ({
   ]);
 
   const onSubmit = async (data: CreatePolizaDto) => {
-    const dataToSend = {
+    const dataToSend: any = {
       ...data,
       idBroker: data.idBroker || undefined,
       idAgente: data.idAgente || undefined,
       comisionBroker: isNaN(data.comisionBroker) ? 0 : data.comisionBroker,
       comisionAgente: isNaN(data.comisionAgente) ? 0 : data.comisionAgente,
     };
+    // Eliminar cualquier campo UUID vacío para evitar 400 del backend
+    for (const key of ['idCliente', 'registradoPor', 'idCompania', 'idProducto', 'idRamo', 'idBroker', 'idAgente']) {
+      if (!dataToSend[key] || !String(dataToSend[key]).trim()) {
+        delete dataToSend[key];
+      }
+    }
     await addPoliza(dataToSend);
     onClose();
   };
