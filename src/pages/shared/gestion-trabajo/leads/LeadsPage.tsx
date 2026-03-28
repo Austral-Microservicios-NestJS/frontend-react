@@ -82,6 +82,8 @@ export default function LeadsPage() {
     cambiarEstadoLead,
     isLoading,
     error,
+    mostrarArchivados,
+    setMostrarArchivados,
   } = useLeads();
 
   const filteredByEstado = useMemo(
@@ -304,6 +306,14 @@ export default function LeadsPage() {
               <span className="text-sm">
                 {sortOrder === "desc" ? "Recientes" : "Antiguos"}
               </span>
+            </Button>
+            <Button
+              variant={mostrarArchivados ? "default" : "outline"}
+              size="sm"
+              onClick={() => setMostrarArchivados(!mostrarArchivados)}
+              className="text-xs"
+            >
+              {mostrarArchivados ? "Ocultar archivados" : "Ver archivados"}
             </Button>
           </div>
 

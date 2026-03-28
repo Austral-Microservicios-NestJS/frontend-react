@@ -1,9 +1,11 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { leadService } from "@/services/lead.service";
 import type { Lead, CreateLead, UpdateLead, EstadoLead } from "@/types/lead.interface";
 import { useAuthStore } from "@/store/auth.store";
 import { Roles } from "@/utils/roles";
+
+const DIAS_OCULTAR_FINALIZADOS = 7; // Leads CERRADO/PERDIDO se ocultan del kanban después de 7 días
 
 export const useLeads = () => {
   const { user } = useAuthStore();
@@ -11,25 +13,32 @@ export const useLeads = () => {
   const createMutation = leadService.useCreate();
   const updateMutation = leadService.useUpdate();
   const deleteMutation = leadService.useDelete();
+  const [mostrarArchivados, setMostrarArchivados] = useState(false);
 
   const rol = user?.rol?.nombreRol;
-  // PROMOTOR_VENTA, PUNTO_VENTA y REFERENCIADOR solo ven los leads asignados a ellos
   const isLimitedRole =
     rol === Roles.PROMOTOR_VENTA ||
     rol === Roles.PUNTO_VENTA ||
     rol === Roles.REFERENCIADOR;
 
-  // Validar que allLeads sea un array y filtrar por rol si corresponde
+  // Filtrar por rol y ocultar CERRADO/PERDIDO antiguos
   const leads = useMemo(() => {
-    if (!Array.isArray(allLeads)) {
-      console.warn("allLeads no es un array:", allLeads);
-      return [];
-    }
+    if (!Array.isArray(allLeads)) return [];
+    let filtered = allLeads;
     if (isLimitedRole) {
-      return allLeads.filter((lead) => lead.asignadoA === user?.nombreUsuario);
+      filtered = filtered.filter((lead) => lead.asignadoA === user?.nombreUsuario);
     }
-    return allLeads;
-  }, [allLeads, isLimitedRole, user?.nombreUsuario]);
+    if (!mostrarArchivados) {
+      const ahora = new Date();
+      const limite = DIAS_OCULTAR_FINALIZADOS * 24 * 60 * 60 * 1000;
+      filtered = filtered.filter((lead) => {
+        if (lead.estado !== "CERRADO" && lead.estado !== "PERDIDO") return true;
+        const fechaCambio = new Date(lead.fechaUltimoCambioEstado || lead.fechaCreacion);
+        return ahora.getTime() - fechaCambio.getTime() < limite;
+      });
+    }
+    return filtered;
+  }, [allLeads, isLimitedRole, user?.nombreUsuario, mostrarArchivados]);
 
   const leadsByEstado = useMemo(() => {
     return {
@@ -107,10 +116,8 @@ export const useLeads = () => {
 
   const cambiarEstadoLead = async (id: string, nuevoEstado: EstadoLead) => {
     try {
-      await updateMutation.mutateAsync({
-        id,
-        data: { estado: nuevoEstado }
-      });
+      await leadService.cambiarEstado(id, nuevoEstado, user?.nombreUsuario);
+      updateMutation.reset();
       toast.success("Estado actualizado exitosamente");
     } catch (error) {
       console.error("Error al cambiar estado:", error);
@@ -129,5 +136,7 @@ export const useLeads = () => {
     updateLead,
     deleteLead,
     cambiarEstadoLead,
+    mostrarArchivados,
+    setMostrarArchivados,
   };
 };

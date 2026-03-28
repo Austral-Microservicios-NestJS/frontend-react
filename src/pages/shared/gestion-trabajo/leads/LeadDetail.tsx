@@ -33,6 +33,7 @@ import {
   Download,
   Save,
   FileCheck,
+  CheckCircle,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import days from "dayjs";
@@ -126,23 +127,38 @@ export default function LeadDetail() {
     setIsRegistrarClienteOpen(true);
   };
 
-  // Crea cliente y vincula su id al lead
+  // Crea cliente y vincula su id al lead → pasa a COTIZADO
   const handleAddClienteAndLink = async (clienteData: any) => {
     const newCliente = await addCliente(clienteData);
     if (newCliente?.idCliente && id) {
       await leadService.update(id, { idCliente: newCliente.idCliente });
-      setLeadState((s: any) => ({ ...s, idCliente: newCliente.idCliente }));
+      await leadService.cambiarEstado(id, "COTIZADO", user?.nombreUsuario, "Cliente registrado y vinculado");
+      setLeadState((s: any) => ({ ...s, idCliente: newCliente.idCliente, estado: "COTIZADO" }));
     }
   };
 
+  // Registra póliza → pasa a EMITIDO
   const handleRegistrarPoliza = async (data: any) => {
     await addPoliza(data);
-    // Marcar lead como CERRADO después de emitir la póliza
     if (id) {
-      await leadService.update(id, { estado: "CERRADO" as any });
-      setLeadState((s: any) => ({ ...s, estado: "CERRADO" }));
+      await leadService.cambiarEstado(id, "EMITIDO", user?.nombreUsuario, "Póliza registrada");
+      setLeadState((s: any) => ({ ...s, estado: "EMITIDO" }));
     }
     setIsRegistrarPolizaOpen(false);
+  };
+
+  // Cerrar lead (final feliz)
+  const handleCerrarLead = async () => {
+    if (!id) return;
+    await leadService.cambiarEstado(id, "CERRADO", user?.nombreUsuario, "Proceso completado exitosamente");
+    setLeadState((s: any) => ({ ...s, estado: "CERRADO" }));
+  };
+
+  // Marcar como perdido
+  const handleMarcarPerdido = async () => {
+    if (!id) return;
+    await leadService.cambiarEstado(id, "PERDIDO", user?.nombreUsuario, "Marcado como perdido manualmente");
+    setLeadState((s: any) => ({ ...s, estado: "PERDIDO" }));
   };
 
   const handleSaveChanges = async () => {
@@ -222,13 +238,30 @@ export default function LeadDetail() {
             <UserPlus className="w-4 h-4" />
             {leadState?.idCliente ? "Cliente Vinculado ✓" : "Registrar Cliente"}
           </button>
-          {leadState?.idCliente && (
+          {leadState?.idCliente && leadState?.estado !== "CERRADO" && leadState?.estado !== "PERDIDO" && (
             <button
               onClick={() => setIsRegistrarPolizaOpen(true)}
               className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-white rounded-lg transition-colors bg-emerald-600 hover:bg-emerald-700"
             >
               <FileCheck className="w-4 h-4" />
               Registrar Póliza
+            </button>
+          )}
+          {leadState?.estado === "EMITIDO" && (
+            <button
+              onClick={handleCerrarLead}
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-white rounded-lg transition-colors bg-green-600 hover:bg-green-700"
+            >
+              <CheckCircle className="w-4 h-4" />
+              Cerrar Lead
+            </button>
+          )}
+          {leadState?.estado !== "CERRADO" && leadState?.estado !== "PERDIDO" && (
+            <button
+              onClick={handleMarcarPerdido}
+              className="inline-flex items-center gap-2 px-2 py-2 text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200"
+            >
+              Perdido
             </button>
           )}
           <button

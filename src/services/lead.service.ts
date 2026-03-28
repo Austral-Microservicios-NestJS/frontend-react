@@ -80,6 +80,11 @@ export const leadService = {
     return data;
   },
 
+  cambiarEstado: async (id: string, estado: string, usuarioResponsable?: string, comentario?: string): Promise<Lead> => {
+    const { data } = await api.patch<Lead>(`/leads/${id}/estado`, { estado, usuarioResponsable, comentario });
+    return data;
+  },
+
   delete: async (id: string): Promise<void> => {
     await api.delete(`/leads/${id}`);
   },
