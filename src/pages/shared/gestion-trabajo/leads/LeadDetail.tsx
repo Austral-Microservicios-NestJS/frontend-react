@@ -154,13 +154,6 @@ export default function LeadDetail() {
     setLeadState((s: any) => ({ ...s, estado: "CERRADO" }));
   };
 
-  // Marcar como perdido
-  const handleMarcarPerdido = async () => {
-    if (!id) return;
-    await leadService.cambiarEstado(id, "PERDIDO", user?.nombreUsuario, "Marcado como perdido manualmente");
-    setLeadState((s: any) => ({ ...s, estado: "PERDIDO" }));
-  };
-
   const handleSaveChanges = async () => {
     if (!leadState || !id) return;
     setIsSaving(true);
@@ -254,14 +247,6 @@ export default function LeadDetail() {
             >
               <CheckCircle className="w-4 h-4" />
               Cerrar Lead
-            </button>
-          )}
-          {leadState?.estado !== "CERRADO" && leadState?.estado !== "PERDIDO" && (
-            <button
-              onClick={handleMarcarPerdido}
-              className="inline-flex items-center gap-2 px-2 py-2 text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200"
-            >
-              Perdido
             </button>
           )}
           <button
@@ -489,28 +474,34 @@ export default function LeadDetail() {
 
                   <div>
                     <p className="text-xs font-semibold text-gray-500 mb-0.5">Estado</p>
-                    <div className="flex items-center gap-2">
-                      <input
-                        value={leadState?.estado ?? ""}
-                        onChange={(e) =>
-                          setLeadState((s: any) => ({
-                            ...s,
-                            estado: e.target.value,
-                          }))
+                    <select
+                      value={leadState?.estado ?? ""}
+                      onChange={async (e) => {
+                        const nuevoEstado = e.target.value;
+                        setLeadState((s: any) => ({ ...s, estado: nuevoEstado }));
+                        if (id) {
+                          try {
+                            await leadService.cambiarEstado(id, nuevoEstado, user?.nombreUsuario, "Cambio manual de estado");
+                          } catch (err) {
+                            console.error("Error al cambiar estado:", err);
+                          }
                         }
-                        className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-blue-400 transition-colors"
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          navigator.clipboard.writeText(leadState?.estado ?? "")
-                        }
-                        className="p-1 text-gray-500 hover:text-gray-800"
-                        title="Copiar estado"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </button>
-                    </div>
+                      }}
+                      className={`w-full rounded-lg px-2.5 py-1.5 text-sm font-semibold border cursor-pointer transition-colors focus:outline-none ${
+                        leadState?.estado === "NUEVO" ? "bg-indigo-50 text-indigo-700 border-indigo-300" :
+                        leadState?.estado === "COTIZADO" ? "bg-violet-50 text-violet-700 border-violet-300" :
+                        leadState?.estado === "EMITIDO" ? "bg-orange-50 text-orange-700 border-orange-300" :
+                        leadState?.estado === "CERRADO" ? "bg-emerald-50 text-emerald-700 border-emerald-300" :
+                        leadState?.estado === "PERDIDO" ? "bg-rose-50 text-rose-700 border-rose-300" :
+                        "bg-gray-50 text-gray-700 border-gray-300"
+                      }`}
+                    >
+                      <option value="NUEVO">Nuevo</option>
+                      <option value="COTIZADO">Cotizado</option>
+                      <option value="EMITIDO">Emitido</option>
+                      <option value="CERRADO">Cerrado</option>
+                      <option value="PERDIDO">Perdido</option>
+                    </select>
                   </div>
 
                   {leadState?.valorEstimado && (
