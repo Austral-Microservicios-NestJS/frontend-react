@@ -83,6 +83,9 @@ export default function LeadDetail() {
     error: errorPlaca,
     refetch: refetchPlaca,
   } = leadService.useConsultarPlacaAI(placaParaConsulta);
+  const {
+    data: consultaCompleta,
+  } = leadService.useConsultaVehicularCompleta(placaParaConsulta);
   const propietariosCount = consultaPlacaData?.propietarios?.length ?? 0;
 
   useEffect(() => {
@@ -861,6 +864,84 @@ export default function LeadDetail() {
                 </div>
               )}
             </div>
+
+            {/* Infraxion: Papeletas, Revisiones Técnicas, Siniestros */}
+            {placaRaw && consultaCompleta && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Papeletas */}
+                <div className="bg-white rounded-lg shadow-sm border border-amber-200 p-4">
+                  <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide mb-2 pb-1.5 border-b border-amber-100">
+                    Papeletas ({consultaCompleta.papeletas?.length || 0})
+                  </h3>
+                  {consultaCompleta.papeletas?.length > 0 ? (
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {consultaCompleta.papeletas.map((p: any, i: number) => (
+                        <div key={i} className="text-xs border border-gray-100 rounded p-2 bg-gray-50">
+                          <div className="flex justify-between">
+                            <span className="font-semibold text-amber-700">{p.falta}</span>
+                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${p.estado === "Pendiente" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
+                              {p.estado}
+                            </span>
+                          </div>
+                          <p className="text-gray-600 mt-0.5">{p.fechaInfraccion} — S/ {p.monto}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-400 italic">Sin papeletas registradas</p>
+                  )}
+                </div>
+
+                {/* Revisiones Técnicas */}
+                <div className="bg-white rounded-lg shadow-sm border border-blue-200 p-4">
+                  <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide mb-2 pb-1.5 border-b border-blue-100">
+                    Rev. Técnica ({consultaCompleta.revisionesTecnicas?.length || 0})
+                  </h3>
+                  {consultaCompleta.revisionesTecnicas?.length > 0 ? (
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {consultaCompleta.revisionesTecnicas.map((r: any, i: number) => (
+                        <div key={i} className="text-xs border border-gray-100 rounded p-2 bg-gray-50">
+                          <div className="flex justify-between">
+                            <span className="font-semibold text-blue-700">{r.resultado}</span>
+                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${r.estado === "VIGENTE" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}>
+                              {r.estado || "—"}
+                            </span>
+                          </div>
+                          <p className="text-gray-600 mt-0.5">{r.fechaInicio} → {r.fechaVencimiento || "—"}</p>
+                          <p className="text-gray-500 truncate">{r.entidad}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-400 italic">Sin revisiones técnicas</p>
+                  )}
+                </div>
+
+                {/* Siniestros */}
+                <div className="bg-white rounded-lg shadow-sm border border-rose-200 p-4">
+                  <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide mb-2 pb-1.5 border-b border-rose-100">
+                    Siniestros ({consultaCompleta.siniestros?.length || 0})
+                  </h3>
+                  {consultaCompleta.siniestros?.length > 0 ? (
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {consultaCompleta.siniestros.map((s: any, i: number) => (
+                        <div key={i} className="text-xs border border-gray-100 rounded p-2 bg-gray-50">
+                          <div className="flex justify-between">
+                            <span className="font-semibold text-rose-700">{s.aseguradora}</span>
+                            <span className="text-gray-500">{s.clase}</span>
+                          </div>
+                          <p className="text-gray-600 mt-0.5">{s.inicio} → {s.fin}</p>
+                          <p className="text-gray-500">{s.marca} {s.modelo} — {s.uso}</p>
+                          {s.comentario && <p className="text-gray-400 italic mt-0.5">{s.comentario}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-400 italic">Sin siniestros registrados</p>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Detalle Auto */}
             {detalleAuto && (

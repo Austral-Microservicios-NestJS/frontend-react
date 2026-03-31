@@ -133,6 +133,12 @@ export const leadService = {
     return data;
   },
 
+  // Consulta completa vehicular (vehículo + papeletas + revisiones + siniestros)
+  consultaVehicularCompleta: async (placa: string): Promise<any> => {
+    const { data } = await api.get<any>(`/vehiculos/consulta-completa/${placa}`);
+    return data;
+  },
+
   // ==================== REACT QUERY HOOKS ====================
 
   useGetAll: () => {
@@ -194,7 +200,18 @@ export const leadService = {
       queryFn: () => leadService.consultarPlacaAI(placa!),
       enabled: !!placa && placa.length >= 6,
       retry: 1,
-      staleTime: 1000 * 60 * 10, // 10 minutos de cache
+      staleTime: 1000 * 60 * 10,
+    });
+  },
+
+  // Hook para consulta completa vehicular
+  useConsultaVehicularCompleta: (placa: string | undefined) => {
+    return useQuery({
+      queryKey: ["consulta-vehicular-completa", placa],
+      queryFn: () => leadService.consultaVehicularCompleta(placa!),
+      enabled: !!placa && placa.length >= 6,
+      retry: 1,
+      staleTime: 1000 * 60 * 10,
     });
   },
 };
