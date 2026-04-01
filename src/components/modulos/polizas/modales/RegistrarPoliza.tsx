@@ -327,14 +327,15 @@ export const RegistrarPoliza = ({
       comisionBroker: isNaN(data.comisionBroker) ? 0 : data.comisionBroker,
       comisionAgente: isNaN(data.comisionAgente) ? 0 : data.comisionAgente,
     };
-    // Eliminar cualquier campo UUID vacío para evitar 400 del backend
-    for (const key of ['idCliente', 'registradoPor', 'idCompania', 'idProducto', 'idRamo', 'idBroker', 'idAgente']) {
-      if (!dataToSend[key] || !String(dataToSend[key]).trim()) {
-        delete dataToSend[key];
-      }
+    // Eliminar campos UUID opcionales vacíos (solo broker y agente son opcionales)
+    if (!dataToSend.idBroker || !String(dataToSend.idBroker).trim()) delete dataToSend.idBroker;
+    if (!dataToSend.idAgente || !String(dataToSend.idAgente).trim()) delete dataToSend.idAgente;
+    try {
+      await addPoliza(dataToSend);
+      onClose();
+    } catch (err: any) {
+      console.error("Poliza error detail:", err?.response?.data || err);
     }
-    await addPoliza(dataToSend);
-    onClose();
   };
 
   return (
