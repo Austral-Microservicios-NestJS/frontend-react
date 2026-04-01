@@ -108,15 +108,14 @@ export const RegistrarPoliza = ({
   );
 
   // Obtener subordinados según el rol
-  // ADMIN: obtiene sus brokers directos (ya obtenido arriba)
-  // BROKER: obtiene sus agentes
+  // BROKER: obtiene sus agentes via asignaciones
   const { data: subordinados = [] } = asignacionApi.useGetSubordinados(
-    isAdmin ? "" : isBroker ? user?.idUsuario || "" : "",
+    isBroker ? user?.idUsuario || "" : "",
   );
 
-  // Obtener agentes del broker seleccionado (solo para ADMIN)
-  const { data: agentesDelBroker = [] } = asignacionApi.useGetSubordinados(
-    isAdmin && watchIdBroker ? watchIdBroker : "",
+  // ADMIN: obtener todos los promotores/agentes del sistema
+  const { data: allAgentes = [] } = usuarioApi.useGetByRole(
+    isAdmin && watchIdBroker ? "PROMOTOR_VENTA" : "",
   );
 
   // Obtener supervisor (para agentes) para pre-llenar broker
@@ -278,14 +277,13 @@ export const RegistrarPoliza = ({
   // Auto-poblar comisión de agente cuando se selecciona
   useEffect(() => {
     if (watchIdAgente) {
-      // Para ADMINISTRADOR: buscar asignación del agente en agentesDelBroker
-      if (isAdmin && agentesDelBroker.length > 0) {
-        const agenteAsignacion = agentesDelBroker.find(
-          (asig) => asig.subordinado.idUsuario === watchIdAgente,
+      // Para ADMINISTRADOR: buscar agente en allAgentes
+      if (isAdmin && allAgentes.length > 0) {
+        const agente = allAgentes.find(
+          (a: any) => a.idUsuario === watchIdAgente,
         );
-
-        if (agenteAsignacion) {
-          setValue("comisionAgente", agenteAsignacion.porcentajeComision);
+        if (agente?.porcentajeComision) {
+          setValue("comisionAgente", agente.porcentajeComision);
         }
       }
 
@@ -311,7 +309,7 @@ export const RegistrarPoliza = ({
     }
   }, [
     watchIdAgente,
-    agentesDelBroker,
+    allAgentes,
     subordinados,
     isAdmin,
     isBroker,
@@ -600,38 +598,26 @@ export const RegistrarPoliza = ({
                           />
                         </SelectTrigger>
                         <SelectContent>
-                          {/* Para ADMIN: mostrar agentes del broker seleccionado */}
+                          {/* Para ADMIN: mostrar todos los promotores/agentes */}
                           {isAdmin &&
-                            agentesDelBroker
-                              .filter(
-                                (asig) =>
-                                  asig.subordinado.rol?.nombreRol === "AGENTE",
-                              )
-                              .map((asig) => (
-                                <SelectItem
-                                  key={asig.subordinado.idUsuario}
-                                  value={asig.subordinado.idUsuario}
-                                >
-                                  {asig.subordinado.nombreUsuario} (
-                                  {asig.porcentajeComision}%)
-                                </SelectItem>
-                              ))}
-                          {/* Para BROKER: mostrar sus propios agentes */}
+                            allAgentes.map((agente: any) => (
+                              <SelectItem
+                                key={agente.idUsuario}
+                                value={agente.idUsuario}
+                              >
+                                {agente.nombreUsuario}
+                              </SelectItem>
+                            ))}
+                          {/* Para BROKER: mostrar sus propios subordinados */}
                           {isBroker &&
-                            subordinados
-                              .filter(
-                                (asig) =>
-                                  asig.subordinado.rol?.nombreRol === "AGENTE",
-                              )
-                              .map((asig) => (
-                                <SelectItem
-                                  key={asig.subordinado.idUsuario}
-                                  value={asig.subordinado.idUsuario}
-                                >
-                                  {asig.subordinado.nombreUsuario} (
-                                  {asig.porcentajeComision}%)
-                                </SelectItem>
-                              ))}
+                            subordinados.map((asig: any) => (
+                              <SelectItem
+                                key={asig.subordinado?.idUsuario || asig.idUsuario}
+                                value={asig.subordinado?.idUsuario || asig.idUsuario}
+                              >
+                                {asig.subordinado?.nombreUsuario || asig.nombreUsuario}
+                              </SelectItem>
+                            ))}
                         </SelectContent>
                       </Select>
                     )}
