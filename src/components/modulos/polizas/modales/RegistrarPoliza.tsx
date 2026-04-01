@@ -102,9 +102,9 @@ export const RegistrarPoliza = ({
   // Obtener productos del ramo seleccionado
   const { data: productos = [] } = productoApi.useGetByRamo(watchIdRamo || "");
 
-  // Obtener brokers para admin
-  const { data: brokers = [] } = usuarioApi.useGetBrokersBySupervisor(
-    isAdmin ? user?.idUsuario || "" : "",
+  // Obtener brokers: ADMIN ve todos los brokers del sistema
+  const { data: brokers = [] } = usuarioApi.useGetByRole(
+    isAdmin ? "BROKER" : "",
   );
 
   // Obtener subordinados según el rol

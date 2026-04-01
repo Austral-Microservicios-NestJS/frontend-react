@@ -56,6 +56,11 @@ export const usuarioApi = {
     return response.data || [];
   },
 
+  getByRole: async (role: string) => {
+    const response = await api.get<any[]>(`/usuarios/role/${role}`);
+    return response.data || [];
+  },
+
   // ===== Hooks de React Query =====
 
   useGetById: (id: string) => {
@@ -78,6 +83,14 @@ export const usuarioApi = {
       queryKey: [...USUARIOS_KEY, "brokers", "supervisor", idSupervisor],
       queryFn: () => usuarioApi.getBrokersBySupervisor(idSupervisor),
       enabled: !!idSupervisor,
+    });
+  },
+
+  useGetByRole: (role: string) => {
+    return useQuery({
+      queryKey: [...USUARIOS_KEY, "role", role],
+      queryFn: () => usuarioApi.getByRole(role),
+      enabled: !!role,
     });
   },
 
