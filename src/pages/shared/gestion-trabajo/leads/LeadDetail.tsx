@@ -2011,6 +2011,75 @@ export default function LeadDetail() {
                     </div>
                   </div>
                 </div>
+
+                {/* Tabla de trabajadores SCTR */}
+                <div className="mt-4 pt-3 border-t border-gray-100">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wide">
+                      Nómina de Trabajadores ({(detalleSCTR.trabajadores || []).length})
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const trabajadores = detalleSCTR.trabajadores || [];
+                        trabajadores.push({ tipoDoc: "DNI", nroDoc: "", apellidoPaterno: "", apellidoMaterno: "", nombres: "", fechaNacimiento: "", sexo: "M", sueldo: 0 });
+                        setDetalleSCTR((d: any) => ({ ...d, trabajadores: [...trabajadores] }));
+                      }}
+                      className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded border border-blue-200 transition-colors"
+                    >
+                      + Agregar trabajador
+                    </button>
+                  </div>
+                  {(detalleSCTR.trabajadores || []).length > 0 ? (
+                    <div className="overflow-x-auto rounded-lg border border-gray-200">
+                      <table className="w-full text-xs">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-2 py-1.5 text-left font-semibold text-gray-600">Tipo</th>
+                            <th className="px-2 py-1.5 text-left font-semibold text-gray-600">N° Doc</th>
+                            <th className="px-2 py-1.5 text-left font-semibold text-gray-600">Ap. Paterno</th>
+                            <th className="px-2 py-1.5 text-left font-semibold text-gray-600">Ap. Materno</th>
+                            <th className="px-2 py-1.5 text-left font-semibold text-gray-600">Nombres</th>
+                            <th className="px-2 py-1.5 text-left font-semibold text-gray-600">F. Nac.</th>
+                            <th className="px-2 py-1.5 text-left font-semibold text-gray-600">Sexo</th>
+                            <th className="px-2 py-1.5 text-left font-semibold text-gray-600">Sueldo</th>
+                            <th className="px-2 py-1.5 w-8"></th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                          {(detalleSCTR.trabajadores || []).map((t: any, idx: number) => (
+                            <tr key={idx} className="hover:bg-gray-50">
+                              <td className="px-1 py-1">
+                                <select value={t.tipoDoc || "DNI"} onChange={(e) => { const trs = [...detalleSCTR.trabajadores]; trs[idx] = { ...t, tipoDoc: e.target.value }; setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs })); }} className="w-14 border rounded px-1 py-0.5 text-xs">
+                                  <option value="DNI">DNI</option>
+                                  <option value="CE">CE</option>
+                                  <option value="PAS">PAS</option>
+                                </select>
+                              </td>
+                              <td className="px-1 py-1"><input value={t.nroDoc || ""} onChange={(e) => { const trs = [...detalleSCTR.trabajadores]; trs[idx] = { ...t, nroDoc: e.target.value }; setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs })); }} className="w-20 border rounded px-1.5 py-0.5 text-xs" placeholder="N° Doc" /></td>
+                              <td className="px-1 py-1"><input value={t.apellidoPaterno || ""} onChange={(e) => { const trs = [...detalleSCTR.trabajadores]; trs[idx] = { ...t, apellidoPaterno: e.target.value }; setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs })); }} className="w-24 border rounded px-1.5 py-0.5 text-xs" /></td>
+                              <td className="px-1 py-1"><input value={t.apellidoMaterno || ""} onChange={(e) => { const trs = [...detalleSCTR.trabajadores]; trs[idx] = { ...t, apellidoMaterno: e.target.value }; setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs })); }} className="w-24 border rounded px-1.5 py-0.5 text-xs" /></td>
+                              <td className="px-1 py-1"><input value={t.nombres || ""} onChange={(e) => { const trs = [...detalleSCTR.trabajadores]; trs[idx] = { ...t, nombres: e.target.value }; setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs })); }} className="w-28 border rounded px-1.5 py-0.5 text-xs" /></td>
+                              <td className="px-1 py-1"><input type="date" value={t.fechaNacimiento || ""} onChange={(e) => { const trs = [...detalleSCTR.trabajadores]; trs[idx] = { ...t, fechaNacimiento: e.target.value }; setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs })); }} className="w-28 border rounded px-1.5 py-0.5 text-xs" /></td>
+                              <td className="px-1 py-1">
+                                <select value={t.sexo || "M"} onChange={(e) => { const trs = [...detalleSCTR.trabajadores]; trs[idx] = { ...t, sexo: e.target.value }; setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs })); }} className="w-10 border rounded px-1 py-0.5 text-xs">
+                                  <option value="M">M</option>
+                                  <option value="F">F</option>
+                                </select>
+                              </td>
+                              <td className="px-1 py-1"><input type="number" step="0.01" value={t.sueldo || ""} onChange={(e) => { const trs = [...detalleSCTR.trabajadores]; trs[idx] = { ...t, sueldo: Number(e.target.value) }; setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs })); }} className="w-20 border rounded px-1.5 py-0.5 text-xs" placeholder="0.00" /></td>
+                              <td className="px-1 py-1">
+                                <button type="button" onClick={() => { const trs = [...detalleSCTR.trabajadores]; trs.splice(idx, 1); setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs })); }} className="text-red-400 hover:text-red-600 text-xs">✕</button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-400 italic">No hay trabajadores registrados. Haz clic en "Agregar trabajador" para comenzar.</p>
+                  )}
+                </div>
               </div>
             )}
 

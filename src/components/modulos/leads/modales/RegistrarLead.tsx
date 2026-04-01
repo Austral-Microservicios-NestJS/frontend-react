@@ -65,7 +65,7 @@ export const RegistrarLead = ({
     defaultValues: {
       estado: EstadoLead.NUEVO,
       prioridad: PrioridadLead.MEDIA,
-      fuente: FuenteLead.FORMULARIO_WEB,
+      fuente: FuenteLead.CRM,
       tipoSeguro: TipoSeguro.VEHICULAR,
     },
   });
@@ -108,7 +108,7 @@ export const RegistrarLead = ({
       reset({
         estado: EstadoLead.NUEVO,
         prioridad: PrioridadLead.MEDIA,
-        fuente: FuenteLead.FORMULARIO_WEB,
+        fuente: FuenteLead.CRM,
         tipoSeguro: TipoSeguro.VEHICULAR,
       });
     }

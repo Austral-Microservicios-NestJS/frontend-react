@@ -164,17 +164,19 @@ export enum PrioridadLead {
 }
 
 export enum FuenteLead {
-  FORMULARIO_WEB    = "FORMULARIO_WEB",
-  FORMULARIO_GOOGLE = "FORMULARIO_GOOGLE",
+  CRM                = "CRM",
+  WHATSAPP           = "WHATSAPP",
   LLAMADA_TELEFONICA = "LLAMADA_TELEFONICA",
-  EMAIL             = "EMAIL",
-  WHATSAPP          = "WHATSAPP",
-  FACEBOOK          = "FACEBOOK",
-  INSTAGRAM         = "INSTAGRAM",
-  LINKEDIN          = "LINKEDIN",
-  REFERIDO          = "REFERIDO",
-  EVENTO            = "EVENTO",
-  OTRO              = "OTRO",
+  EMAIL              = "EMAIL",
+  REFERIDO           = "REFERIDO",
+  SITIO_WEB          = "SITIO_WEB",
+  FACEBOOK           = "FACEBOOK",
+  INSTAGRAM          = "INSTAGRAM",
+  LINKEDIN           = "LINKEDIN",
+  EVENTO             = "EVENTO",
+  FORMULARIO_WEB     = "FORMULARIO_WEB",
+  FORMULARIO_GOOGLE  = "FORMULARIO_GOOGLE",
+  OTRO               = "OTRO",
 }
 
 export enum TipoSeguro {
@@ -310,16 +312,18 @@ export const prioridadLeadOptions = [
 ] as const;
 
 export const fuenteLeadOptions = [
-  { value: FuenteLead.FORMULARIO_WEB,     label: "CRM" },
-  { value: FuenteLead.FORMULARIO_GOOGLE,  label: "Formulario Google" },
+  { value: FuenteLead.CRM,                label: "CRM" },
+  { value: FuenteLead.WHATSAPP,           label: "WhatsApp (Chatbot)" },
   { value: FuenteLead.LLAMADA_TELEFONICA, label: "Llamada Telefónica" },
   { value: FuenteLead.EMAIL,              label: "Email" },
-  { value: FuenteLead.WHATSAPP,           label: "WhatsApp" },
+  { value: FuenteLead.REFERIDO,           label: "Referido" },
+  { value: FuenteLead.SITIO_WEB,          label: "Sitio Web" },
   { value: FuenteLead.FACEBOOK,           label: "Facebook" },
   { value: FuenteLead.INSTAGRAM,          label: "Instagram" },
   { value: FuenteLead.LINKEDIN,           label: "LinkedIn" },
-  { value: FuenteLead.REFERIDO,           label: "Referido" },
   { value: FuenteLead.EVENTO,             label: "Evento" },
+  { value: FuenteLead.FORMULARIO_WEB,     label: "Formulario Web" },
+  { value: FuenteLead.FORMULARIO_GOOGLE,  label: "Formulario Google" },
   { value: FuenteLead.OTRO,               label: "Otro" },
 ] as const;
 
