@@ -1,10 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Outfit:wght@100..900&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: 'Mulish', sans-serif;
+  --font-sans: 'Figtree', sans-serif;
+}
+
+body {
+  font-family: 'Figtree', sans-serif;
+  font-weight: 500;
+  font-style: normal;
 }
 
 @theme inline {

@@ -25,7 +25,7 @@ export const Header = ({
   const navigate = useNavigate();
 
   return (
-    <header className="mb-4 sticky top-0 z-40">
+    <header className="mb-4 sticky top-0 z-20">
       <div className="bg-white/80 backdrop-blur-md border-b border-gray-200/60 shadow-sm transition-all duration-300">
         <div className="px-5 py-4">
           <div className="flex items-start justify-between gap-4">
