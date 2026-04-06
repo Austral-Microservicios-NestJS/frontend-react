@@ -9,8 +9,6 @@ import { useSidebarStore } from "@/store/sidebar.store";
 import { searchService, type SearchResults } from "@/services/search.service";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Cliente, TipoPersona } from "@/types/cliente.interface";
-import type { Poliza } from "@/types/poliza.interface";
-import type { Lead } from "@/types/lead.interface";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -86,7 +84,7 @@ function SearchDropdown({ query, results, loading, onNavigate }: DropdownProps) 
                     <p className="text-sm font-semibold text-gray-800 truncate group-hover:text-blue-700 transition-colors">
                       {clienteLabel(c)}
                     </p>
-                    <p className="text-xs text-gray-400 truncate">{c.tipoPersona} · {c.correo || "Sin correo"}</p>
+                    <p className="text-xs text-gray-400 truncate">{c.tipoPersona} · {c.emailNotificaciones || c.telefono1 || "Sin contacto"}</p>
                   </div>
                 </button>
               ))}
