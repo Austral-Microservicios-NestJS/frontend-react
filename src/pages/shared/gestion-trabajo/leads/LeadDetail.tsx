@@ -2102,14 +2102,27 @@ export default function LeadDetail() {
                           {doc.descripcion && <p className="text-xs text-gray-500">{doc.descripcion}</p>}
                         </div>
                       </div>
-                      <a
-                        href={doc.urlArchivo}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors"
-                      >
-                        <Download className="w-3 h-3" /> Descargar
-                      </a>
+                      <div className="flex items-center gap-2">
+                        {doc.urlArchivo?.endsWith('.pdf') && (
+                          <a
+                            href={doc.urlArchivo}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                          >
+                            <FileText className="w-3 h-3" /> Vista previa
+                          </a>
+                        )}
+                        <a
+                          href={doc.urlArchivo}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          download
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors"
+                        >
+                          <Download className="w-3 h-3" /> Descargar
+                        </a>
+                      </div>
                     </div>
                   ))}
                 </div>

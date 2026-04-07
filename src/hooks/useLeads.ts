@@ -5,7 +5,7 @@ import type { Lead, CreateLead, UpdateLead, EstadoLead } from "@/types/lead.inte
 import { useAuthStore } from "@/store/auth.store";
 import { Roles } from "@/utils/roles";
 
-const DIAS_OCULTAR_FINALIZADOS = 7; // Leads CERRADO/PERDIDO se ocultan del kanban después de 7 días
+const DIAS_OCULTAR_FINALIZADOS = 3; // Leads CERRADO/PERDIDO se ocultan del kanban después de 3 días
 
 export const useLeads = () => {
   const { user } = useAuthStore();
