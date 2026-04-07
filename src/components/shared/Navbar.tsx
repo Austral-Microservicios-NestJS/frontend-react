@@ -74,7 +74,7 @@ function SearchDropdown({ query, results, loading, onNavigate }: DropdownProps) 
               {results.clientes.map((c) => (
                 <button
                   key={c.idCliente}
-                  onClick={() => onNavigate("/dashboard/gestion-trabajo/clientes")}
+                  onClick={() => onNavigate(`/dashboard/gestion-trabajo/clientes/${c.idCliente}/polizas`)}
                   className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-blue-50/60 transition-colors group text-left"
                 >
                   <div className="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
@@ -104,7 +104,7 @@ function SearchDropdown({ query, results, loading, onNavigate }: DropdownProps) 
               {results.polizas.map((p) => (
                 <button
                   key={p.id ?? p.idPoliza}
-                  onClick={() => onNavigate("/dashboard/gestion-trabajo/polizas")}
+                  onClick={() => onNavigate(`/dashboard/gestion-trabajo/clientes/${p.idCliente}/polizas`)}
                   className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-emerald-50/60 transition-colors group text-left"
                 >
                   <div className="w-7 h-7 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
@@ -134,7 +134,7 @@ function SearchDropdown({ query, results, loading, onNavigate }: DropdownProps) 
               {results.leads.map((l) => (
                 <button
                   key={l.idLead}
-                  onClick={() => onNavigate("/dashboard/gestion-trabajo/leads")}
+                  onClick={() => onNavigate(`/dashboard/gestion-trabajo/leads/${l.idLead}`)}
                   className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-purple-50/60 transition-colors group text-left"
                 >
                   <div className="w-7 h-7 rounded-lg bg-purple-100 flex items-center justify-center shrink-0">
