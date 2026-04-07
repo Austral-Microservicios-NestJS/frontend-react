@@ -1,4 +1,4 @@
-import { Info, ArrowLeft, Menu, ChevronLeft } from "lucide-react";
+import { Info, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface Props {
@@ -19,8 +19,6 @@ export const Header = ({
   onClickInfo,
   tutorialActive = false,
   showBackButton = false,
-  isSidebarOpen = true,
-  onToggleSidebar,
 }: Props) => {
   const navigate = useNavigate();
 
@@ -32,20 +30,6 @@ export const Header = ({
             {/* Sección de título */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-1.5">
-                {onToggleSidebar && (
-                  <button
-                    onClick={onToggleSidebar}
-                    className="p-1.5 text-gray-500 hover:text-blue-700 hover:bg-blue-50 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
-                    title={isSidebarOpen ? "Ocultar menú" : "Mostrar menú"}
-                    aria-label={isSidebarOpen ? "Ocultar menú" : "Mostrar menú"}
-                  >
-                    {isSidebarOpen ? (
-                      <ChevronLeft className="w-5 h-5" />
-                    ) : (
-                      <Menu className="w-5 h-5" />
-                    )}
-                  </button>
-                )}
                 {showBackButton && (
                   <button
                     onClick={() => navigate(-1)}

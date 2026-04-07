@@ -22,6 +22,7 @@ import AgenteFacturaPage from "@/pages/shared/agentes-ia/documentos/agente-factu
 import AgentePolizaPage from "@/pages/shared/agentes-ia/documentos/agente-poliza/AgentePolizaPage";
 import AustralAIPage from "@/pages/shared/agentes-ia/austral-ai/AustralAIPage";
 import InsightsPage from "@/pages/shared/agentes-ia/insights/InsightsPage";
+import Perfil from "@/pages/shared/perfil/Perfil";
 
 // Componentes de maestros - Administrador
 import UsuariosPage from "@/pages/admin/maestros/usuarios/UsuariosPage";
@@ -75,6 +76,10 @@ const router = createBrowserRouter([
       {
         path: "home",
         element: <Home />,
+      },
+      {
+        path: "perfil",
+        element: <Perfil />,
       },
       {
         path: "general/mapa",

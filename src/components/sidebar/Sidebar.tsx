@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
-import { LogOut, Settings, Users, Building2, ChevronDown } from "lucide-react";
+import { Settings, Users, Building2, ChevronDown } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { useSidebarStore } from "@/store/sidebar.store";
 import { moduleCategories } from "@/routes/modulos";
@@ -47,7 +47,7 @@ export const Sidebar = () => {
   };
 
   const { isSidebarOpen, viewMode, setSidebarOpen, setViewMode } = useSidebarStore();
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
 
   const userRole = user?.rol?.nombreRol || "";
 
@@ -69,10 +69,6 @@ export const Sidebar = () => {
 
   const activeColor = viewMode === "CRM" ? "#003D5C" : "#0c4cbaff";
 
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
 
   const { showWarning, minutesLeft, extendSession, logoutNow } = useSessionTimeout();
 
@@ -324,31 +320,6 @@ export const Sidebar = () => {
             )}
           </nav>
 
-          {/* Footer: logout */}
-          <div className={cn(
-            "border-t border-gray-200 transition-all duration-300",
-            isSidebarOpen ? "p-3" : "p-2"
-          )}>
-            <button
-              onClick={handleLogout}
-              onMouseEnter={(e) => !isSidebarOpen && showTooltip("Cerrar Sesión", e)}
-              onMouseLeave={hideTooltip}
-              className={cn(
-                "w-full flex items-center rounded-lg text-sm font-semibold",
-                "text-white transition-all duration-200 hover:opacity-90",
-                isSidebarOpen ? "justify-center gap-2.5 px-4 py-2.5" : "justify-center py-2.5"
-              )}
-              style={{ backgroundColor: "var(--austral-azul)" }}
-            >
-              <LogOut size={16} className="shrink-0" />
-              <span className={cn(
-                "transition-all duration-200 overflow-hidden whitespace-nowrap",
-                isSidebarOpen ? "max-w-xs opacity-100" : "max-w-0 opacity-0"
-              )}>
-                Cerrar Sesión
-              </span>
-            </button>
-          </div>
         </aside>
 
         {/* Overlay móvil */}
