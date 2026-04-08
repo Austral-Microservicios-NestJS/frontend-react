@@ -130,7 +130,7 @@ const Home = () => {
               )}
             </button>
             <div>
-              <h1 className="text-5xl font-bold text-gray-700">
+              <h1 className="text-4xl font-bold text-gray-700">
                 Bienvenido, {displayName}
               </h1>
               <p className="text-gray-500 mt-0.5 text-sm font-medium capitalize">
