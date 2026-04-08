@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 import { useLeads } from "@/hooks/useLeads";
 import { Users, ArrowRight, TrendingUp, Flame, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -98,25 +97,20 @@ export const LeadsSummaryWidget = () => {
 
   if (isLoading) {
     return (
-      <Card className="h-full border-none shadow-sm ring-1 ring-gray-200">
-        <div className="p-4 h-full flex items-center justify-center">
-          <div className="w-10 h-10 rounded-full border-4 border-gray-100 border-t-indigo-500 animate-spin" />
-        </div>
-      </Card>
+      <div className="h-full bg-white rounded-2xl border border-gray-100 shadow-sm flex items-center justify-center">
+        <div className="w-10 h-10 rounded-full border-4 border-gray-100 border-t-violet-500 animate-spin" />
+      </div>
     );
   }
 
   return (
-    <Card className="h-full border-none shadow-sm ring-1 ring-[#003d5c]/10 hover:ring-[#003d5c]/20 transition-all bg-white overflow-hidden relative flex flex-col">
-      {/* Subtle gradient accent */}
-      <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#003d5c]" />
-
-      <div className="px-4 pt-3 pb-4 flex flex-col h-full">
+    <div className="h-full bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col">
+      <div className="px-5 pt-4 pb-4 flex flex-col h-full">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <div className="bg-[#003d5c] p-1.5 rounded-lg">
-              <Users className="w-4 h-4 text-white" />
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-violet-50 rounded-xl flex items-center justify-center shrink-0">
+              <Users className="w-5 h-5 text-violet-600" />
             </div>
             <h3 className="font-semibold text-gray-900 text-base">
               Resumen de Leads
@@ -124,7 +118,7 @@ export const LeadsSummaryWidget = () => {
           </div>
           <Link
             to="/dashboard/gestion-trabajo/leads"
-            className="flex items-center gap-1 text-sm font-semibold text-[#003d5c] hover:text-[#003d5c]/70 transition-colors group/link"
+            className="flex items-center gap-1 text-sm font-semibold text-violet-600 hover:text-violet-700 transition-colors group/link"
           >
             Ver tablero
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/link:translate-x-0.5" />
@@ -239,6 +233,6 @@ export const LeadsSummaryWidget = () => {
           ) : null}
         </div>
       </div>
-    </Card>
+    </div>
   );
 };

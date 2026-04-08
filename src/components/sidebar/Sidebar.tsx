@@ -107,15 +107,9 @@ export const Sidebar = () => {
           )}
         >
           {/* Header: avatar + CRM/ERP */}
-          <div className={cn(
-            "border-b border-gray-200 transition-all duration-300",
-            isSidebarOpen ? "p-3" : "p-2"
-          )}>
+          <div className="border-b border-gray-200 p-2">
             {/* Switch CRM/ERP */}
-            <div className={cn(
-              "bg-gray-50 rounded-lg border border-gray-100 transition-all duration-300",
-              isSidebarOpen ? "p-1.5" : "p-1"
-            )}>
+            <div className="bg-gray-50 rounded-lg border border-gray-100 p-1">
               <div className="flex flex-col gap-1">
                 {/* CRM */}
                 <button
@@ -123,22 +117,21 @@ export const Sidebar = () => {
                   onMouseEnter={(e) => !isSidebarOpen && showTooltip("CRM", e)}
                   onMouseLeave={hideTooltip}
                   className={cn(
-                    "flex-1 flex items-center rounded-md text-xs font-semibold transition-all duration-200",
-                    isSidebarOpen ? "justify-center gap-1.5 py-2 px-3" : "justify-center py-1",
+                    "flex-1 flex items-center py-1 rounded-md text-xs font-semibold transition-all duration-300",
+                    isSidebarOpen ? "gap-2 px-1 justify-start" : "justify-center",
                     viewMode === "CRM"
                       ? "bg-(--austral-azul) text-white shadow-sm"
                       : "text-gray-600 hover:bg-gray-100"
                   )}
                 >
                   <div className={cn(
-                    "flex items-center justify-center shrink-0 transition-all duration-200",
-                    !isSidebarOpen && "w-7 h-7 rounded-md",
-                    !isSidebarOpen && (viewMode === "CRM" ? "bg-white/20" : "bg-gray-100")
+                    "w-7 h-7 rounded-md flex items-center justify-center shrink-0 transition-colors duration-200",
+                    viewMode === "CRM" && "bg-white/20"
                   )}>
                     <Users className="w-3.5 h-3.5" />
                   </div>
                   <span className={cn(
-                    "transition-all duration-200 overflow-hidden whitespace-nowrap",
+                    "overflow-hidden whitespace-nowrap transition-all duration-300",
                     isSidebarOpen ? "max-w-xs opacity-100" : "max-w-0 opacity-0"
                   )}>CRM</span>
                 </button>
@@ -148,22 +141,21 @@ export const Sidebar = () => {
                   onMouseEnter={(e) => !isSidebarOpen && showTooltip("ERP", e)}
                   onMouseLeave={hideTooltip}
                   className={cn(
-                    "flex-1 flex items-center rounded-md text-xs font-semibold transition-all duration-200",
-                    isSidebarOpen ? "justify-center gap-1.5 py-2 px-3" : "justify-center py-1",
+                    "flex-1 flex items-center py-1 rounded-md text-xs font-semibold transition-all duration-300",
+                    isSidebarOpen ? "gap-2 px-1 justify-start" : "justify-center",
                     viewMode === "ERP"
                       ? "bg-(--austral-azul-ejecutivo) text-white shadow-sm"
                       : "text-gray-600 hover:bg-gray-100"
                   )}
                 >
                   <div className={cn(
-                    "flex items-center justify-center shrink-0 transition-all duration-200",
-                    !isSidebarOpen && "w-7 h-7 rounded-md",
-                    !isSidebarOpen && (viewMode === "ERP" ? "bg-white/20" : "bg-gray-100")
+                    "w-7 h-7 rounded-md flex items-center justify-center shrink-0 transition-colors duration-200",
+                    viewMode === "ERP" && "bg-white/20"
                   )}>
                     <Building2 className="w-3.5 h-3.5" />
                   </div>
                   <span className={cn(
-                    "transition-all duration-200 overflow-hidden whitespace-nowrap",
+                    "overflow-hidden whitespace-nowrap transition-all duration-300",
                     isSidebarOpen ? "max-w-xs opacity-100" : "max-w-0 opacity-0"
                   )}>ERP</span>
                 </button>
@@ -191,47 +183,31 @@ export const Sidebar = () => {
 
                   return (
                     <div key={category.id}>
-                      {/* Categoría header expandido */}
-                      <div className={cn(
-                        "transition-all duration-200 overflow-hidden",
-                        isSidebarOpen ? "max-h-10 opacity-100 mb-0.5" : "max-h-0 opacity-0"
-                      )}>
-                        <button
-                          onClick={() => toggleCategory(category.id)}
-                          className="w-full flex items-center justify-between gap-2 px-1 py-1.5 rounded-md hover:bg-gray-50 transition-colors"
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className={`w-7 h-7 rounded-lg ${iconBg} flex items-center justify-center shrink-0`}>
-                              <CategoryIcon className={`w-3.5 h-3.5 ${iconColor}`} />
-                            </div>
-                            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">
-                              {category.title}
-                            </h3>
-                          </div>
-                          <ChevronDown
-                            className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-300 shrink-0 ${
-                              isOpen ? "rotate-0" : "-rotate-90"
-                            }`}
-                          />
-                        </button>
-                      </div>
-
-                      {/* Categoría header colapsado — ícono clickeable para toggle */}
-                      {!isSidebarOpen && (
-                        <button
-                          onClick={() => toggleCategory(category.id)}
-                          className="w-full flex justify-center mb-1 mt-1"
-                          onMouseEnter={(e) => showTooltip(category.title, e)}
-                          onMouseLeave={hideTooltip}
-                        >
-                          <div className={cn(
-                            `w-7 h-7 rounded-lg ${iconBg} flex items-center justify-center transition-opacity`,
-                            !isOpen && "opacity-50"
-                          )}>
-                            <CategoryIcon className={`w-3.5 h-3.5 ${iconColor}`} />
-                          </div>
-                        </button>
-                      )}
+                      {/* Categoría header — layout fijo, solo texto/chevron se desvanecen */}
+                      <button
+                        onClick={() => toggleCategory(category.id)}
+                        onMouseEnter={(e) => !isSidebarOpen && showTooltip(category.title, e)}
+                        onMouseLeave={hideTooltip}
+                        className="w-full flex items-center gap-2 px-1 py-1.5 mb-0.5 rounded-md hover:bg-gray-50 transition-colors"
+                      >
+                        <div className={cn(
+                          `w-7 h-7 rounded-lg ${iconBg} flex items-center justify-center shrink-0 transition-opacity duration-300`,
+                          !isSidebarOpen && !isOpen && "opacity-50"
+                        )}>
+                          <CategoryIcon className={`w-3.5 h-3.5 ${iconColor}`} />
+                        </div>
+                        <h3 className={cn(
+                          "text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap overflow-hidden transition-all duration-300",
+                          isSidebarOpen ? "max-w-xs opacity-100" : "max-w-0 opacity-0"
+                        )}>
+                          {category.title}
+                        </h3>
+                        <ChevronDown className={cn(
+                          "w-3.5 h-3.5 text-gray-400 shrink-0 ml-auto transition-all duration-300",
+                          isOpen ? "rotate-0" : "-rotate-90",
+                          isSidebarOpen ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+                        )} />
+                      </button>
 
                       {/* Módulos */}
                       {isSidebarOpen ? (

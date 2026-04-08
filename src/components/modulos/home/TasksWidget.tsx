@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 import { useTareas } from "@/hooks/useTareas";
 import { CheckSquare, Clock, ArrowRight, AlertCircle } from "lucide-react";
 import dayjs from "dayjs";
@@ -47,26 +46,22 @@ export const TasksWidget = () => {
 
   if (isLoading) {
     return (
-      <Card className="h-full border-none shadow-sm ring-1 ring-gray-200">
-        <div className="px-4 pt-3 pb-4 h-full flex flex-col gap-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-14.5 bg-gray-50 rounded-xl animate-pulse" />
-          ))}
-        </div>
-      </Card>
+      <div className="h-full bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-3 px-5 pt-4 pb-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-14 bg-gray-50 rounded-xl animate-pulse" />
+        ))}
+      </div>
     );
   }
 
   return (
-    <Card className="h-full border-none shadow-sm ring-1 ring-[#003d5c]/10 hover:ring-[#003d5c]/20 transition-all bg-white overflow-hidden relative flex flex-col">
-      <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#003d5c]" />
-
-      <div className="px-4 pt-3 pb-4 flex flex-col h-full">
+    <div className="h-full bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col">
+      <div className="px-5 pt-4 pb-4 flex flex-col h-full">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <div className="bg-[#003d5c] p-1.5 rounded-lg">
-              <CheckSquare className="w-4 h-4 text-white" />
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
+              <CheckSquare className="w-5 h-5 text-blue-600" />
             </div>
             <h3 className="font-semibold text-gray-900 text-base">
               Tareas Pendientes
@@ -74,7 +69,7 @@ export const TasksWidget = () => {
           </div>
           <Link
             to="/dashboard/gestion-trabajo/tareas"
-            className="flex items-center gap-1 text-sm font-semibold text-[#003d5c] hover:text-[#003d5c]/70 transition-colors group/link"
+            className="flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors group/link"
           >
             Ver todas
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/link:translate-x-0.5" />
@@ -192,6 +187,6 @@ export const TasksWidget = () => {
           )}
         </div>
       </div>
-    </Card>
+    </div>
   );
 };

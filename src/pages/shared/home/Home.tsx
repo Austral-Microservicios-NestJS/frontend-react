@@ -6,7 +6,8 @@ import {
   FilePlus2,
   UserPlus,
   PlusCircle,
-  ChevronLeft,
+  PanelLeftOpen,
+  PanelLeftClose,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -27,36 +28,39 @@ type QuickAction = {
   link: string;
 };
 
+const PRIMARY = "bg-[#003d5c] text-white hover:bg-[#002d44] border border-[#003d5c]";
+const SECONDARY = "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200";
+
 const QUICK_ACTIONS: Record<string, QuickAction[]> = {
   [Roles.ADMINISTRADOR]: [
-    { label: "Crear cliente",  icon: UserPlus,  className: "bg-green-50 border-green-200 hover:bg-green-600 hover:border-green-600 text-green-700 hover:text-white",   link: "/dashboard/gestion-trabajo/clientes" },
-    { label: "Crear póliza",   icon: FilePlus2, className: "bg-indigo-50 border-indigo-200 hover:bg-indigo-600 hover:border-indigo-600 text-indigo-700 hover:text-white", link: "/dashboard/gestion-trabajo/polizas" },
-    { label: "Crear lead",     icon: PlusCircle, className: "bg-blue-50 border-blue-200 hover:bg-blue-600 hover:border-blue-600 text-blue-700 hover:text-white",          link: "/dashboard/gestion-trabajo/leads" },
+    { label: "Crear cliente",  icon: UserPlus,   className: PRIMARY,   link: "/dashboard/gestion-trabajo/clientes" },
+    { label: "Crear póliza",   icon: FilePlus2,  className: SECONDARY, link: "/dashboard/gestion-trabajo/polizas" },
+    { label: "Crear lead",     icon: PlusCircle, className: SECONDARY, link: "/dashboard/gestion-trabajo/leads" },
   ],
   [Roles.EJECUTIVO_CUENTA]: [
-    { label: "Crear cliente",  icon: UserPlus,  className: "bg-green-50 border-green-200 hover:bg-green-600 hover:border-green-600 text-green-700 hover:text-white",   link: "/dashboard/gestion-trabajo/clientes" },
-    { label: "Crear póliza",   icon: FilePlus2, className: "bg-indigo-50 border-indigo-200 hover:bg-indigo-600 hover:border-indigo-600 text-indigo-700 hover:text-white", link: "/dashboard/gestion-trabajo/polizas" },
-    { label: "Crear lead",     icon: PlusCircle, className: "bg-blue-50 border-blue-200 hover:bg-blue-600 hover:border-blue-600 text-blue-700 hover:text-white",          link: "/dashboard/gestion-trabajo/leads" },
+    { label: "Crear cliente",  icon: UserPlus,   className: PRIMARY,   link: "/dashboard/gestion-trabajo/clientes" },
+    { label: "Crear póliza",   icon: FilePlus2,  className: SECONDARY, link: "/dashboard/gestion-trabajo/polizas" },
+    { label: "Crear lead",     icon: PlusCircle, className: SECONDARY, link: "/dashboard/gestion-trabajo/leads" },
   ],
   [Roles.BROKER]: [
-    { label: "Crear lead",     icon: PlusCircle, className: "bg-blue-50 border-blue-200 hover:bg-blue-600 hover:border-blue-600 text-blue-700 hover:text-white",   link: "/dashboard/gestion-trabajo/leads" },
-    { label: "Crear cliente",  icon: UserPlus,  className: "bg-green-50 border-green-200 hover:bg-green-600 hover:border-green-600 text-green-700 hover:text-white", link: "/dashboard/gestion-trabajo/clientes" },
+    { label: "Crear lead",    icon: PlusCircle, className: PRIMARY,   link: "/dashboard/gestion-trabajo/leads" },
+    { label: "Crear cliente", icon: UserPlus,   className: SECONDARY, link: "/dashboard/gestion-trabajo/clientes" },
   ],
   [Roles.PROMOTOR_VENTA]: [
-    { label: "Crear lead",     icon: PlusCircle, className: "bg-blue-50 border-blue-200 hover:bg-blue-600 hover:border-blue-600 text-blue-700 hover:text-white", link: "/dashboard/gestion-trabajo/leads" },
+    { label: "Crear lead",    icon: PlusCircle, className: PRIMARY, link: "/dashboard/gestion-trabajo/leads" },
   ],
   [Roles.PUNTO_VENTA]: [
-    { label: "Crear cliente",  icon: UserPlus, className: "bg-green-50 border-green-200 hover:bg-green-600 hover:border-green-600 text-green-700 hover:text-white", link: "/dashboard/gestion-trabajo/clientes" },
+    { label: "Crear cliente", icon: UserPlus, className: PRIMARY, link: "/dashboard/gestion-trabajo/clientes" },
   ],
   [Roles.REFERENCIADOR]: [
-    { label: "Registrar lead", icon: PlusCircle, className: "bg-indigo-50 border-indigo-200 hover:bg-indigo-600 hover:border-indigo-600 text-indigo-700 hover:text-white", link: "/dashboard/gestion-trabajo/leads" },
+    { label: "Registrar lead", icon: PlusCircle, className: PRIMARY, link: "/dashboard/gestion-trabajo/leads" },
   ],
 };
 
 // ─── Subtítulos por rol ───────────────────────────────────────────────────────
 
 const SUBTITULOS: Record<string, string> = {
-  [Roles.ADMINISTRADOR]:    "Vista completa del sistema",
+  [Roles.ADMINISTRADOR]:    "",
   [Roles.EJECUTIVO_CUENTA]: "Gestión comercial y cuentas",
   [Roles.BROKER]:           "Tu red y cartera de clientes",
   [Roles.PROMOTOR_VENTA]:   "Tus leads y actividad del día",
@@ -95,6 +99,7 @@ const Home = () => {
   const rol = user?.rol?.nombreRol || "";
   const quickActions = QUICK_ACTIONS[rol] ?? [];
   const subtitulo = SUBTITULOS[rol] ?? "¿Qué te gustaría gestionar hoy?";
+  const fechaHoy = new Date().toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 
   return (
     <>
@@ -119,18 +124,17 @@ const Home = () => {
               title={isSidebarOpen ? "Ocultar menú" : "Mostrar menú"}
             >
               {isSidebarOpen ? (
-                <ChevronLeft className="w-5 h-5" />
+                <PanelLeftClose className="w-5 h-5" />
               ) : (
-                <Menu className="w-5 h-5" />
+                <PanelLeftOpen className="w-5 h-5" />
               )}
             </button>
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
-                ¡Bienvenido,{" "}
-                <span className="text-[#003d5c]">{displayName}</span>!
+              <h1 className="text-5xl font-bold text-gray-700">
+                Bienvenido, {displayName}
               </h1>
-              <p className="text-gray-500 mt-0.5 text-sm font-medium">
-                {subtitulo}
+              <p className="text-gray-500 mt-0.5 text-sm font-medium capitalize">
+                {rol === Roles.ADMINISTRADOR ? fechaHoy : subtitulo}
               </p>
             </div>
           </div>
@@ -142,7 +146,7 @@ const Home = () => {
                 <Link
                   key={action.label}
                   to={action.link}
-                  className={`group flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 transition-all duration-200 font-medium text-sm ${action.className}`}
+                  className={`group flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200 font-medium text-sm shadow-sm ${action.className}`}
                 >
                   <action.icon className="w-4 h-4" />
                   <span>{action.label}</span>

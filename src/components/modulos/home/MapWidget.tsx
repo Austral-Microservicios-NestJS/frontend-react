@@ -1,5 +1,4 @@
 import { useState, useCallback } from "react";
-import { Card } from "@/components/ui/card";
 import { MapPin, ArrowRight, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -93,15 +92,13 @@ export const MapWidget = () => {
     isLoaded && !loadingClientes && !loadError && GOOGLE_MAPS_API_KEY;
 
   return (
-    <Card className="h-full border-none shadow-sm ring-1 ring-[#003d5c]/10 hover:ring-[#003d5c]/20 transition-all bg-white overflow-hidden relative flex flex-col">
-      <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#003d5c]" />
-
-      <div className="px-4 pt-3 pb-4 flex flex-col h-full">
+    <div className="h-full bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col">
+      <div className="px-5 pt-4 pb-4 flex flex-col h-full">
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <div className="bg-[#003d5c] p-1.5 rounded-lg">
-              <MapPin className="w-4 h-4 text-white" />
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center shrink-0">
+              <MapPin className="w-5 h-5 text-emerald-600" />
             </div>
             <h3 className="font-semibold text-gray-900 text-base">
               Mapa de Clientes
@@ -109,7 +106,7 @@ export const MapWidget = () => {
           </div>
           <Link
             to="/dashboard/general/mapa"
-            className="flex items-center gap-1 text-sm font-semibold text-[#003d5c] hover:text-[#003d5c]/70 transition-colors group/link"
+            className="flex items-center gap-1 text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors group/link"
           >
             Ver completo
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/link:translate-x-0.5" />
@@ -181,6 +178,6 @@ export const MapWidget = () => {
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 };

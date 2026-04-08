@@ -1,14 +1,15 @@
-import { Card } from "@/components/ui/card";
 import { useClientes } from "@/hooks/useCliente";
 import { usePolizas } from "@/hooks/usePolizas";
 import { useLeads } from "@/hooks/useLeads";
-import { Users, Shield, AlertTriangle, TrendingUp } from "lucide-react";
+import { Users, Shield, AlertTriangle, TrendingUp, ArrowUpRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 
 export const StatsRowWidget = () => {
   const { clientes, clientesActivos, isLoading: loadingClientes } = useClientes();
   const { polizas, isLoading: loadingPolizas } = usePolizas();
   const { leads } = useLeads();
+  const navigate = useNavigate();
 
   const polizasVigentes = polizas.filter((p) => p.estado === "VIGENTE").length;
 
@@ -26,59 +27,59 @@ export const StatsRowWidget = () => {
   const stats = [
     {
       icon: Users,
-      iconBg: "bg-[#003d5c]",
+      iconBg: "bg-blue-50",
+      iconColor: "text-blue-600",
+      arrowColor: "text-blue-500",
       label: "Mis Clientes",
       value: loadingClientes ? "—" : clientes.length,
-      badge: loadingClientes ? null : `${clientesActivos.length} activos`,
-      badgeColor: "bg-emerald-50 text-emerald-700",
+      sub: loadingClientes ? "" : `${clientesActivos.length} activos`,
+      path: "/dashboard/gestion-trabajo/clientes",
     },
     {
       icon: Shield,
-      iconBg: "bg-[#003d5c]",
+      iconBg: "bg-emerald-50",
+      iconColor: "text-emerald-600",
+      arrowColor: "text-emerald-500",
       label: "Mis Pólizas",
       value: loadingPolizas ? "—" : polizas.length,
-      badge: loadingPolizas ? null : `${polizasVigentes} vigentes`,
-      badgeColor: "bg-blue-50 text-blue-700",
+      sub: loadingPolizas ? "" : `${polizasVigentes} vigentes`,
+      path: "/dashboard/gestion-trabajo/polizas",
     },
     {
       icon: porVencer > 0 ? AlertTriangle : TrendingUp,
-      iconBg: porVencer > 0 ? "bg-amber-400" : "bg-[#003d5c]",
+      iconBg: porVencer > 0 ? "bg-amber-50" : "bg-indigo-50",
+      iconColor: porVencer > 0 ? "text-amber-500" : "text-indigo-600",
+      arrowColor: porVencer > 0 ? "text-amber-500" : "text-indigo-500",
       label: "Por Vencer",
       value: loadingPolizas ? "—" : porVencer,
-      badge: loadingPolizas ? null : `${leadsActivos} leads activos`,
-      badgeColor: "bg-indigo-50 text-indigo-700",
+      sub: loadingPolizas ? "" : `${leadsActivos} leads activos`,
+      path: "/dashboard/gestion-trabajo/polizas",
     },
   ];
 
   return (
-    <div className="flex flex-col gap-4 h-full">
+    <div className="flex flex-col gap-3 h-full">
       {stats.map((s) => (
-        <Card
+        <button
           key={s.label}
-          className="flex-1 border-none shadow-sm ring-1 ring-[#003d5c]/10 bg-white overflow-hidden relative"
+          onClick={() => navigate(s.path)}
+          className="flex-1 bg-white rounded-2xl border border-gray-100 shadow-sm px-4 py-3.5 flex items-center gap-4 hover:shadow-md transition-shadow text-left group"
         >
-          <div className="px-4 py-3 flex items-center gap-4 h-full">
-            {/* Icon */}
-            <div className={`${s.iconBg} p-2 rounded-lg shrink-0`}>
-              <s.icon className="w-4 h-4 text-white" />
-            </div>
-            {/* Number */}
-            <span className="text-3xl font-black text-gray-900 leading-none shrink-0">
-              {s.value}
-            </span>
-            {/* Text */}
-            <div className="flex flex-col min-w-0">
-              <span className="text-xs font-semibold text-gray-500 leading-tight">
-                {s.label}
-              </span>
-              {s.badge && (
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full mt-1 w-fit ${s.badgeColor}`}>
-                  {s.badge}
-                </span>
-              )}
-            </div>
+          {/* Ícono */}
+          <div className={`${s.iconBg} w-11 h-11 rounded-xl flex items-center justify-center shrink-0`}>
+            <s.icon className={`w-5 h-5 ${s.iconColor}`} />
           </div>
-        </Card>
+
+          {/* Texto */}
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">{s.label}</p>
+            <p className="text-2xl font-bold text-gray-800 leading-tight">{s.value}</p>
+            {s.sub && <p className="text-[11px] text-gray-400 mt-0.5">{s.sub}</p>}
+          </div>
+
+          {/* Flecha */}
+          <ArrowUpRight className={`w-4 h-4 ${s.arrowColor} shrink-0 opacity-60 group-hover:opacity-100 transition-opacity`} />
+        </button>
       ))}
     </div>
   );

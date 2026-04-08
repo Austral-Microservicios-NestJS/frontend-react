@@ -265,7 +265,7 @@ export const Navbar = () => {
   const showDropdown = searchOpen && query.trim().length >= 2;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 h-16 bg-white/95 backdrop-blur-md border-b border-gray-200/70">
+    <nav className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-[#002d44]" style={{ backgroundColor: "#003d5c" }}>
 
       {/* ── Búsqueda centrada absolutamente ── */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -274,14 +274,14 @@ export const Navbar = () => {
             className={`
               flex items-center gap-2 px-3 py-2 rounded-xl border transition-all duration-200
               ${searchOpen || query
-                ? "border-[#003d5c]/50 bg-white shadow-sm ring-2 ring-[#003d5c]/10"
-                : "border-gray-200 bg-gray-50 hover:border-gray-300"
+                ? "border-white/40 bg-white shadow-sm ring-2 ring-white/20"
+                : "border-white/20 bg-white/10 hover:bg-white/15"
               }
             `}
           >
             {isSearching
-              ? <Loader2 className="w-4 h-4 shrink-0 text-[#003d5c] animate-spin" />
-              : <Search className={`w-4 h-4 shrink-0 transition-colors duration-200 ${query ? "text-[#003d5c]" : "text-gray-400"}`} />
+              ? <Loader2 className="w-4 h-4 shrink-0 text-white animate-spin" />
+              : <Search className={`w-4 h-4 shrink-0 transition-colors duration-200 ${query ? "text-[#003d5c]" : "text-white/60"}`} />
             }
             <input
               ref={inputRef}
@@ -289,7 +289,7 @@ export const Navbar = () => {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar clientes, pólizas, leads..."
-              className="flex-1 bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none min-w-0"
+              className={`flex-1 bg-transparent text-sm outline-none min-w-0 ${searchOpen || query ? "text-gray-700 placeholder-gray-400" : "text-white placeholder-white/50"}`}
               onFocus={() => { if (query.trim().length >= 2) setSearchOpen(true); }}
             />
             {query ? (
@@ -324,13 +324,7 @@ export const Navbar = () => {
       <div className="absolute left-0 top-0 h-full flex items-center gap-2 px-4">
         <button
           onClick={toggleSidebar}
-          className={`
-            p-2 rounded-xl transition-all duration-200 active:scale-95
-            ${isSidebarOpen
-              ? "text-[#003d5c] bg-[#003d5c]/8 hover:bg-[#003d5c]/15"
-              : "text-gray-500 hover:text-gray-800 hover:bg-gray-100"
-            }
-          `}
+          className="p-2 rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200 active:scale-95"
           aria-label={isSidebarOpen ? "Ocultar sidebar" : "Mostrar sidebar"}
         >
           {isSidebarOpen
@@ -338,14 +332,14 @@ export const Navbar = () => {
             : <PanelLeftOpen  className="w-4.5 h-4.5" />
           }
         </button>
-        <div className="w-px h-5 bg-gray-200 shrink-0" />
+        <div className="w-px h-5 bg-white/20 shrink-0" />
         <div className="flex items-center gap-2.5 shrink-0">
-          <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center bg-[#003d5c]">
+          <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center bg-white/15">
             <img src="/images/logo-austral-main.png" alt="Austral" className="w-5 h-5 object-contain brightness-0 invert" />
           </div>
           <div className="hidden sm:block leading-none">
-            <p className="text-sm font-bold text-gray-900">Austral</p>
-            <p className="text-[10px] text-gray-400 font-medium tracking-wide uppercase">Corredores</p>
+            <p className="text-sm font-bold text-white">Austral</p>
+            <p className="text-[10px] text-white/60 font-medium tracking-wide uppercase">Corredores</p>
           </div>
         </div>
       </div>
@@ -356,18 +350,18 @@ export const Navbar = () => {
         <div className="relative ml-1" ref={dropdownRef}>
           <button
             onClick={() => setProfileOpen((p) => !p)}
-            className={`flex items-center gap-2 px-2 py-1.5 rounded-xl transition-all duration-200 active:scale-95 ${profileOpen ? "bg-gray-100" : "hover:bg-gray-100"}`}
+            className={`flex items-center gap-2 px-2 py-1.5 rounded-xl transition-all duration-200 active:scale-95 ${profileOpen ? "bg-white/15" : "hover:bg-white/10"}`}
             aria-expanded={profileOpen}
             aria-haspopup="menu"
           >
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs shrink-0 select-none" style={{ backgroundColor: "#003d5c" }}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[#003d5c] font-bold text-xs shrink-0 select-none bg-white">
               {initials}
             </div>
             <div className="hidden md:block text-left leading-none">
-              <p className="text-xs font-semibold text-gray-800 truncate max-w-24">{user?.nombreUsuario || "Usuario"}</p>
-              <p className="text-[10px] text-gray-400 mt-0.5 truncate max-w-24">{roleName}</p>
+              <p className="text-xs font-semibold text-white truncate max-w-24">{user?.nombreUsuario || "Usuario"}</p>
+              <p className="text-[10px] text-white/60 mt-0.5 truncate max-w-24">{roleName}</p>
             </div>
-            <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 hidden md:block ${profileOpen ? "rotate-180" : ""}`} />
+            <ChevronDown className={`w-3.5 h-3.5 text-white/60 transition-transform duration-200 hidden md:block ${profileOpen ? "rotate-180" : ""}`} />
           </button>
 
           <AnimatePresence>
