@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
-import { Settings, Users, Building2, ChevronDown } from "lucide-react";
+import { Settings, Users, Building2, ChevronDown, LayoutGrid, Briefcase, Sparkles, BookOpen } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { useSidebarStore } from "@/store/sidebar.store";
 import { moduleCategories } from "@/routes/modulos";
@@ -47,6 +47,7 @@ export const Sidebar = () => {
   };
 
   const { isSidebarOpen, viewMode, setSidebarOpen, setViewMode } = useSidebarStore();
+
   const { user } = useAuthStore();
 
   const userRole = user?.rol?.nombreRol || "";
@@ -63,6 +64,7 @@ export const Sidebar = () => {
     .filter((category) => category.modules.length > 0);
 
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({ maestros: false });
+
   const isCategoryOpen = (id: string) => openCategories[id] !== false;
   const toggleCategory = (id: string) =>
     setOpenCategories((prev) => ({ ...prev, [id]: prev[id] === false ? true : false }));
@@ -114,7 +116,7 @@ export const Sidebar = () => {
               "bg-gray-50 rounded-lg border border-gray-100 transition-all duration-300",
               isSidebarOpen ? "p-1.5" : "p-1"
             )}>
-              <div className={cn("flex gap-1 transition-all duration-300", isSidebarOpen ? "flex-row" : "flex-col")}>
+              <div className="flex flex-col gap-1">
                 {/* CRM */}
                 <button
                   onClick={() => setViewMode("CRM")}
@@ -122,13 +124,19 @@ export const Sidebar = () => {
                   onMouseLeave={hideTooltip}
                   className={cn(
                     "flex-1 flex items-center rounded-md text-xs font-semibold transition-all duration-200",
-                    isSidebarOpen ? "justify-center gap-1.5 py-2 px-3" : "justify-center py-2",
+                    isSidebarOpen ? "justify-center gap-1.5 py-2 px-3" : "justify-center py-1",
                     viewMode === "CRM"
                       ? "bg-(--austral-azul) text-white shadow-sm"
                       : "text-gray-600 hover:bg-gray-100"
                   )}
                 >
-                  <Users className="w-3.5 h-3.5 shrink-0" />
+                  <div className={cn(
+                    "flex items-center justify-center shrink-0 transition-all duration-200",
+                    !isSidebarOpen && "w-7 h-7 rounded-md",
+                    !isSidebarOpen && (viewMode === "CRM" ? "bg-white/20" : "bg-gray-100")
+                  )}>
+                    <Users className="w-3.5 h-3.5" />
+                  </div>
                   <span className={cn(
                     "transition-all duration-200 overflow-hidden whitespace-nowrap",
                     isSidebarOpen ? "max-w-xs opacity-100" : "max-w-0 opacity-0"
@@ -141,13 +149,19 @@ export const Sidebar = () => {
                   onMouseLeave={hideTooltip}
                   className={cn(
                     "flex-1 flex items-center rounded-md text-xs font-semibold transition-all duration-200",
-                    isSidebarOpen ? "justify-center gap-1.5 py-2 px-3" : "justify-center py-2",
+                    isSidebarOpen ? "justify-center gap-1.5 py-2 px-3" : "justify-center py-1",
                     viewMode === "ERP"
                       ? "bg-(--austral-azul-ejecutivo) text-white shadow-sm"
                       : "text-gray-600 hover:bg-gray-100"
                   )}
                 >
-                  <Building2 className="w-3.5 h-3.5 shrink-0" />
+                  <div className={cn(
+                    "flex items-center justify-center shrink-0 transition-all duration-200",
+                    !isSidebarOpen && "w-7 h-7 rounded-md",
+                    !isSidebarOpen && (viewMode === "ERP" ? "bg-white/20" : "bg-gray-100")
+                  )}>
+                    <Building2 className="w-3.5 h-3.5" />
+                  </div>
                   <span className={cn(
                     "transition-all duration-200 overflow-hidden whitespace-nowrap",
                     isSidebarOpen ? "max-w-xs opacity-100" : "max-w-0 opacity-0"
@@ -166,15 +180,18 @@ export const Sidebar = () => {
               <div className="space-y-1">
                 {filteredCategories.map((category, categoryIndex) => {
                   const isOpen = isCategoryOpen(category.id);
-                  const dotColor =
-                    categoryIndex === 0 ? "bg-emerald-500"
-                    : categoryIndex === 1 ? "bg-blue-500"
-                    : categoryIndex === 2 ? "bg-purple-500"
-                    : "bg-orange-500";
+                  const categoryMeta = [
+                    { dot: "bg-emerald-500", iconBg: "bg-emerald-100", iconColor: "text-emerald-600", Icon: LayoutGrid },
+                    { dot: "bg-blue-500",    iconBg: "bg-blue-100",    iconColor: "text-blue-600",    Icon: Briefcase },
+                    { dot: "bg-purple-500",  iconBg: "bg-purple-100",  iconColor: "text-purple-600",  Icon: Sparkles },
+                    { dot: "bg-orange-500",  iconBg: "bg-orange-100",  iconColor: "text-orange-600",  Icon: BookOpen },
+                  ][categoryIndex] ?? { dot: "bg-gray-400", iconBg: "bg-gray-100", iconColor: "text-gray-500", Icon: Settings };
+
+                  const { dot: dotColor, iconBg, iconColor, Icon: CategoryIcon } = categoryMeta;
 
                   return (
                     <div key={category.id}>
-                      {/* Categoría header — solo visible cuando está abierto */}
+                      {/* Categoría header expandido */}
                       <div className={cn(
                         "transition-all duration-200 overflow-hidden",
                         isSidebarOpen ? "max-h-10 opacity-100 mb-0.5" : "max-h-0 opacity-0"
@@ -184,7 +201,9 @@ export const Sidebar = () => {
                           className="w-full flex items-center justify-between gap-2 px-1 py-1.5 rounded-md hover:bg-gray-50 transition-colors"
                         >
                           <div className="flex items-center gap-2">
-                            <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotColor}`} />
+                            <div className={`w-7 h-7 rounded-lg ${iconBg} flex items-center justify-center shrink-0`}>
+                              <CategoryIcon className={`w-3.5 h-3.5 ${iconColor}`} />
+                            </div>
                             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">
                               {category.title}
                             </h3>
@@ -196,6 +215,23 @@ export const Sidebar = () => {
                           />
                         </button>
                       </div>
+
+                      {/* Categoría header colapsado — ícono clickeable para toggle */}
+                      {!isSidebarOpen && (
+                        <button
+                          onClick={() => toggleCategory(category.id)}
+                          className="w-full flex justify-center mb-1 mt-1"
+                          onMouseEnter={(e) => showTooltip(category.title, e)}
+                          onMouseLeave={hideTooltip}
+                        >
+                          <div className={cn(
+                            `w-7 h-7 rounded-lg ${iconBg} flex items-center justify-center transition-opacity`,
+                            !isOpen && "opacity-50"
+                          )}>
+                            <CategoryIcon className={`w-3.5 h-3.5 ${iconColor}`} />
+                          </div>
+                        </button>
+                      )}
 
                       {/* Módulos */}
                       {isSidebarOpen ? (
@@ -238,7 +274,7 @@ export const Sidebar = () => {
                                     onClick={() => navigateToModule(module.path)}
                                     className={cn(
                                       "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200",
-                                      isActive ? "text-white shadow-sm" : "text-gray-700 hover:bg-gray-100"
+                                      isActive ? "text-white shadow-sm" : "text-gray-700 hover:bg-gray-100 hover:translate-x-1"
                                     )}
                                     style={isActive ? { backgroundColor: activeColor } : {}}
                                   >
@@ -255,8 +291,8 @@ export const Sidebar = () => {
                             </div>
                           </div>
                         </div>
-                      ) : (
-                        /* Modo icon-only: todos los módulos visibles, icono centrado + tooltip portal */
+                      ) : isOpen ? (
+                        /* Modo icon-only: solo módulos de categorías abiertas */
                         <div className="space-y-0.5 pb-1">
                           {category.modules.map((module) => {
                             const isActive = location.pathname.startsWith(module.path);
@@ -305,7 +341,7 @@ export const Sidebar = () => {
                             );
                           })}
                         </div>
-                      )}
+                      ) : null}
                     </div>
                   );
                 })}

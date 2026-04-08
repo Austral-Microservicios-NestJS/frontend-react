@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import {
-  Search, User, LogOut, ChevronDown, PanelLeft,
+  Search, User, LogOut, ChevronDown, PanelLeftOpen, PanelLeftClose,
   Loader2, Users, ShieldCheck, TrendingUp, X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -333,7 +333,10 @@ export const Navbar = () => {
           `}
           aria-label={isSidebarOpen ? "Ocultar sidebar" : "Mostrar sidebar"}
         >
-          <PanelLeft className="w-4.5 h-4.5" />
+          {isSidebarOpen
+            ? <PanelLeftClose className="w-4.5 h-4.5" />
+            : <PanelLeftOpen  className="w-4.5 h-4.5" />
+          }
         </button>
         <div className="w-px h-5 bg-gray-200 shrink-0" />
         <div className="flex items-center gap-2.5 shrink-0">
