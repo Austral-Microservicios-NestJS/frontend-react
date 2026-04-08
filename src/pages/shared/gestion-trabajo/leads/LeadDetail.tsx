@@ -20,8 +20,9 @@ import { usePolizas } from "@/hooks/usePolizas";
 import {
   ArrowLeft, Copy, Car, Sparkles, Settings, FileText, RefreshCw,
   ShieldCheck, User, MapPin, Hash, UserPlus, Download, Save,
-  FileCheck, CheckCircle, ChevronDown,
+  FileCheck, CheckCircle, ChevronDown, ClipboardList,
 } from "lucide-react";
+import { GenerarCotizacionModal } from "@/components/modulos/leads/GenerarCotizacionModal";
 import * as XLSX from "xlsx";
 import days from "dayjs";
 import { useEffect, useState } from "react";
@@ -115,6 +116,7 @@ export default function LeadDetail() {
   const [isConsultaModalOpen, setIsConsultaModalOpen] = useState(false);
   const [isRegistrarClienteOpen, setIsRegistrarClienteOpen] = useState(false);
   const [isRegistrarPolizaOpen, setIsRegistrarPolizaOpen] = useState(false);
+  const [isCotizacionOpen, setIsCotizacionOpen] = useState(false);
   const [leadInitialValues, setLeadInitialValues] = useState<Partial<any> | undefined>(undefined);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -239,6 +241,13 @@ export default function LeadDetail() {
         <div className="flex items-center gap-2 flex-wrap">
           <button onClick={handleGoBack} className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
             <ArrowLeft className="w-4 h-4" /> Volver
+          </button>
+          <button
+            onClick={() => setIsCotizacionOpen(true)}
+            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-white rounded-lg transition-colors"
+            style={{ backgroundColor: "var(--austral-azul)" }}
+          >
+            <ClipboardList className="w-4 h-4" /> Generar Cotización
           </button>
           <button
             onClick={handleRegistrarCliente}
@@ -1110,6 +1119,20 @@ export default function LeadDetail() {
           cliente={clienteVinculado}
         />
       )}
+
+      <GenerarCotizacionModal
+        open={isCotizacionOpen}
+        onClose={() => setIsCotizacionOpen(false)}
+        lead={leadState}
+        detalles={{
+          auto: detalleAuto,
+          soat: detalleSoat,
+          salud: detalleSalud,
+          sctr: detalleSCTR,
+          vida: detalleVida,
+          vidaLey: detalleVidaLey,
+        }}
+      />
     </>
   );
 }
