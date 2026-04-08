@@ -116,6 +116,16 @@ export const clienteService = {
     }
   },
 
+  // Validar documento contra RENIEC (DNI) o SUNAT (RUC) para autocompletar
+  validarDocumento: async (tipoDoc: string, numero: string): Promise<any | null> => {
+    try {
+      const { data } = await api.get(`/clientes/validar/${tipoDoc}/${numero}`);
+      return data?.found ? data : null;
+    } catch {
+      return null;
+    }
+  },
+
   downloadTemplate: async (): Promise<void> => {
     const response = await api.get("/clientes/plantilla/excel", {
       responseType: "blob",

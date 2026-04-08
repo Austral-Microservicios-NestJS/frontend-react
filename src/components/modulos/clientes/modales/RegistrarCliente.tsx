@@ -23,7 +23,7 @@ import type { Cliente } from "@/types/cliente.interface";
 import type { User } from "@/store/auth.store";
 import { clienteService } from "@/services/cliente.service";
 import { storageService } from "@/services/storage.service";
-import { AlertCircle, Upload, FileText, X } from "lucide-react";
+import { AlertCircle, Upload, FileText, X, ShieldCheck } from "lucide-react";
 
 interface RegistrarClienteProps {
   isOpen: boolean;
@@ -82,6 +82,8 @@ export const RegistrarCliente = ({
 
   const [clienteExistente, setClienteExistente] = useState<Cliente | null>(null);
   const [checkingDoc, setCheckingDoc] = useState(false);
+  const [validatingDoc, setValidatingDoc] = useState(false);
+  const [validationResult, setValidationResult] = useState<any>(null);
   const [cartaFile, setCartaFile] = useState<File | null>(null);
   const [uploadingCarta, setUploadingCarta] = useState(false);
   const cartaInputRef = useRef<HTMLInputElement>(null);
@@ -118,11 +120,43 @@ export const RegistrarCliente = ({
     }
   };
 
+  // Validar documento contra RENIEC/SUNAT y autocompletar
+  const handleValidarDocumento = async () => {
+    const numero = watch("numeroDocumento")?.toString().trim();
+    const tipo = watch("tipoDocumento");
+    if (!numero || !tipo || (tipo === "DNI" && numero.length !== 8) || (tipo === "RUC" && numero.length !== 11)) return;
+
+    setValidatingDoc(true);
+    setValidationResult(null);
+    try {
+      const result = await clienteService.validarDocumento(tipo, numero);
+      setValidationResult(result);
+      if (result) {
+        setValue("tipoPersona", result.tipoPersona);
+        if (result.tipoPersona === "NATURAL") {
+          const nombres = result.nombres || "";
+          const apellidos = [result.apellidoPaterno, result.apellidoMaterno].filter(Boolean).join(" ");
+          setValue("nombres", nombres);
+          setValue("apellidos", apellidos);
+        } else {
+          setValue("razonSocial", result.razonSocial || "");
+        }
+        if (result.direccion) setValue("direccion", result.direccion);
+        if (result.distrito) setValue("distrito", result.distrito);
+        if (result.provincia) setValue("provincia", result.provincia);
+        if (result.departamento) setValue("departamento", result.departamento);
+      }
+    } finally {
+      setValidatingDoc(false);
+    }
+  };
+
   // Resetear formulario cuando el modal se cierra
   useEffect(() => {
     if (!isOpen) {
       reset();
       setClienteExistente(null);
+      setValidationResult(null);
       setCartaFile(null);
     } else if (isOpen && initialValues) {
       reset({
@@ -266,9 +300,11 @@ export const RegistrarCliente = ({
               <Label htmlFor="numeroDocumento" required>
                 Número de Documento
               </Label>
+              <div className="flex gap-2">
               <Input
                 id="numeroDocumento"
                 type="text"
+                className="flex-1"
                 placeholder={
                   tipoDocumento === "DNI"       ? "8 dígitos numéricos" :
                   tipoDocumento === "RUC"       ? "11 dígitos (empieza con 10 o 20)" :
@@ -299,8 +335,33 @@ export const RegistrarCliente = ({
                   onBlur: (e) => handleDocumentoBlur(e.target.value),
                 })}
               />
+              {(tipoDocumento === "DNI" || tipoDocumento === "RUC") && (
+                <button
+                  type="button"
+                  onClick={handleValidarDocumento}
+                  disabled={validatingDoc}
+                  className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 shrink-0"
+                  style={{ backgroundColor: "var(--austral-azul)" }}
+                >
+                  {validatingDoc ? "Validando..." : "Validar"}
+                </button>
+              )}
+              </div>
+              {validationResult && (
+                <div className="flex items-start gap-2 mt-1 p-3 bg-green-50 border border-green-300 rounded-lg">
+                  <ShieldCheck className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                  <div className="text-sm text-green-800">
+                    <p className="font-semibold">Datos autocompletados desde {tipoDocumento === "RUC" ? "SUNAT" : "RENIEC"}</p>
+                    <p className="mt-0.5">{validationResult.nombreCompleto || validationResult.razonSocial}</p>
+                    {validationResult.estado && <p className="text-xs text-green-600">Estado: {validationResult.estado} — {validationResult.condicion}</p>}
+                  </div>
+                </div>
+              )}
+              {validatingDoc && (
+                <span className="text-xs text-blue-500">Consultando {tipoDocumento === "RUC" ? "SUNAT" : "RENIEC"}...</span>
+              )}
               {checkingDoc && (
-                <span className="text-xs text-gray-400">Verificando documento...</span>
+                <span className="text-xs text-gray-400">Verificando en el CRM...</span>
               )}
               {errors.numeroDocumento && (
                 <span className="text-sm text-red-500">
