@@ -58,10 +58,6 @@ const router = createBrowserRouter([
     element: <LoginPage />,
   },
   {
-    path: "*",
-    element: <div>Not Found</div>,
-  },
-  {
     path: "/dashboard",
     element: (
       <ProtectedRoute>
@@ -301,6 +297,10 @@ const router = createBrowserRouter([
         ),
       },
     ],
+  },
+  {
+    path: "*",
+    element: <div>Not Found</div>,
   },
 ]);
 

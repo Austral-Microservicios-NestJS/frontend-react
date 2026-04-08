@@ -2083,6 +2083,31 @@ export default function LeadDetail() {
               </div>
             )}
 
+            {/* Token SBS del cliente */}
+            {leadState?.idCliente && clienteVinculado?.tokenSBS && (
+              <div className="bg-white rounded-lg shadow-sm border border-emerald-200 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <span className="text-xs font-bold text-gray-700 uppercase tracking-wide">Token SBS</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <code className="px-3 py-1 bg-emerald-50 text-emerald-800 text-sm font-mono rounded border border-emerald-200">
+                      {clienteVinculado.tokenSBS}
+                    </code>
+                    <button
+                      type="button"
+                      onClick={() => navigator.clipboard.writeText(clienteVinculado.tokenSBS || "")}
+                      className="p-1 text-gray-400 hover:text-gray-600"
+                      title="Copiar token"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Documentos del cliente — carta de nombramiento */}
             {leadState?.idCliente && documentosCliente.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm border border-blue-200 p-4">

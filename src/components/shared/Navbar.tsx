@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import {
-  Search, Bell, User, LogOut, ChevronDown, PanelLeft,
+  Search, User, LogOut, ChevronDown, PanelLeft,
   Loader2, Users, ShieldCheck, TrendingUp, X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -347,16 +347,8 @@ export const Navbar = () => {
         </div>
       </div>
 
-      {/* ── Right: bell + profile ── */}
+      {/* ── Right: profile ── */}
       <div className="absolute right-0 top-0 h-full flex items-center gap-1 px-4">
-        <button
-          className="relative p-2.5 rounded-xl text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-all duration-200 active:scale-95"
-          aria-label="Notificaciones"
-        >
-          <Bell className="w-4.5 h-4.5" />
-          <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-red-500 rounded-full ring-[1.5px] ring-white" />
-        </button>
-
         {/* Profile */}
         <div className="relative ml-1" ref={dropdownRef}>
           <button

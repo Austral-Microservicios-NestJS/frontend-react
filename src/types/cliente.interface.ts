@@ -93,6 +93,7 @@ export interface Cliente {
   emailNotificaciones?: string;
   recibirNotificaciones: boolean;
   cumpleanos?: string; // Date string
+  tokenSBS?: string; // Token unico para seguimiento SBS
   activo: boolean;
   disponible: boolean;
   asignadoA?: string;
