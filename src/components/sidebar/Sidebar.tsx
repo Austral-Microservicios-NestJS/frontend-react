@@ -179,7 +179,7 @@ export const Sidebar = () => {
                     { dot: "bg-orange-500",  iconBg: "bg-orange-100",  iconColor: "text-orange-600",  Icon: BookOpen },
                   ][categoryIndex] ?? { dot: "bg-gray-400", iconBg: "bg-gray-100", iconColor: "text-gray-500", Icon: Settings };
 
-                  const { dot: dotColor, iconBg, iconColor, Icon: CategoryIcon } = categoryMeta;
+                  const { iconBg, iconColor, Icon: CategoryIcon } = categoryMeta;
 
                   return (
                     <div key={category.id}>
