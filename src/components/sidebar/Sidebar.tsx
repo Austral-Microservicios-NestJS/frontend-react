@@ -8,6 +8,7 @@ import { moduleCategories } from "@/routes/modulos";
 import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import { SessionWarningModal } from "@/components/shared/SessionWarningModal";
 import { Navbar } from "@/components/shared/Navbar";
+import { HelpChat } from "@/components/shared/HelpChat";
 import { cn } from "@/lib/utils";
 
 // Tooltip flotante renderizado en el body — escapa cualquier overflow
@@ -352,6 +353,7 @@ export const Sidebar = () => {
           </div>
         </main>
       </div>
+      <HelpChat />
     </>
   );
 };

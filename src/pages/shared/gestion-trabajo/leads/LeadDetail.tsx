@@ -351,10 +351,10 @@ export default function LeadDetail() {
                       <FieldLabel>Estado</FieldLabel>
                       <select
                         value={leadState?.estado ?? ""}
-                        onChange={async (e) => {
+                        onChange={(e) => {
                           const v = e.target.value;
                           setLeadState((s: any) => ({ ...s, estado: v }));
-                          if (id) { try { await leadService.cambiarEstado(id, v, user?.nombreUsuario, "Cambio manual"); } catch { /* */ } }
+                          if (id) { leadService.cambiarEstado(id, v, user?.nombreUsuario, "Cambio manual").catch(() => {}); }
                         }}
                         className={`w-full rounded-lg px-2.5 py-1.5 text-sm font-semibold border cursor-pointer transition-colors focus:outline-none ${estadoClass(leadState?.estado ?? "")}`}
                       >
