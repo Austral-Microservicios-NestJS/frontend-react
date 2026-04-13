@@ -749,21 +749,83 @@ export default function LeadDetail() {
                 label="Detalle SCTR" open={openSections.has("sctr")} onToggle={() => toggleSection("sctr")}
                 icon={<FileText className="w-3.5 h-3.5" />} iconBg="bg-orange-100" iconColor="text-orange-600" borderColor="border-l-orange-500"
                 action={
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const data = [["Campo", "Valor"], ["Razón Social", detalleSCTR.razonSocial ?? ""], ["RUC", detalleSCTR.rucEmpresa ?? ""], ["Nº Trabajadores", detalleSCTR.numeroTrabajadores ?? ""], ["Planilla Mensual (S/)", detalleSCTR.planillaMensual ?? ""], ["Actividad / Giro", detalleSCTR.actividadEconomica ?? ""], ["Cobertura", detalleSCTR.tipoRiesgo ?? ""]];
-                      const ws = XLSX.utils.aoa_to_sheet(data);
-                      ws["!cols"] = [{ wch: 28 }, { wch: 45 }];
-                      const wb = XLSX.utils.book_new();
-                      XLSX.utils.book_append_sheet(wb, ws, "Ficha SCTR");
-                      const nombre = (detalleSCTR.razonSocial || detalleSCTR.rucEmpresa || "cliente").replace(/[^a-zA-Z0-9]/g, "_").substring(0, 30);
-                      XLSX.writeFile(wb, `ficha_sctr_${nombre}.xlsx`);
-                    }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
-                  >
-                    <Download className="w-3.5 h-3.5" /> Descargar Excel
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {/* Importar Excel */}
+                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors cursor-pointer">
+                      <Download className="w-3.5 h-3.5 rotate-180" /> Importar Excel
+                      <input type="file" accept=".xlsx,.xls" className="hidden" onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = (evt) => {
+                          const wb = XLSX.read(evt.target?.result, { type: "binary" });
+                          const ws = wb.Sheets[wb.SheetNames[0]];
+                          const rows: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1 });
+                          // Detectar header (buscar fila que tenga "documento" o "paterno")
+                          let startRow = 0;
+                          for (let i = 0; i < Math.min(rows.length, 5); i++) {
+                            const row = (rows[i] || []).map((c: any) => String(c).toLowerCase());
+                            if (row.some((c: string) => c.includes("documento") || c.includes("paterno") || c.includes("nombre"))) {
+                              startRow = i + 1;
+                              break;
+                            }
+                          }
+                          if (startRow === 0) startRow = 1; // skip header row
+                          const trabajadores = rows.slice(startRow).filter((r) => r.length >= 3 && r[1]).map((r) => ({
+                            tipoDoc: String(r[0] || "DNI").toUpperCase().includes("CE") ? "CE" : "DNI",
+                            nroDoc: String(r[1] || "").trim(),
+                            apellidoPaterno: String(r[2] || "").trim(),
+                            apellidoMaterno: String(r[3] || "").trim(),
+                            nombres: String(r[4] || "").trim(),
+                            fechaNacimiento: String(r[5] || "").trim(),
+                            sexo: String(r[6] || "M").toUpperCase().startsWith("F") ? "F" : "M",
+                            sueldo: parseFloat(String(r[7] || "0").replace(",", ".")) || 0,
+                          }));
+                          if (trabajadores.length > 0) {
+                            setDetalleSCTR((d: any) => ({ ...d, trabajadores: [...(d.trabajadores || []), ...trabajadores], numeroTrabajadores: (d.trabajadores?.length || 0) + trabajadores.length }));
+                          }
+                        };
+                        reader.readAsBinaryString(file);
+                        e.target.value = "";
+                      }} />
+                    </label>
+                    {/* Exportar Excel */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const wb = XLSX.utils.book_new();
+                        // Hoja 1: Datos empresa
+                        const empresaData = [
+                          ["FICHA SCTR - " + (detalleSCTR.razonSocial || "")],
+                          [],
+                          ["Campo", "Valor"],
+                          ["RUC Empresa", detalleSCTR.rucEmpresa ?? ""],
+                          ["Razon Social", detalleSCTR.razonSocial ?? ""],
+                          ["N Trabajadores", (detalleSCTR.trabajadores || []).length || detalleSCTR.numeroTrabajadores || 0],
+                          ["Planilla Mensual (S/)", detalleSCTR.planillaMensual ?? ""],
+                          ["Actividad Economica", detalleSCTR.actividadEconomica ?? ""],
+                          ["Tipo de Riesgo", detalleSCTR.tipoRiesgo ?? ""],
+                        ];
+                        const wsEmpresa = XLSX.utils.aoa_to_sheet(empresaData);
+                        wsEmpresa["!cols"] = [{ wch: 25 }, { wch: 45 }];
+                        XLSX.utils.book_append_sheet(wb, wsEmpresa, "Empresa");
+                        // Hoja 2: Trabajadores (formato trama estandar)
+                        const headers = ["TIPO_DOCUMENTO", "NRO_DOCUMENTO", "APELLIDO_PATERNO", "APELLIDO_MATERNO", "PRIMER_NOMBRE", "FECHA_NACIMIENTO", "SEXO", "IMPORTE_SUELDO_BRUTO"];
+                        const tRows = (detalleSCTR.trabajadores || []).map((t: any) => [
+                          t.tipoDoc || "DNI", t.nroDoc || "", t.apellidoPaterno || "", t.apellidoMaterno || "",
+                          t.nombres || "", t.fechaNacimiento || "", t.sexo || "M", t.sueldo || 0,
+                        ]);
+                        const wsTrab = XLSX.utils.aoa_to_sheet([headers, ...tRows]);
+                        wsTrab["!cols"] = headers.map(() => ({ wch: 20 }));
+                        XLSX.utils.book_append_sheet(wb, wsTrab, "Trabajadores");
+                        const nombre = (detalleSCTR.razonSocial || detalleSCTR.rucEmpresa || "sctr").replace(/[^a-zA-Z0-9]/g, "_").substring(0, 25);
+                        XLSX.writeFile(wb, `SCTR_${nombre}.xlsx`);
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
+                    >
+                      <Download className="w-3.5 h-3.5" /> Exportar Excel
+                    </button>
+                  </div>
                 }
               >
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
