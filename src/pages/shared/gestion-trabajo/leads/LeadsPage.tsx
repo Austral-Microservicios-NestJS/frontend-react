@@ -140,8 +140,8 @@ export default function LeadsPage() {
     }
   };
 
-  const handleDrop = async (leadId: string, nuevoEstado: EstadoLead) => {
-    await cambiarEstadoLead(leadId, nuevoEstado);
+  const handleDrop = (leadId: string, nuevoEstado: EstadoLead) => {
+    cambiarEstadoLead(leadId, nuevoEstado);
   };
 
   const clearFilters = () => {
