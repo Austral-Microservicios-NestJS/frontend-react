@@ -119,13 +119,10 @@ export const useLeads = () => {
   const cambiarEstadoLead = (id: string, nuevoEstado: EstadoLead) => {
     // Actualización optimista: mover lead en cache inmediatamente
     queryClient.setQueryData(["leads"], (old: any) => {
-      if (!old?.data) return old;
-      return {
-        ...old,
-        data: old.data.map((l: any) =>
-          l.idLead === id ? { ...l, estado: nuevoEstado, fechaUltimoCambioEstado: new Date().toISOString() } : l
-        ),
-      };
+      if (!Array.isArray(old)) return old;
+      return old.map((l: any) =>
+        l.idLead === id ? { ...l, estado: nuevoEstado, fechaUltimoCambioEstado: new Date().toISOString() } : l
+      );
     });
     // API en background
     leadService.cambiarEstado(id, nuevoEstado, user?.nombreUsuario).catch(() => {
