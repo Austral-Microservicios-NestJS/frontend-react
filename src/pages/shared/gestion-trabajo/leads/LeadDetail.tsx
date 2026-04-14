@@ -201,12 +201,12 @@ export default function LeadDetail() {
         valorEstimado: leadState.valorEstimado, comision: leadState.comision,
         idCliente: leadState.idCliente, notas: leadState.notas,
       });
-      if (detalleAuto) { try { await leadService.updateDetalleAuto(id, detalleAuto); } catch { /* */ } }
-      if (detalleSoat) { try { await leadService.updateDetalleSoat(id, detalleSoat); } catch { /* */ } }
-      if (detalleSalud) { try { await leadService.updateDetalleSalud(id, detalleSalud); } catch { /* */ } }
-      if (detalleSCTR) { try { await leadService.updateDetalleSCTR(id, detalleSCTR); } catch { /* */ } }
-      if (detalleVida) { try { await leadService.updateDetalleVida(id, detalleVida); } catch { /* */ } }
-      if (detalleVidaLey) { try { await leadService.updateDetalleVidaLey(id, detalleVidaLey); } catch { /* */ } }
+      if (detalleAuto) { try { await leadService.updateDetalleAuto(id, detalleAuto); } catch (e) { console.error("Error detalle auto:", e); } }
+      if (detalleSoat) { try { await leadService.updateDetalleSoat(id, detalleSoat); } catch (e) { console.error("Error detalle soat:", e); } }
+      if (detalleSalud) { try { await leadService.updateDetalleSalud(id, detalleSalud); } catch (e) { console.error("Error detalle salud:", e); } }
+      if (detalleSCTR) { try { await leadService.updateDetalleSCTR(id, detalleSCTR); } catch (e) { console.error("Error detalle SCTR:", e); } }
+      if (detalleVida) { try { await leadService.updateDetalleVida(id, detalleVida); } catch (e) { console.error("Error detalle vida:", e); } }
+      if (detalleVidaLey) { try { await leadService.updateDetalleVidaLey(id, detalleVidaLey); } catch (e) { console.error("Error detalle vida ley:", e); } }
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2500);
     } catch (err) { console.error(err); } finally { setIsSaving(false); }
