@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 import { leadService } from "@/services/lead.service";
 import type { Lead, CreateLead, UpdateLead, EstadoLead } from "@/types/lead.interface";
 import { useAuthStore } from "@/store/auth.store";
@@ -9,6 +10,7 @@ const DIAS_OCULTAR_FINALIZADOS = 3; // Leads CERRADO/PERDIDO se ocultan del kanb
 
 export const useLeads = () => {
   const { user } = useAuthStore();
+  const queryClient = useQueryClient();
   const { data: allLeads = [], isLoading, error } = leadService.useGetAll();
   const createMutation = leadService.useCreate();
   const updateMutation = leadService.useUpdate();
@@ -114,16 +116,19 @@ export const useLeads = () => {
     }
   };
 
-  const cambiarEstadoLead = async (id: string, nuevoEstado: EstadoLead) => {
-    try {
-      await leadService.cambiarEstado(id, nuevoEstado, user?.nombreUsuario);
-      updateMutation.reset();
-      toast.success("Estado actualizado exitosamente");
-    } catch (error) {
-      console.error("Error al cambiar estado:", error);
+  const cambiarEstadoLead = (id: string, nuevoEstado: EstadoLead) => {
+    // Actualización optimista: mover lead en cache inmediatamente
+    queryClient.setQueryData(["leads"], (old: any) => {
+      if (!Array.isArray(old)) return old;
+      return old.map((l: any) =>
+        l.idLead === id ? { ...l, estado: nuevoEstado, fechaUltimoCambioEstado: new Date().toISOString() } : l
+      );
+    });
+    // API en background
+    leadService.cambiarEstado(id, nuevoEstado, user?.nombreUsuario).catch(() => {
       toast.error("Error al cambiar el estado");
-      throw error;
-    }
+      queryClient.invalidateQueries({ queryKey: ["leads"] });
+    });
   };
 
   return {

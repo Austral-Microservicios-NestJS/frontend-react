@@ -356,10 +356,10 @@ export default function LeadDetail() {
                       <FieldLabel>Estado</FieldLabel>
                       <select
                         value={leadState?.estado ?? ""}
-                        onChange={async (e) => {
+                        onChange={(e) => {
                           const v = e.target.value;
                           setLeadState((s: any) => ({ ...s, estado: v }));
-                          if (id) { try { await leadService.cambiarEstado(id, v, user?.nombreUsuario, "Cambio manual"); } catch { /* */ } }
+                          if (id) { leadService.cambiarEstado(id, v, user?.nombreUsuario, "Cambio manual").catch(() => {}); }
                         }}
                         className={`w-full rounded-lg px-2.5 py-1.5 text-sm font-semibold border cursor-pointer transition-colors focus:outline-none ${estadoClass(leadState?.estado ?? "")}`}
                       >
@@ -754,21 +754,83 @@ export default function LeadDetail() {
                 label="Detalle SCTR" open={openSections.has("sctr")} onToggle={() => toggleSection("sctr")}
                 icon={<FileText className="w-3.5 h-3.5" />} iconBg="bg-orange-100" iconColor="text-orange-600" borderColor="border-l-orange-500"
                 action={
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const data = [["Campo", "Valor"], ["Razón Social", detalleSCTR.razonSocial ?? ""], ["RUC", detalleSCTR.rucEmpresa ?? ""], ["Nº Trabajadores", detalleSCTR.numeroTrabajadores ?? ""], ["Planilla Mensual (S/)", detalleSCTR.planillaMensual ?? ""], ["Actividad / Giro", detalleSCTR.actividadEconomica ?? ""], ["Cobertura", detalleSCTR.tipoRiesgo ?? ""]];
-                      const ws = XLSX.utils.aoa_to_sheet(data);
-                      ws["!cols"] = [{ wch: 28 }, { wch: 45 }];
-                      const wb = XLSX.utils.book_new();
-                      XLSX.utils.book_append_sheet(wb, ws, "Ficha SCTR");
-                      const nombre = (detalleSCTR.razonSocial || detalleSCTR.rucEmpresa || "cliente").replace(/[^a-zA-Z0-9]/g, "_").substring(0, 30);
-                      XLSX.writeFile(wb, `ficha_sctr_${nombre}.xlsx`);
-                    }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
-                  >
-                    <Download className="w-3.5 h-3.5" /> Descargar Excel
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {/* Importar Excel */}
+                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors cursor-pointer">
+                      <Download className="w-3.5 h-3.5 rotate-180" /> Importar Excel
+                      <input type="file" accept=".xlsx,.xls" className="hidden" onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = (evt) => {
+                          const wb = XLSX.read(evt.target?.result, { type: "binary" });
+                          const ws = wb.Sheets[wb.SheetNames[0]];
+                          const rows: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1 });
+                          // Detectar header (buscar fila que tenga "documento" o "paterno")
+                          let startRow = 0;
+                          for (let i = 0; i < Math.min(rows.length, 5); i++) {
+                            const row = (rows[i] || []).map((c: any) => String(c).toLowerCase());
+                            if (row.some((c: string) => c.includes("documento") || c.includes("paterno") || c.includes("nombre"))) {
+                              startRow = i + 1;
+                              break;
+                            }
+                          }
+                          if (startRow === 0) startRow = 1; // skip header row
+                          const trabajadores = rows.slice(startRow).filter((r) => r.length >= 3 && r[1]).map((r) => ({
+                            tipoDoc: String(r[0] || "DNI").toUpperCase().includes("CE") ? "CE" : "DNI",
+                            nroDoc: String(r[1] || "").trim(),
+                            apellidoPaterno: String(r[2] || "").trim(),
+                            apellidoMaterno: String(r[3] || "").trim(),
+                            nombres: String(r[4] || "").trim(),
+                            fechaNacimiento: String(r[5] || "").trim(),
+                            sexo: String(r[6] || "M").toUpperCase().startsWith("F") ? "F" : "M",
+                            sueldo: parseFloat(String(r[7] || "0").replace(",", ".")) || 0,
+                          }));
+                          if (trabajadores.length > 0) {
+                            setDetalleSCTR((d: any) => ({ ...d, trabajadores: [...(d.trabajadores || []), ...trabajadores], numeroTrabajadores: (d.trabajadores?.length || 0) + trabajadores.length }));
+                          }
+                        };
+                        reader.readAsBinaryString(file);
+                        e.target.value = "";
+                      }} />
+                    </label>
+                    {/* Exportar Excel */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const wb = XLSX.utils.book_new();
+                        // Hoja 1: Datos empresa
+                        const empresaData = [
+                          ["FICHA SCTR - " + (detalleSCTR.razonSocial || "")],
+                          [],
+                          ["Campo", "Valor"],
+                          ["RUC Empresa", detalleSCTR.rucEmpresa ?? ""],
+                          ["Razon Social", detalleSCTR.razonSocial ?? ""],
+                          ["N Trabajadores", (detalleSCTR.trabajadores || []).length || detalleSCTR.numeroTrabajadores || 0],
+                          ["Planilla Mensual (S/)", detalleSCTR.planillaMensual ?? ""],
+                          ["Actividad Economica", detalleSCTR.actividadEconomica ?? ""],
+                          ["Tipo de Riesgo", detalleSCTR.tipoRiesgo ?? ""],
+                        ];
+                        const wsEmpresa = XLSX.utils.aoa_to_sheet(empresaData);
+                        wsEmpresa["!cols"] = [{ wch: 25 }, { wch: 45 }];
+                        XLSX.utils.book_append_sheet(wb, wsEmpresa, "Empresa");
+                        // Hoja 2: Trabajadores (formato trama estandar)
+                        const headers = ["TIPO_DOCUMENTO", "NRO_DOCUMENTO", "APELLIDO_PATERNO", "APELLIDO_MATERNO", "PRIMER_NOMBRE", "FECHA_NACIMIENTO", "SEXO", "IMPORTE_SUELDO_BRUTO"];
+                        const tRows = (detalleSCTR.trabajadores || []).map((t: any) => [
+                          t.tipoDoc || "DNI", t.nroDoc || "", t.apellidoPaterno || "", t.apellidoMaterno || "",
+                          t.nombres || "", t.fechaNacimiento || "", t.sexo || "M", t.sueldo || 0,
+                        ]);
+                        const wsTrab = XLSX.utils.aoa_to_sheet([headers, ...tRows]);
+                        wsTrab["!cols"] = headers.map(() => ({ wch: 20 }));
+                        XLSX.utils.book_append_sheet(wb, wsTrab, "Trabajadores");
+                        const nombre = (detalleSCTR.razonSocial || detalleSCTR.rucEmpresa || "sctr").replace(/[^a-zA-Z0-9]/g, "_").substring(0, 25);
+                        XLSX.writeFile(wb, `SCTR_${nombre}.xlsx`);
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
+                    >
+                      <Download className="w-3.5 h-3.5" /> Exportar Excel
+                    </button>
+                  </div>
                 }
               >
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -799,68 +861,130 @@ export default function LeadDetail() {
                     </div>
                   </div>
                 </div>
-                {/* Nómina */}
+                {/* Nómina de Trabajadores */}
                 <div className="mt-5 pt-4 border-t border-gray-100">
                   <div className="flex items-center justify-between mb-3">
-                    <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wide">Nómina de Trabajadores ({(detalleSCTR.trabajadores || []).length})</h4>
-                    <button type="button" onClick={() => { const trs = [...(detalleSCTR.trabajadores || [])]; trs.push({ tipoDoc: "DNI", nroDoc: "", apellidoPaterno: "", apellidoMaterno: "", nombres: "", fechaNacimiento: "", sexo: "M", sueldo: 0 }); setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs })); }} className="px-2.5 py-1 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
+                    <div>
+                      <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wide">
+                        Nomina de Trabajadores ({(detalleSCTR.trabajadores || []).length})
+                      </h4>
+                      {(detalleSCTR.trabajadores || []).length > 0 && (
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          Planilla total: S/ {(detalleSCTR.trabajadores || []).reduce((s: number, t: any) => s + (Number(t.sueldo) || 0), 0).toLocaleString("es-PE", { minimumFractionDigits: 2 })}
+                        </p>
+                      )}
+                    </div>
+                    <button type="button" onClick={() => {
+                      const trs = [...(detalleSCTR.trabajadores || [])];
+                      trs.push({ tipoDoc: "DNI", nroDoc: "", apellidoPaterno: "", apellidoMaterno: "", nombres: "", fechaNacimiento: "", sexo: "M", sueldo: 0 });
+                      setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs, numeroTrabajadores: trs.length }));
+                    }} className="px-2.5 py-1 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors">
                       + Agregar trabajador
                     </button>
                   </div>
                   {(detalleSCTR.trabajadores || []).length > 0 ? (
                     <div className="overflow-x-auto rounded-xl border border-gray-200">
                       <table className="w-full text-xs">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-gray-100">
                           <tr>
-                            {["Tipo", "N° Doc", "Ap. Paterno", "Ap. Materno", "Nombres", "F. Nac.", "Sexo", "Sueldo", ""].map((h) => (
-                              <th key={h} className="px-2 py-1.5 text-left font-semibold text-gray-600">{h}</th>
-                            ))}
+                            <th className="px-2 py-2 text-left font-bold text-gray-700 w-8">#</th>
+                            <th className="px-2 py-2 text-left font-bold text-gray-700">Tipo</th>
+                            <th className="px-2 py-2 text-left font-bold text-gray-700">N. Documento</th>
+                            <th className="px-2 py-2 text-left font-bold text-gray-700">Apellido Paterno</th>
+                            <th className="px-2 py-2 text-left font-bold text-gray-700">Apellido Materno</th>
+                            <th className="px-2 py-2 text-left font-bold text-gray-700">Nombres</th>
+                            <th className="px-2 py-2 text-left font-bold text-gray-700">Fecha Nac.</th>
+                            <th className="px-2 py-2 text-left font-bold text-gray-700">Sexo</th>
+                            <th className="px-2 py-2 text-left font-bold text-gray-700">Sueldo Bruto</th>
+                            <th className="px-2 py-2 w-8"></th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                          {(detalleSCTR.trabajadores || []).map((t: any, idx: number) => (
-                            <tr key={idx} className="hover:bg-gray-50">
-                              <td className="px-1 py-1"><select value={t.tipoDoc || "DNI"} onChange={(e) => { const trs = [...detalleSCTR.trabajadores]; trs[idx] = { ...t, tipoDoc: e.target.value }; setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs })); }} className="w-14 border rounded px-1 py-0.5 text-xs"><option value="DNI">DNI</option><option value="CE">CE</option><option value="PAS">PAS</option></select></td>
-                              <td className="px-1 py-1"><input value={t.nroDoc || ""} onChange={(e) => { const trs = [...detalleSCTR.trabajadores]; trs[idx] = { ...t, nroDoc: e.target.value }; setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs })); }} className="w-20 border rounded px-1.5 py-0.5 text-xs" /></td>
-                              <td className="px-1 py-1"><input value={t.apellidoPaterno || ""} onChange={(e) => { const trs = [...detalleSCTR.trabajadores]; trs[idx] = { ...t, apellidoPaterno: e.target.value }; setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs })); }} className="w-24 border rounded px-1.5 py-0.5 text-xs" /></td>
-                              <td className="px-1 py-1"><input value={t.apellidoMaterno || ""} onChange={(e) => { const trs = [...detalleSCTR.trabajadores]; trs[idx] = { ...t, apellidoMaterno: e.target.value }; setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs })); }} className="w-24 border rounded px-1.5 py-0.5 text-xs" /></td>
-                              <td className="px-1 py-1"><input value={t.nombres || ""} onChange={(e) => { const trs = [...detalleSCTR.trabajadores]; trs[idx] = { ...t, nombres: e.target.value }; setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs })); }} className="w-28 border rounded px-1.5 py-0.5 text-xs" /></td>
-                              <td className="px-1 py-1"><input type="date" value={t.fechaNacimiento || ""} onChange={(e) => { const trs = [...detalleSCTR.trabajadores]; trs[idx] = { ...t, fechaNacimiento: e.target.value }; setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs })); }} className="w-28 border rounded px-1.5 py-0.5 text-xs" /></td>
-                              <td className="px-1 py-1"><select value={t.sexo || "M"} onChange={(e) => { const trs = [...detalleSCTR.trabajadores]; trs[idx] = { ...t, sexo: e.target.value }; setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs })); }} className="w-10 border rounded px-1 py-0.5 text-xs"><option value="M">M</option><option value="F">F</option></select></td>
-                              <td className="px-1 py-1"><input type="number" step="0.01" value={t.sueldo || ""} onChange={(e) => { const trs = [...detalleSCTR.trabajadores]; trs[idx] = { ...t, sueldo: Number(e.target.value) }; setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs })); }} className="w-20 border rounded px-1.5 py-0.5 text-xs" placeholder="0.00" /></td>
-                              <td className="px-1 py-1"><button type="button" onClick={() => { const trs = [...detalleSCTR.trabajadores]; trs.splice(idx, 1); setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs })); }} className="text-red-400 hover:text-red-600 font-bold">✕</button></td>
-                            </tr>
-                          ))}
+                          {(detalleSCTR.trabajadores || []).map((t: any, idx: number) => {
+                            const updateField = (field: string, value: any) => {
+                              const trs = [...detalleSCTR.trabajadores];
+                              trs[idx] = { ...t, [field]: value };
+                              setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs }));
+                            };
+                            const removeRow = () => {
+                              const trs = [...detalleSCTR.trabajadores];
+                              trs.splice(idx, 1);
+                              setDetalleSCTR((d: any) => ({ ...d, trabajadores: trs, numeroTrabajadores: trs.length }));
+                            };
+                            return (
+                              <tr key={idx} className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                                <td className="px-2 py-1.5 text-gray-400 font-mono">{idx + 1}</td>
+                                <td className="px-1 py-1">
+                                  <select value={t.tipoDoc || "DNI"} onChange={(e) => updateField("tipoDoc", e.target.value)} className="w-16 border border-gray-200 rounded px-1 py-1 text-xs focus:border-blue-400 focus:outline-none">
+                                    <option value="DNI">DNI</option><option value="CE">CE</option><option value="PAS">PAS</option>
+                                  </select>
+                                </td>
+                                <td className="px-1 py-1"><input value={t.nroDoc || ""} onChange={(e) => updateField("nroDoc", e.target.value)} className="w-24 border border-gray-200 rounded px-2 py-1 text-xs focus:border-blue-400 focus:outline-none" placeholder="N. Doc" /></td>
+                                <td className="px-1 py-1"><input value={t.apellidoPaterno || ""} onChange={(e) => updateField("apellidoPaterno", e.target.value)} className="w-28 border border-gray-200 rounded px-2 py-1 text-xs focus:border-blue-400 focus:outline-none" /></td>
+                                <td className="px-1 py-1"><input value={t.apellidoMaterno || ""} onChange={(e) => updateField("apellidoMaterno", e.target.value)} className="w-28 border border-gray-200 rounded px-2 py-1 text-xs focus:border-blue-400 focus:outline-none" /></td>
+                                <td className="px-1 py-1"><input value={t.nombres || ""} onChange={(e) => updateField("nombres", e.target.value)} className="w-32 border border-gray-200 rounded px-2 py-1 text-xs focus:border-blue-400 focus:outline-none" /></td>
+                                <td className="px-1 py-1"><input type="date" value={t.fechaNacimiento || ""} onChange={(e) => updateField("fechaNacimiento", e.target.value)} className="w-32 border border-gray-200 rounded px-2 py-1 text-xs focus:border-blue-400 focus:outline-none" /></td>
+                                <td className="px-1 py-1">
+                                  <select value={t.sexo || "M"} onChange={(e) => updateField("sexo", e.target.value)} className="w-12 border border-gray-200 rounded px-1 py-1 text-xs focus:border-blue-400 focus:outline-none">
+                                    <option value="M">M</option><option value="F">F</option>
+                                  </select>
+                                </td>
+                                <td className="px-1 py-1"><input type="number" step="0.01" value={t.sueldo || ""} onChange={(e) => updateField("sueldo", Number(e.target.value))} className="w-24 border border-gray-200 rounded px-2 py-1 text-xs focus:border-blue-400 focus:outline-none text-right" placeholder="0.00" /></td>
+                                <td className="px-1 py-1"><button type="button" onClick={removeRow} className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="Eliminar">✕</button></td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
+                        {(detalleSCTR.trabajadores || []).length > 0 && (
+                          <tfoot className="bg-gray-100 font-semibold">
+                            <tr>
+                              <td colSpan={8} className="px-2 py-2 text-right text-xs text-gray-700">Total Planilla:</td>
+                              <td className="px-2 py-2 text-xs text-right text-gray-900">
+                                S/ {(detalleSCTR.trabajadores || []).reduce((s: number, t: any) => s + (Number(t.sueldo) || 0), 0).toLocaleString("es-PE", { minimumFractionDigits: 2 })}
+                              </td>
+                              <td></td>
+                            </tr>
+                          </tfoot>
+                        )}
                       </table>
                     </div>
                   ) : (
-                    <p className="text-xs text-gray-400 italic">No hay trabajadores. Haz clic en "+ Agregar trabajador" para comenzar.</p>
+                    <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+                      <ClipboardList className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                      <p className="text-sm text-gray-400">No hay trabajadores registrados</p>
+                      <p className="text-xs text-gray-400 mt-1">Haz clic en "+ Agregar trabajador" o usa "Importar Excel"</p>
+                    </div>
                   )}
                 </div>
               </CollapsibleSection>
             )}
 
-            {/* Token SBS del cliente */}
-            {leadState?.idCliente && clienteVinculado?.tokenSBS && (
+            {/* Seguimiento SBS del cliente */}
+            {leadState?.idCliente && clienteVinculado && (
               <div className="bg-white rounded-lg shadow-sm border border-emerald-200 p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                    <span className="text-xs font-bold text-gray-700 uppercase tracking-wide">Token SBS</span>
+                <div className="flex items-center gap-2 mb-3 pb-2 border-b border-emerald-100">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide">Seguimiento SBS</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="px-3 py-2 bg-emerald-50 rounded-lg border border-emerald-100">
+                    <p className="text-[10px] font-semibold text-emerald-600 uppercase">Token Unico</p>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <code className="text-sm font-mono text-emerald-800 truncate">{clienteVinculado.tokenSBS || "Pendiente"}</code>
+                      {clienteVinculado.tokenSBS && (
+                        <button type="button" onClick={() => navigator.clipboard.writeText(clienteVinculado.tokenSBS || "")} className="p-0.5 text-emerald-500 hover:text-emerald-700 shrink-0" title="Copiar"><Copy className="w-3 h-3" /></button>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <code className="px-3 py-1 bg-emerald-50 text-emerald-800 text-sm font-mono rounded border border-emerald-200">
-                      {clienteVinculado.tokenSBS}
-                    </code>
-                    <button
-                      type="button"
-                      onClick={() => navigator.clipboard.writeText(clienteVinculado.tokenSBS || "")}
-                      className="p-1 text-gray-400 hover:text-gray-600"
-                      title="Copiar token"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                    </button>
+                  <div className="px-3 py-2 bg-gray-50 rounded-lg border border-gray-100">
+                    <p className="text-[10px] font-semibold text-gray-500 uppercase">Cliente</p>
+                    <p className="text-sm font-medium text-gray-800 mt-0.5 truncate">
+                      {clienteVinculado.tipoPersona === "JURIDICO" ? clienteVinculado.razonSocial : `${clienteVinculado.nombres || ""} ${clienteVinculado.apellidos || ""}`.trim()}
+                    </p>
+                  </div>
+                  <div className="px-3 py-2 bg-gray-50 rounded-lg border border-gray-100">
+                    <p className="text-[10px] font-semibold text-gray-500 uppercase">{clienteVinculado.tipoDocumento}</p>
+                    <p className="text-sm font-mono text-gray-800 mt-0.5">{clienteVinculado.numeroDocumento}</p>
                   </div>
                 </div>
               </div>
