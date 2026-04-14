@@ -1,98 +1,113 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X, ChevronRight, ChevronLeft, Check,
   Shield, Car, Heart, Users, Briefcase, FileText,
-  Zap, Globe, Star, Umbrella, Sun,
+  Zap, Globe, Star, Umbrella, Sun, Eye, Send, ExternalLink, Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { quoteService } from "@/services/quote.service";
 
 // ─── Aseguradoras ─────────────────────────────────────────────────────────────
 
 const ASEGURADORAS = [
-  { id: "rimac",       name: "Rímac",        sub: "Seguros",    Icon: Shield,    bg: "bg-blue-600",    ring: "ring-blue-300" },
-  { id: "pacifico",    name: "Pacífico",      sub: "Seguros",    Icon: Globe,     bg: "bg-emerald-600", ring: "ring-emerald-300" },
-  { id: "mapfre",      name: "Mapfre",        sub: "Perú",       Icon: Star,      bg: "bg-red-600",     ring: "ring-red-300" },
-  { id: "la_positiva", name: "La Positiva",   sub: "Seguros",    Icon: Sun,       bg: "bg-amber-500",   ring: "ring-amber-300" },
-  { id: "interseguro", name: "Interseguro",   sub: "Perú",       Icon: Zap,       bg: "bg-violet-600",  ring: "ring-violet-300" },
-  { id: "secrex",      name: "Secrex",        sub: "Perú",       Icon: Umbrella,  bg: "bg-gray-700",    ring: "ring-gray-300" },
+  { id: "rimac", name: "Rímac", sub: "Seguros", Icon: Shield, bg: "bg-blue-600", ring: "ring-blue-300" },
+  { id: "pacifico", name: "Pacífico", sub: "Seguros", Icon: Globe, bg: "bg-emerald-600", ring: "ring-emerald-300" },
+  { id: "mapfre", name: "Mapfre", sub: "Perú", Icon: Star, bg: "bg-red-600", ring: "ring-red-300" },
+  { id: "la_positiva", name: "La Positiva", sub: "Seguros", Icon: Sun, bg: "bg-amber-500", ring: "ring-amber-300" },
+  { id: "interseguro", name: "Interseguro", sub: "Perú", Icon: Zap, bg: "bg-violet-600", ring: "ring-violet-300" },
+  { id: "qualitas", name: "Qualitas", sub: "Perú", Icon: Umbrella, bg: "bg-gray-700", ring: "ring-gray-300" },
 ];
 
 // ─── Tipos de seguro ──────────────────────────────────────────────────────────
 
 const TIPOS_SEGURO = [
-  { id: "AUTO",     label: "Vehicular", Icon: Car,       bg: "bg-blue-50",    iconColor: "text-blue-600",    border: "border-blue-200",    activeBg: "bg-blue-600" },
-  { id: "SOAT",     label: "SOAT",      Icon: Shield,    bg: "bg-amber-50",   iconColor: "text-amber-600",   border: "border-amber-200",   activeBg: "bg-amber-500" },
-  { id: "SALUD",    label: "Salud",     Icon: Heart,     bg: "bg-rose-50",    iconColor: "text-rose-600",    border: "border-rose-200",    activeBg: "bg-rose-600" },
-  { id: "VIDA",     label: "Vida",      Icon: Users,     bg: "bg-violet-50",  iconColor: "text-violet-600",  border: "border-violet-200",  activeBg: "bg-violet-600" },
-  { id: "VIDA_LEY", label: "Vida Ley",  Icon: Briefcase, bg: "bg-emerald-50", iconColor: "text-emerald-600", border: "border-emerald-200", activeBg: "bg-emerald-600" },
-  { id: "SCTR",     label: "SCTR",      Icon: FileText,  bg: "bg-indigo-50",  iconColor: "text-indigo-600",  border: "border-indigo-200",  activeBg: "bg-indigo-600" },
+  { id: "VEHICULAR", label: "Vehicular", Icon: Car, bg: "bg-blue-50", iconColor: "text-blue-600", border: "border-blue-200", activeBg: "bg-blue-600" },
+  { id: "SOAT", label: "SOAT", Icon: Shield, bg: "bg-amber-50", iconColor: "text-amber-600", border: "border-amber-200", activeBg: "bg-amber-500" },
+  { id: "SALUD", label: "Salud", Icon: Heart, bg: "bg-rose-50", iconColor: "text-rose-600", border: "border-rose-200", activeBg: "bg-rose-600" },
+  { id: "VIDA", label: "Vida", Icon: Users, bg: "bg-violet-50", iconColor: "text-violet-600", border: "border-violet-200", activeBg: "bg-violet-600" },
+  { id: "VIDA_LEY", label: "Vida Ley", Icon: Briefcase, bg: "bg-emerald-50", iconColor: "text-emerald-600", border: "border-emerald-200", activeBg: "bg-emerald-600" },
+  { id: "SCTR", label: "SCTR", Icon: FileText, bg: "bg-indigo-50", iconColor: "text-indigo-600", border: "border-indigo-200", activeBg: "bg-indigo-600" },
 ];
 
 // ─── Campos por tipo ──────────────────────────────────────────────────────────
 
-const getFields = (tipo: string, lead: any, detalles: Record<string, any>) => {
-  const nombre = [lead?.nombre, lead?.apellidos].filter(Boolean).join(" ");
+const getFields = (tipo: string, lead: any, detalles: Record<string, any>, cliente?: any) => {
+  const nombre = cliente 
+    ? [cliente.nombres, cliente.apellidos].filter(Boolean).join(" ") || cliente.razonSocial
+    : [lead?.nombre, lead?.apellidos].filter(Boolean).join(" ");
+  
   const d = detalles[tipo] || {};
+  
+  const commonHeader = [
+    { key: "nombreAsegurado", label: "Nombre del asegurado", value: nombre, type: "text", span: 2 },
+    { key: "dni", label: "DNI / RUC", value: cliente?.numeroDocumento || lead?.numeroDocumento || "", type: "text", span: 1 },
+    { key: "email", label: "Correo electrónico", value: cliente?.emailNotificaciones || lead?.email || "", type: "email", span: 1 },
+    { key: "telefono", label: "Teléfono", value: cliente?.telefono1 || lead?.telefono || "", type: "text", span: 1 },
+  ];
+
+  const addressFields = [
+    { key: "direccion", label: "Dirección", value: cliente?.direccion || lead?.direccion || "", type: "text", span: 2 },
+  ];
   switch (tipo) {
-    case "AUTO": return [
-      { key: "nombreAsegurado", label: "Nombre del asegurado", value: nombre,                           type: "text",   span: 2 },
-      { key: "dni",             label: "DNI / RUC",             value: lead?.numeroDocumento || "",      type: "text",   span: 1 },
-      { key: "email",           label: "Correo electrónico",    value: lead?.email || "",               type: "email",  span: 1 },
-      { key: "telefono",        label: "Teléfono",              value: lead?.telefono || "",            type: "text",   span: 1 },
-      { key: "placa",           label: "Placa",                 value: d.placa || "",                   type: "text",   span: 1 },
-      { key: "marca",           label: "Marca",                 value: d.marca || "",                   type: "text",   span: 1 },
-      { key: "modelo",          label: "Modelo",                value: d.modelo || "",                  type: "text",   span: 1 },
-      { key: "anio",            label: "Año",                   value: d.anio ? String(d.anio) : "",    type: "text",   span: 1 },
-      { key: "uso",             label: "Uso del vehículo",      value: d.uso || "PARTICULAR",           type: "text",   span: 1 },
-      { key: "valorVehiculo",   label: "Valor del vehículo (S/)",value: d.valorVehiculo ? String(d.valorVehiculo) : "", type: "number", span: 1 },
-      { key: "sumaAsegurada",   label: "Suma asegurada (S/)",   value: d.sumaAsegurada ? String(d.sumaAsegurada) : "", type: "number", span: 1 },
+    case "VEHICULAR":
+    case "AUTO": // Soporte para datos legacy
+      return [
+      ...commonHeader,
+      ...addressFields,
+      { key: "placa", label: "Placa", value: d.placa || "", type: "text", span: 1 },
+      { key: "marca", label: "Marca", value: d.marca || "", type: "text", span: 1 },
+      { key: "modelo", label: "Modelo", value: d.modelo || "", type: "text", span: 1 },
+      { key: "anio", label: "Año", value: d.anio ? String(d.anio) : "", type: "text", span: 1 },
+      { key: "uso", label: "Uso del vehículo", value: d.usoVehiculo || d.uso || "PARTICULAR", type: "text", span: 1 },
+      { key: "sumaAsegurada", label: "Suma asegurada (S/)", value: d.valorComercial || lead?.valorEstimado ? String(d.valorComercial || lead?.valorEstimado) : "", type: "number", span: 1 },
     ];
     case "SOAT": return [
-      { key: "nombreAsegurado", label: "Nombre del asegurado", value: nombre,                           type: "text",   span: 2 },
-      { key: "dni",             label: "DNI / RUC",             value: lead?.numeroDocumento || "",      type: "text",   span: 1 },
-      { key: "placa",           label: "Placa",                 value: d.placa || "",                   type: "text",   span: 1 },
-      { key: "tipoVehiculo",    label: "Tipo de vehículo",      value: d.tipoVehiculo || "",            type: "text",   span: 1 },
-      { key: "marca",           label: "Marca",                 value: d.marca || "",                   type: "text",   span: 1 },
-      { key: "anio",            label: "Año de fabricación",    value: d.anio ? String(d.anio) : "",    type: "text",   span: 1 },
-      { key: "nroAsientos",     label: "N° de asientos",        value: d.nroAsientos ? String(d.nroAsientos) : "", type: "number", span: 1 },
+      ...commonHeader,
+      ...addressFields,
+      { key: "placa", label: "Placa", value: d.placa || "", type: "text", span: 1 },
+      { key: "marca", label: "Marca", value: d.marca || "", type: "text", span: 1 },
+      { key: "modelo", label: "Modelo", value: d.modelo || "", type: "text", span: 1 },
+      { key: "anio", label: "Año de fabricación", value: d.anio ? String(d.anio) : "", type: "text", span: 1 },
+      { key: "valorVehiculo", label: "Valor del vehículo ($)", value: d.valorComercial || lead?.valorEstimado ? String(d.valorComercial || lead?.valorEstimado) : "", type: "number", span: 1 },
+      { key: "usoVehiculo", label: "Uso del vehículo", value: d.usoVehiculo || d.uso || "PARTICULAR", type: "text", span: 1 },
     ];
     case "SALUD": return [
-      { key: "nombreAsegurado", label: "Nombre del asegurado", value: nombre,                           type: "text",   span: 2 },
-      { key: "dni",             label: "DNI",                   value: lead?.numeroDocumento || "",      type: "text",   span: 1 },
-      { key: "email",           label: "Correo electrónico",    value: lead?.email || "",               type: "email",  span: 1 },
-      { key: "telefono",        label: "Teléfono",              value: lead?.telefono || "",            type: "text",   span: 1 },
-      { key: "fechaNacimiento", label: "Fecha de nacimiento",   value: d.fechaNacimiento || "",         type: "date",   span: 1 },
-      { key: "edad",            label: "Edad",                  value: d.edad ? String(d.edad) : "",    type: "number", span: 1 },
-      { key: "planSalud",       label: "Plan de salud",         value: d.planSalud || "",               type: "text",   span: 1 },
-      { key: "sumaAsegurada",   label: "Suma asegurada (S/)",   value: d.sumaAsegurada ? String(d.sumaAsegurada) : "", type: "number", span: 1 },
-      { key: "nroAsegurados",   label: "N° de asegurados",      value: "1",                             type: "number", span: 1 },
+      ...commonHeader,
+      ...addressFields,
+      { key: "fechaNacimiento", label: "Fecha de nacimiento", value: d.fechaNacimiento || "", type: "date", span: 1 },
+      { key: "edad", label: "Edad", value: d.edad ? String(d.edad) : "", type: "number", span: 1 },
+      { key: "planSalud", label: "Plan de salud", value: d.tipoCobertura || d.planSalud || "", type: "text", span: 1 },
+      { key: "sumaAsegurada", label: "Presupuesto mensual (S/)", value: d.presupuestoMensual || lead?.valorEstimado ? String(d.presupuestoMensual || lead?.valorEstimado) : "", type: "number", span: 1 },
+      { key: "nroAsegurados", label: "N° de asegurados", value: "1", type: "number", span: 1 },
     ];
     case "VIDA": return [
-      { key: "nombreAsegurado", label: "Nombre del asegurado", value: nombre,                           type: "text",   span: 2 },
-      { key: "dni",             label: "DNI",                   value: lead?.numeroDocumento || "",      type: "text",   span: 1 },
-      { key: "email",           label: "Correo electrónico",    value: lead?.email || "",               type: "email",  span: 1 },
-      { key: "edad",            label: "Edad",                  value: d.edad ? String(d.edad) : "",    type: "number", span: 1 },
-      { key: "ocupacion",       label: "Ocupación",             value: d.ocupacion || "",               type: "text",   span: 1 },
-      { key: "sumaAsegurada",   label: "Suma asegurada (S/)",   value: d.sumaAsegurada ? String(d.sumaAsegurada) : "", type: "number", span: 1 },
-      { key: "beneficiarios",   label: "Beneficiarios",         value: d.beneficiarios || "",           type: "text",   span: 2 },
+      ...commonHeader,
+      ...addressFields,
+      { key: "edad", label: "Edad", value: d.edad ? String(d.edad) : "", type: "number", span: 1 },
+      { key: "ocupacion", label: "Ocupación", value: d.ocupacion || "", type: "text", span: 1 },
+      { key: "sumaAsegurada", label: "Suma asegurada (S/)", value: d.sumaAsegurada || lead?.valorEstimado ? String(d.sumaAsegurada || lead?.valorEstimado) : "", type: "number", span: 1 },
+      { key: "beneficiarios", label: "Beneficiarios", value: d.beneficiarios || "", type: "text", span: 2 },
     ];
     case "VIDA_LEY": return [
-      { key: "razonSocial",     label: "Razón social / empresa",value: lead?.empresa || "",              type: "text",   span: 2 },
-      { key: "ruc",             label: "RUC",                   value: lead?.numeroDocumento || "",      type: "text",   span: 1 },
-      { key: "email",           label: "Correo de contacto",    value: lead?.email || "",               type: "email",  span: 1 },
-      { key: "nroTrabajadores", label: "N° de trabajadores",    value: d.nroTrabajadores ? String(d.nroTrabajadores) : "", type: "number", span: 1 },
-      { key: "actividadEconomica", label: "Actividad económica",value: d.actividadEconomica || "",      type: "text",   span: 2 },
-      { key: "remuneracionPromedio", label: "Remuneración promedio (S/)", value: d.remuneracionPromedio ? String(d.remuneracionPromedio) : "", type: "number", span: 1 },
+      ...commonHeader,
+      { key: "ruc", label: "RUC", value: d.rucEmpresa || lead?.numeroDocumento || "", type: "text", span: 1 },
+      { key: "razonSocial", label: "Razón social / empresa", value: d.razonSocial || lead?.empresa || "", type: "text", span: 2 },
+      { key: "nroTrabajadores", label: "N° de trabajadores", value: d.numeroEmpleadosPlanilla || d.nroTrabajadores ? String(d.numeroEmpleadosPlanilla || d.nroTrabajadores) : "", type: "number", span: 1 },
+      { key: "actividadEconomica", label: "Actividad económica", value: d.actividadEconomica || "", type: "text", span: 2 },
+      { key: "planillaMensual", label: "Planilla mensual (S/)", value: d.planillaMensual ? String(d.planillaMensual) : "", type: "number", span: 1 },
     ];
-    case "SCTR": return [
-      { key: "razonSocial",     label: "Razón social / empresa",value: lead?.empresa || "",              type: "text",   span: 2 },
-      { key: "ruc",             label: "RUC",                   value: lead?.numeroDocumento || "",      type: "text",   span: 1 },
-      { key: "email",           label: "Correo de contacto",    value: lead?.email || "",               type: "email",  span: 1 },
-      { key: "nroTrabajadores", label: "N° de trabajadores",    value: d.nroTrabajadores ? String(d.nroTrabajadores) : "", type: "number", span: 1 },
-      { key: "actividadEconomica", label: "Actividad económica",value: d.actividadEconomica || "",      type: "text",   span: 2 },
-      { key: "nivelRiesgo",     label: "Nivel de riesgo",       value: d.nivelRiesgo || "MEDIO",        type: "text",   span: 1 },
-      { key: "sumaAsegurada",   label: "Suma asegurada (S/)",   value: d.sumaAsegurada ? String(d.sumaAsegurada) : "", type: "number", span: 1 },
+    case "SCTR":
+    case "SCTR_SALUD":
+    case "SCTR_PENSION":
+      return [
+      ...commonHeader,
+      { key: "ruc", label: "RUC", value: d.rucEmpresa || lead?.numeroDocumento || "", type: "text", span: 1 },
+      { key: "razonSocial", label: "Razón social / empresa", value: d.razonSocial || lead?.empresa || "", type: "text", span: 2 },
+      { key: "nroTrabajadores", label: "N° de trabajadores", value: d.numeroTrabajadores || d.nroTrabajadores ? String(d.numeroTrabajadores || d.nroTrabajadores) : "", type: "number", span: 1 },
+      { key: "actividadEconomica", label: "Actividad económica", value: d.actividadEconomica || "", type: "text", span: 2 },
+      { key: "nivelRiesgo", label: "Nivel de riesgo", value: d.tipoRiesgo || d.nivelRiesgo || "MEDIO", type: "text", span: 1 },
+      { key: "sumaAsegurada", label: "Prima estimada (S/)", value: lead?.valorEstimado ? String(lead?.valorEstimado) : "", type: "number", span: 1 },
     ];
     default: return [];
   }
@@ -100,7 +115,7 @@ const getFields = (tipo: string, lead: any, detalles: Record<string, any>) => {
 
 // ─── Stepper ──────────────────────────────────────────────────────────────────
 
-const STEPS = ["Aseguradora", "Tipo de seguro", "Confirmar datos"];
+const INITIAL_STEPS = ["Aseguradora", "Tipo de seguro", "Confirmar datos", "Visualizar", "Enviar"];
 
 // ─── Variantes de animación ───────────────────────────────────────────────────
 
@@ -116,25 +131,43 @@ interface Props {
   open: boolean;
   onClose: () => void;
   lead: any;
+  cliente?: any;
   detalles?: { auto?: any; soat?: any; salud?: any; sctr?: any; vida?: any; vidaLey?: any };
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export const GenerarCotizacionModal = ({ open, onClose, lead, detalles = {} }: Props) => {
-  const [step, setStep]               = useState(0);
-  const [dir, setDir]                 = useState(1);
+export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles = {} }: Props) => {
+  const [step, setStep] = useState(0);
+  const [dir, setDir] = useState(1);
   const [aseguradora, setAseguradora] = useState<string | null>(null);
-  const [tipoSeguro, setTipoSeguro]   = useState<string | null>(null);
-  const [formValues, setFormValues]   = useState<Record<string, string>>({});
-  const [confirmed, setConfirmed]     = useState(false);
+  const [tipoSeguro, setTipoSeguro] = useState<string | null>(null);
+  const [formValues, setFormValues] = useState<Record<string, string>>({});
+  const [confirmed, setConfirmed] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [quoteId, setQuoteId] = useState<string | null>(null);
+
+  // Determinar si debemos saltar el paso de selección de tipo de seguro
+  const skipTipoSeguro = !!lead?.tipoSeguro;
+  const STEPS = skipTipoSeguro 
+    ? INITIAL_STEPS.filter(s => s !== "Tipo de seguro")
+    : INITIAL_STEPS;
+
+  // Sincronizar tipo de seguro si viene del Lead
+  useEffect(() => {
+    if (open && lead?.tipoSeguro) {
+      handleTipoSelect(lead.tipoSeguro);
+    }
+  }, [open, lead?.tipoSeguro]);
 
   const detallesMap: Record<string, any> = {
-    AUTO: detalles.auto, SOAT: detalles.soat, SALUD: detalles.salud,
+    VEHICULAR: detalles.auto, AUTO: detalles.auto, SOAT: detalles.soat, SALUD: detalles.salud,
     SCTR: detalles.sctr, VIDA: detalles.vida, VIDA_LEY: detalles.vidaLey,
   };
 
-  const fields = tipoSeguro ? getFields(tipoSeguro, lead, detallesMap) : [];
+  const fields = tipoSeguro ? getFields(tipoSeguro, lead, detallesMap, cliente) : [];
 
   const goTo = (next: number) => {
     setDir(next > step ? 1 : -1);
@@ -143,22 +176,119 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, detalles = {} }: P
 
   const handleTipoSelect = (tipo: string) => {
     setTipoSeguro(tipo);
-    const fs = getFields(tipo, lead, detallesMap);
+    const fs = getFields(tipo, lead, detallesMap, cliente);
     const init: Record<string, string> = {};
     fs.forEach((f) => { init[f.key] = f.value; });
     setFormValues(init);
+  };
+
+  const getFieldValidationError = (key: string, value: string) => {
+    if (!value || value.toString().trim() === "") return "Este campo es requerido";
+    
+    const val = value.toString().trim();
+    
+    if (key === "email") {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(val)) return "Formato de correo inválido";
+    }
+    
+    if (key === "dni") {
+      if (!/^\d+$/.test(val)) return "Solo se permiten números";
+      if (val.length !== 8) return "Debe tener 8 dígitos";
+    }
+    
+    if (key === "ruc") {
+      if (!/^\d+$/.test(val)) return "Solo se permiten números";
+      if (val.length !== 11) return "Debe tener 11 dígitos";
+    }
+    
+    if (key === "telefono") {
+      if (!/^\d+$/.test(val)) return "Solo se permiten números";
+      if (val.length !== 9) return "Debe tener 9 dígitos";
+    }
+    
+    return null;
+  };
+
+  const isFormValid = () => {
+    return fields.every(f => !getFieldValidationError(f.key, formValues[f.key]));
+  };
+
+  const currentStepLabel = STEPS[step];
+
+  const handleGenerate = async () => {
+    if (!lead?.idLead) {
+      alert("Error: No se han cargado los datos del lead correctamente.");
+      return;
+    }
+    setIsGenerating(true);
+    try {
+      // 1. Crear cotización inicial
+      const q = await quoteService.create(lead.idLead, aseguradora || "Genérica");
+      // 2. Completar cotización (genera el PDF con los datos validados del modal)
+      // Ahora enviamos formValues para que el backend persista los cambios antes de generar el PDF
+      const completed = await quoteService.completeQuote(q.id, formValues);
+      setPdfUrl(completed.pdfUrl || null);
+      setQuoteId(completed.id);
+      
+      // Encontrar el índice de "Visualizar" en STEPS para navegar correctamente
+      const visualizarIndex = STEPS.indexOf("Visualizar");
+      if (visualizarIndex !== -1) goTo(visualizarIndex);
+    } catch (error: any) {
+      console.error("Error al generar cotización:", error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleSendEmail = async () => {
+    if (!quoteId) return;
+    setIsSending(true);
+    try {
+      await quoteService.enviarEmail({
+        destinatario: formValues.email || lead?.email || "",
+        nombreCliente: formValues.nombreAsegurado || lead?.nombre || "",
+        pdfBase64: pdfUrl?.includes('base64,') ? pdfUrl.split('base64,')[1] : undefined,
+        cotizacion: {
+          numeroPoliza: quoteId.substring(0, 8).toUpperCase(),
+          cliente: {
+            nombres: lead?.nombre || "Cliente",
+            email: lead?.email || "",
+            telefono: lead?.telefono || "",
+            tipoDocumento: "DNI",
+            numeroDocumento: lead?.numeroDocumento || "",
+            direccion: "Lima, Perú",
+          },
+          seguro: {
+            tipo: tipoSeguro || "Vehicular",
+            cobertura: "Todo Riesgo",
+            vigenciaInicio: new Date().toISOString(),
+            vigenciaFin: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
+            prima: 1200.00,
+            moneda: "USD",
+          },
+          fechaEmision: new Date().toISOString(),
+        },
+      });
+      setConfirmed(true);
+    } catch (error) {
+      console.error("Error enviando email:", error);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleClose = () => {
     setTimeout(() => {
       setStep(0); setDir(1); setAseguradora(null);
       setTipoSeguro(null); setFormValues({}); setConfirmed(false);
+      setPdfUrl(null); setQuoteId(null); setIsGenerating(false); setIsSending(false);
     }, 300);
     onClose();
   };
 
   const aseguradoraObj = ASEGURADORAS.find((a) => a.id === aseguradora);
-  const tipoObj        = TIPOS_SEGURO.find((t) => t.id === tipoSeguro);
+  const tipoObj = TIPOS_SEGURO.find((t) => t.id === tipoSeguro);
 
   return (
     <AnimatePresence>
@@ -180,8 +310,8 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, detalles = {} }: P
             className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col overflow-hidden"
             style={{ maxHeight: "88vh" }}
             initial={{ opacity: 0, scale: 0.95, y: 16 }}
-            animate={{ opacity: 1, scale: 1,    y: 0  }}
-            exit={{ opacity: 0,   scale: 0.95, y: 16  }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 16 }}
             transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
           >
 
@@ -211,9 +341,9 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, detalles = {} }: P
                   <div key={s} className="flex items-center gap-1 flex-1 last:flex-none">
                     <div className={cn(
                       "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all duration-300",
-                      i < step   ? "bg-emerald-100 text-emerald-700" :
-                      i === step ? "bg-[#003d5c] text-white shadow-sm" :
-                                   "bg-gray-100 text-gray-400"
+                      i < step ? "bg-emerald-100 text-emerald-700" :
+                        i === step ? "bg-[#003d5c] text-white shadow-sm" :
+                          "bg-gray-100 text-gray-400"
                     )}>
                       {i < step
                         ? <Check className="w-3 h-3 shrink-0" />
@@ -222,7 +352,12 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, detalles = {} }: P
                       <span>{s}</span>
                     </div>
                     {i < STEPS.length - 1 && (
-                      <div className={cn("flex-1 h-px mx-1 transition-colors duration-300", i < step ? "bg-emerald-200" : "bg-gray-200")} />
+                      <div className={cn("flex-1 h-px mx-1 transition-colors duration-300", 
+                        // Ajuste de lógica para el color de la línea si hay saltos
+                        (skipTipoSeguro && i === 0 && step >= 2) || (i < (skipTipoSeguro && step >= 2 ? step - 1 : step)) 
+                          ? "bg-emerald-200" 
+                          : "bg-gray-200"
+                      )} />
                     )}
                   </div>
                 ))}
@@ -244,7 +379,7 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, detalles = {} }: P
                 >
 
                   {/* ── Paso 1: Aseguradora ── */}
-                  {step === 0 && (
+                  {currentStepLabel === "Aseguradora" && (
                     <div>
                       <p className="text-sm text-gray-500 mb-4">Selecciona la aseguradora para esta cotización.</p>
                       <div className="grid grid-cols-3 gap-3">
@@ -291,7 +426,7 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, detalles = {} }: P
                   )}
 
                   {/* ── Paso 2: Tipo de seguro ── */}
-                  {step === 1 && (
+                  {currentStepLabel === "Tipo de seguro" && (
                     <div>
                       {aseguradoraObj && (
                         <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-gray-50 rounded-xl border border-gray-100">
@@ -341,7 +476,7 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, detalles = {} }: P
                   )}
 
                   {/* ── Paso 3: Datos ── */}
-                  {step === 2 && !confirmed && (
+                  {currentStepLabel === "Confirmar datos" && !confirmed && (
                     <div>
                       {/* Resumen selección */}
                       <div className="flex items-center gap-3 mb-5 p-3 rounded-xl border border-gray-100 bg-gray-50">
@@ -365,24 +500,111 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, detalles = {} }: P
 
                       <p className="text-sm text-gray-500 mb-4">Revisa y ajusta los datos pre-llenados del lead.</p>
 
+                      {!isFormValid() && (
+                        <div className="mb-4 px-3 py-2 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-2 text-amber-700 text-xs font-medium animate-pulse">
+                          <Check className="w-3 h-3 rotate-45" /> Por favor, completa todos los campos para generar la cotización.
+                        </div>
+                      )}
+
                       <div className="grid grid-cols-2 gap-3">
-                        {fields.map((f) => (
-                          <div key={f.key} className={f.span === 2 ? "col-span-2" : ""}>
-                            <label className="block text-xs font-semibold text-gray-500 mb-1">{f.label}</label>
-                            <input
-                              type={f.type}
-                              value={formValues[f.key] ?? ""}
-                              onChange={(e) => setFormValues((prev) => ({ ...prev, [f.key]: e.target.value }))}
-                              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm bg-gray-50 focus:outline-none focus:bg-white focus:border-[#003d5c]/50 focus:ring-2 focus:ring-[#003d5c]/10 transition-all"
-                            />
-                          </div>
-                        ))}
+                        {fields.map((f) => {
+                          const error = getFieldValidationError(f.key, formValues[f.key]);
+                          const isNumeric = ["dni", "ruc", "telefono", "anio", "valorVehiculo", "sumAsegurada", "nroTrabajadores"].includes(f.key);
+                          
+                          return (
+                            <div key={f.key} className={f.span === 2 ? "col-span-2" : ""}>
+                              <div className="flex justify-between items-center mb-1">
+                                <label className="block text-xs font-semibold text-gray-500">{f.label}</label>
+                                {formValues[f.key] && error && (
+                                  <span className="text-[10px] text-red-500 font-medium animate-in fade-in slide-in-from-right-1">{error}</span>
+                                )}
+                              </div>
+                              <input
+                                type={f.type}
+                                value={formValues[f.key] ?? ""}
+                                maxLength={f.key === "dni" ? 8 : f.key === "ruc" ? 11 : f.key === "telefono" ? 9 : undefined}
+                                onChange={(e) => {
+                                  let val = e.target.value;
+                                  if (isNumeric) val = val.replace(/\D/g, ""); // Solo números
+                                  setFormValues((prev) => ({ ...prev, [f.key]: val }));
+                                }}
+                                className={cn(
+                                  "w-full border rounded-xl px-3 py-2 text-sm transition-all focus:outline-none focus:ring-2",
+                                  formValues[f.key] && error 
+                                    ? "border-red-200 bg-red-50/30 focus:border-red-400 focus:ring-red-100" 
+                                    : "border-gray-200 bg-gray-50 focus:bg-white focus:border-[#003d5c]/50 focus:ring-[#003d5c]/10"
+                                )}
+                              />
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   )}
 
-                  {/* ── Confirmado ── */}
-                  {step === 2 && confirmed && (
+                  {/* ── Paso 4: Visualizar PDF ── */}
+                  {currentStepLabel === "Visualizar" && (
+                    <div className="flex flex-col h-full">
+                      <div className="flex items-center justify-between mb-4">
+                        <p className="text-sm text-gray-500">Vista previa de la cotización generada.</p>
+                        <button
+                          onClick={() => pdfUrl && window.open(pdfUrl, "_blank")}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#003d5c] bg-[#003d5c]/5 rounded-lg hover:bg-[#003d5c]/10 transition-colors"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" /> Expandir
+                        </button>
+                      </div>
+
+                      <div className="flex-1 bg-gray-100 rounded-xl overflow-hidden border border-gray-200 min-h-[400px]">
+                        {pdfUrl ? (
+                          <iframe
+                            src={pdfUrl}
+                            className="w-full h-full border-none"
+                            title="Vista previa de cotización"
+                          />
+                        ) : (
+                          <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                            <Eye className="w-12 h-12 mb-2 opacity-20" />
+                            <p className="text-sm">No se pudo cargar la vista previa</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ── Paso 5: Enviar ── */}
+                  {currentStepLabel === "Enviar" && !confirmed && (
+                    <div className="flex flex-col items-center justify-center py-8 text-center">
+                      <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6">
+                        <Send className="w-8 h-8 text-[#003d5c]" />
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">Enviar Cotización</h3>
+                      <p className="text-sm text-gray-500 max-w-sm mx-auto mb-8">
+                        La cotización se enviará al correo electrónico <span className="font-semibold text-gray-800">{formValues.email || lead?.email || "—"}</span>.
+                      </p>
+
+                      <div className="w-full max-w-sm p-4 rounded-2xl border border-gray-100 bg-gray-50 text-left">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">Resumen de envío</p>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-500">Aseguradora:</span>
+                            <span className="font-medium text-gray-800">{aseguradoraObj?.name}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-500">Tipo de Seguro:</span>
+                            <span className="font-medium text-gray-800">{tipoObj?.label}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-500">Destinatario:</span>
+                            <span className="font-medium text-gray-800 truncate max-w-[180px]">{formValues.nombreAsegurado || lead?.nombre || "—"}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ── Éxito Final ── */}
+                  {confirmed && (
                     <div className="flex flex-col items-center justify-center py-12 text-center">
                       <motion.div
                         initial={{ scale: 0, rotate: -10 }}
@@ -397,16 +619,17 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, detalles = {} }: P
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.15 }}
                       >
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">¡Cotización lista!</h3>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">¡Cotización Enviada!</h3>
                         <p className="text-sm text-gray-500 max-w-xs mx-auto">
-                          Datos confirmados para{" "}
-                          <span className="font-semibold text-gray-700">{aseguradoraObj?.name}</span>
-                          {" "}·{" "}
-                          <span className="font-semibold text-gray-700">{tipoObj?.label}</span>
+                          El documento ha sido enviado exitosamente a{" "}
+                          <span className="font-semibold text-gray-700">{formValues.email || lead?.email || "—"}</span>.
                         </p>
-                        <p className="text-xs text-gray-400 mt-3 px-6">
-                          La integración con el backend para enviar la solicitud estará disponible próximamente.
-                        </p>
+                        <button
+                          onClick={handleClose}
+                          className="mt-8 px-6 py-2.5 bg-[#003d5c] text-white rounded-xl font-semibold hover:bg-[#002d44] transition-colors shadow-sm"
+                        >
+                          Cerrar Modal
+                        </button>
                       </motion.div>
                     </div>
                   )}
@@ -416,53 +639,69 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, detalles = {} }: P
             </div>
 
             {/* ── Footer ── */}
-            <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/70 flex items-center justify-between shrink-0">
-              <button
-                onClick={step === 0 ? handleClose : () => goTo(step - 1)}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
-              >
-                {step === 0 ? <X className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-                {step === 0 ? "Cancelar" : "Atrás"}
-              </button>
-
-              {step === 0 && (
+            {!confirmed && (
+              <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/70 flex items-center justify-between shrink-0">
                 <button
-                  onClick={() => goTo(1)}
-                  disabled={!aseguradora}
-                  className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-[#003d5c] rounded-xl hover:bg-[#002d44] disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
+                  onClick={step === 0 ? handleClose : () => goTo(step - 1)}
+                  disabled={isGenerating || isSending}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50"
                 >
-                  Siguiente <ChevronRight className="w-4 h-4" />
+                  {step === 0 ? <X className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+                  {step === 0 ? "Cancelar" : "Atrás"}
                 </button>
-              )}
 
-              {step === 1 && (
-                <button
-                  onClick={() => goTo(2)}
-                  disabled={!tipoSeguro}
-                  className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-[#003d5c] rounded-xl hover:bg-[#002d44] disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
-                >
-                  Siguiente <ChevronRight className="w-4 h-4" />
-                </button>
-              )}
+                {currentStepLabel === "Aseguradora" && (
+                  <button
+                    onClick={() => goTo(step + 1)}
+                    disabled={!aseguradora}
+                    className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-[#003d5c] rounded-xl hover:bg-[#002d44] disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
+                  >
+                    Siguiente <ChevronRight className="w-4 h-4" />
+                  </button>
+                )}
 
-              {step === 2 && !confirmed && (
-                <button
-                  onClick={() => setConfirmed(true)}
-                  className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors shadow-sm"
-                >
-                  <Check className="w-4 h-4" /> Confirmar cotización
-                </button>
-              )}
+                {currentStepLabel === "Tipo de seguro" && (
+                  <button
+                    onClick={() => goTo(step + 1)}
+                    disabled={!tipoSeguro}
+                    className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-[#003d5c] rounded-xl hover:bg-[#002d44] disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
+                  >
+                    Siguiente <ChevronRight className="w-4 h-4" />
+                  </button>
+                )}
 
-              {step === 2 && confirmed && (
-                <button
-                  onClick={handleClose}
-                  className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-[#003d5c] rounded-xl hover:bg-[#002d44] transition-colors shadow-sm"
-                >
-                  Cerrar <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
+                {currentStepLabel === "Confirmar datos" && (
+                  <button
+                    onClick={handleGenerate}
+                    disabled={isGenerating || !isFormValid()}
+                    className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                    {isGenerating ? "Generando..." : "Confirmar y Generar PDF"}
+                  </button>
+                )}
+
+                {currentStepLabel === "Visualizar" && (
+                  <button
+                    onClick={() => goTo(step + 1)}
+                    className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-[#003d5c] rounded-xl hover:bg-[#002d44] transition-colors shadow-sm"
+                  >
+                    Siguiente <ChevronRight className="w-4 h-4" />
+                  </button>
+                )}
+
+                {currentStepLabel === "Enviar" && (
+                  <button
+                    onClick={handleSendEmail}
+                    disabled={isSending}
+                    className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors shadow-sm disabled:opacity-70"
+                  >
+                    {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    {isSending ? "Enviando..." : "Enviar Cotización"}
+                  </button>
+                )}
+              </div>
+            )}
 
           </motion.div>
         </div>

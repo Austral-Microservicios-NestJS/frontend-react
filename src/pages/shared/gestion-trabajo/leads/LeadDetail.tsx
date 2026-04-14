@@ -244,8 +244,13 @@ export default function LeadDetail() {
           </button>
           <button
             onClick={() => setIsCotizacionOpen(true)}
-            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-white rounded-lg transition-colors"
-            style={{ backgroundColor: "var(--austral-azul)" }}
+            disabled={!leadState?.idCliente}
+            className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-white rounded-lg transition-colors shadow-sm ${
+              leadState?.idCliente 
+                ? "bg-[#003d5c] hover:bg-[#002d44]" 
+                : "bg-gray-400 cursor-not-allowed opacity-70"
+            }`}
+            title={!leadState?.idCliente ? "Debe vincular un cliente antes de generar una cotización" : ""}
           >
             <ClipboardList className="w-4 h-4" /> Generar Cotización
           </button>
@@ -1124,6 +1129,7 @@ export default function LeadDetail() {
         open={isCotizacionOpen}
         onClose={() => setIsCotizacionOpen(false)}
         lead={leadState}
+        cliente={clienteVinculado}
         detalles={{
           auto: detalleAuto,
           soat: detalleSoat,
