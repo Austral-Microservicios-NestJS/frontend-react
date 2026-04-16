@@ -794,42 +794,82 @@ export default function LeadDetail() {
                         e.target.value = "";
                       }} />
                     </label>
-                    {/* Exportar Excel */}
-                    <button
-                      type="button"
-                      onClick={() => {
+                    {/* Exportar Excel por aseguradora */}
+                    <select
+                      onChange={(e) => {
+                        const fmt = e.target.value;
+                        if (!fmt) return;
+                        e.target.value = "";
+                        const trab = detalleSCTR.trabajadores || [];
                         const wb = XLSX.utils.book_new();
-                        // Hoja 1: Datos empresa
-                        const empresaData = [
-                          ["FICHA SCTR - " + (detalleSCTR.razonSocial || "")],
-                          [],
-                          ["Campo", "Valor"],
-                          ["RUC Empresa", detalleSCTR.rucEmpresa ?? ""],
-                          ["Razon Social", detalleSCTR.razonSocial ?? ""],
-                          ["N Trabajadores", (detalleSCTR.trabajadores || []).length || detalleSCTR.numeroTrabajadores || 0],
-                          ["Planilla Mensual (S/)", detalleSCTR.planillaMensual ?? ""],
-                          ["Actividad Economica", detalleSCTR.actividadEconomica ?? ""],
-                          ["Tipo de Riesgo", detalleSCTR.tipoRiesgo ?? ""],
-                        ];
-                        const wsEmpresa = XLSX.utils.aoa_to_sheet(empresaData);
-                        wsEmpresa["!cols"] = [{ wch: 25 }, { wch: 45 }];
-                        XLSX.utils.book_append_sheet(wb, wsEmpresa, "Empresa");
-                        // Hoja 2: Trabajadores (formato trama estandar)
-                        const headers = ["TIPO_DOCUMENTO", "NRO_DOCUMENTO", "APELLIDO_PATERNO", "APELLIDO_MATERNO", "PRIMER_NOMBRE", "FECHA_NACIMIENTO", "SEXO", "IMPORTE_SUELDO_BRUTO"];
-                        const tRows = (detalleSCTR.trabajadores || []).map((t: any) => [
-                          t.tipoDoc || "DNI", t.nroDoc || "", t.apellidoPaterno || "", t.apellidoMaterno || "",
-                          t.nombres || "", t.fechaNacimiento || "", t.sexo || "M", t.sueldo || 0,
-                        ]);
-                        const wsTrab = XLSX.utils.aoa_to_sheet([headers, ...tRows]);
-                        wsTrab["!cols"] = headers.map(() => ({ wch: 20 }));
-                        XLSX.utils.book_append_sheet(wb, wsTrab, "Trabajadores");
                         const nombre = (detalleSCTR.razonSocial || detalleSCTR.rucEmpresa || "sctr").replace(/[^a-zA-Z0-9]/g, "_").substring(0, 25);
-                        XLSX.writeFile(wb, `SCTR_${nombre}.xlsx`);
+                        const fmtDate = (d: string) => {
+                          if (!d) return "";
+                          const [y, m, dd] = d.split("-");
+                          return y && m && dd ? `${dd}/${m}/${y}` : d;
+                        };
+                        const tipoDocMap: Record<string, string> = { DNI: "1", CE: "2", PAS: "6" };
+
+                        if (fmt === "rimac") {
+                          const h = ["PRODUCTO", "SEDE", "TIPO DOCUMENTO", "NRO DOCUMENTO", "APELLIDO PATERNO", "APELLIDO MATERNO", "PRIMER NOMBRE", "SEGUNDO NOMBRE", "FECHA NACIMIENTO", "SEXO", "IMPORTE SUELDO BRUTO"];
+                          const rows = trab.map((t: any) => ["SCTR", "", t.tipoDoc || "DNI", t.nroDoc || "", t.apellidoPaterno || "", t.apellidoMaterno || "", t.nombres?.split(" ")[0] || "", t.nombres?.split(" ").slice(1).join(" ") || "", fmtDate(t.fechaNacimiento), t.sexo === "F" ? "F" : "M", t.sueldo || 0]);
+                          const ws = XLSX.utils.aoa_to_sheet([h, ...rows]);
+                          ws["!cols"] = h.map(() => ({ wch: 18 }));
+                          XLSX.utils.book_append_sheet(wb, ws, "Registro de Trabajadores");
+                          XLSX.writeFile(wb, `SCTR_RIMAC_${nombre}.xls`);
+                        } else if (fmt === "mapfre") {
+                          const h = ["TipDoc", "NumDoc", "ApePaterno", "ApeMaterno", "Nombres", "Nombre Completo", "Nacimiento", "Sueldo"];
+                          const rows = trab.map((t: any) => [t.tipoDoc || "DNI", t.nroDoc || "", t.apellidoPaterno || "", t.apellidoMaterno || "", t.nombres || "", `${t.apellidoPaterno || ""} ${t.apellidoMaterno || ""} ${t.nombres || ""}`.trim(), fmtDate(t.fechaNacimiento), t.sueldo || 0]);
+                          const ws = XLSX.utils.aoa_to_sheet([h, ...rows]);
+                          ws["!cols"] = h.map(() => ({ wch: 20 }));
+                          XLSX.utils.book_append_sheet(wb, ws, "Trabajadores");
+                          XLSX.writeFile(wb, `SCTR_MAPFRE_${nombre}.xls`);
+                        } else if (fmt === "pacifico") {
+                          const h = ["Tipo Documento", "Documento de Identidad", "Apellido Paterno", "Apellido Materno", "Primer Nombre", "Segundo Nombre", "Fecha Nacimiento", "Sexo", "Nacionalidad", "Ocupacion", "Departamento", "Provincia", "Distrito", "Direccion", "RUC", "Nivel Riesgo", "Mes de Planilla", "Moneda Sueldo", "Importe Sueldo", "Condicion", "Proy/Obra", "Tipo Producto", "Tipo Movimiento", "Fecha Inicio Vigencia", "Moneda Prima", "Codigo Asegurado"];
+                          const now = new Date();
+                          const mesPlanilla = String(now.getMonth() + 1).padStart(2, "0") + now.getFullYear();
+                          const riesgoMap: Record<string, string> = { BAJO: "003", MEDIO: "002", ALTO: "001" };
+                          const rows = trab.map((t: any) => [tipoDocMap[t.tipoDoc] || "1", t.nroDoc || "", t.apellidoPaterno || "", t.apellidoMaterno || "", t.nombres?.split(" ")[0] || "", t.nombres?.split(" ").slice(1).join(" ") || "", fmtDate(t.fechaNacimiento), t.sexo === "F" ? "F" : "M", "PERU", "", "", "", "", "", detalleSCTR.rucEmpresa || "", riesgoMap[detalleSCTR.tipoRiesgo] || "001", mesPlanilla, "1", String(t.sueldo || 0), "P", "", "SP", "N", "", "1", ""]);
+                          const ws = XLSX.utils.aoa_to_sheet([h, ...rows]);
+                          ws["!cols"] = h.map(() => ({ wch: 16 }));
+                          XLSX.utils.book_append_sheet(wb, ws, "Modelo de Trama");
+                          XLSX.writeFile(wb, `SCTR_PACIFICO_${nombre}.xls`);
+                        } else if (fmt === "positiva") {
+                          const h = ["Nombres", "Paterno", "Materno", "TipoTrab", "TipoDoc", "NroDoc", "Sexo", "EstadoCivil", "Direccion", "Telefono", "FechaNac", "Correo", "Moneda", "Remuneracion"];
+                          const rows = trab.map((t: any) => [t.nombres || "", t.apellidoPaterno || "", t.apellidoMaterno || "", "EMPLEADO", t.tipoDoc || "DNI", t.nroDoc || "", t.sexo || "M", "", "", "", fmtDate(t.fechaNacimiento), "", "PEN", t.sueldo || 0]);
+                          const ws = XLSX.utils.aoa_to_sheet([h, ...rows]);
+                          ws["!cols"] = h.map(() => ({ wch: 16 }));
+                          XLSX.utils.book_append_sheet(wb, ws, "Planilla");
+                          XLSX.writeFile(wb, `SCTR_POSITIVA_${nombre}.xls`);
+                        } else if (fmt === "sanitas") {
+                          const h = ["Nombres*", "ApPaterno*", "ApMaterno", "TipoTrabajador*", "PaisNacimiento", "TipoIdent*", "NumIdent*", "Sexo*", "FecNacimiento*", "Moneda*", "Remuneracion*", "EstadoCivil*", "Ocupacion"];
+                          const rows = trab.map((t: any) => [t.nombres || "", t.apellidoPaterno || "", t.apellidoMaterno || "", "EMPLEADO", "PERU", t.tipoDoc || "DNI", t.nroDoc || "", t.sexo || "M", fmtDate(t.fechaNacimiento), "PEN", t.sueldo || 0, "", ""]);
+                          const ws = XLSX.utils.aoa_to_sheet([h, ...rows]);
+                          ws["!cols"] = h.map(() => ({ wch: 16 }));
+                          XLSX.utils.book_append_sheet(wb, ws, "Afiliados");
+                          XLSX.writeFile(wb, `SCTR_SANITAS_${nombre}.xls`);
+                        } else {
+                          // Estandar
+                          const h = ["TIPO_DOCUMENTO", "NRO_DOCUMENTO", "APELLIDO_PATERNO", "APELLIDO_MATERNO", "PRIMER_NOMBRE", "FECHA_NACIMIENTO", "SEXO", "IMPORTE_SUELDO_BRUTO"];
+                          const rows = trab.map((t: any) => [t.tipoDoc || "DNI", t.nroDoc || "", t.apellidoPaterno || "", t.apellidoMaterno || "", t.nombres || "", t.fechaNacimiento || "", t.sexo || "M", t.sueldo || 0]);
+                          const ws = XLSX.utils.aoa_to_sheet([h, ...rows]);
+                          ws["!cols"] = h.map(() => ({ wch: 20 }));
+                          XLSX.utils.book_append_sheet(wb, ws, "Trabajadores");
+                          XLSX.writeFile(wb, `SCTR_${nombre}.xlsx`);
+                        }
                       }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
+                      className="px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 rounded-lg cursor-pointer appearance-none"
+                      defaultValue=""
+                      style={{ backgroundImage: "none" }}
                     >
-                      <Download className="w-3.5 h-3.5" /> Exportar Excel
-                    </button>
+                      <option value="" disabled>Exportar Trama...</option>
+                      <option value="rimac">Rimac</option>
+                      <option value="mapfre">Mapfre</option>
+                      <option value="pacifico">Pacifico</option>
+                      <option value="positiva">La Positiva</option>
+                      <option value="sanitas">Sanitas / Crecer</option>
+                      <option value="estandar">Formato Estandar</option>
+                    </select>
                   </div>
                 }
               >
