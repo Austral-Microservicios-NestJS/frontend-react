@@ -183,11 +183,13 @@ export default function AustralAIPage() {
       setConversationId(response.conversationId);
     } catch (error) {
       console.error("Error al enviar mensaje:", error);
+      // Resetear conversationId si hay error de permisos para crear nueva conversacion
+      setConversationId(undefined);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
         content:
-          "Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta de nuevo.",
+          "Hubo un error. Se ha reiniciado la conversacion. Por favor, intenta de nuevo.",
         timestamp: new Date(),
       };
       addMessage(errorMessage);
@@ -251,11 +253,12 @@ export default function AustralAIPage() {
       setConversationId(response.conversationId);
     } catch (error) {
       console.error("Error al enviar mensaje:", error);
+      setConversationId(undefined);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
         content:
-          "Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta de nuevo.",
+          "Hubo un error. Se ha reiniciado la conversacion. Por favor, intenta de nuevo.",
         timestamp: new Date(),
       };
       addMessage(errorMessage);

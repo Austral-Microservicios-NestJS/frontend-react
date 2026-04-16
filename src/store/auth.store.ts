@@ -56,6 +56,7 @@ export const useAuthStore = create<AuthState>()(
             },
             logout: () => {
                 Cookies.remove('auth-token');
+                try { localStorage.removeItem('austral-ai-chat-storage'); } catch {}
                 set({ user: null, isAuthenticated: false, lastActivity: 0 });
             },
             setLoading: (loading) => set({ isLoading: loading }),
