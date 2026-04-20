@@ -88,11 +88,9 @@ export const HelpChat = () => {
     setInput("");
     setLoading(true);
     try {
-      const { data } = await api.post("/chatbot/query", {
-        userId: user?.idUsuario,
-        userRole: user?.rol?.nombreRol,
-        query: `Eres el asistente de ayuda del CRM Austral AI Corredores de Seguros. Responde SOLO sobre el uso del sistema CRM. El usuario pregunta: "${text}". Responde en maximo 4 oraciones, de forma clara y practica. Si preguntan sobre funciones: Leads (kanban con estados Nuevo/Cotizado/Emitido/Cerrado/Perdido), Clientes (registro con validacion DNI/RUC via RENIEC/SUNAT), Polizas (registro con compania/ramo/producto), SCTR (tabla de trabajadores con importar/exportar Excel por aseguradora), Vehiculos (consulta automatica placa via Infraxion), Token SBS (seguimiento por cliente), Carta de Nombramiento (upload PDF/DOC). NO uses herramientas externas, solo responde con tu conocimiento del CRM.`,
-        conversationId: null,
+      const { data } = await api.post("/chatbot/help", {
+        question: text,
+        userRole: user?.rol?.nombreRol || "USUARIO",
       });
       setMessages((prev) => [...prev, { role: "assistant", content: data.response || "No pude procesar tu consulta." }]);
     } catch {
