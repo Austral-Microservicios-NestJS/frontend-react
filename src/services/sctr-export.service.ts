@@ -214,7 +214,8 @@ export const sctrExportService = {
 
       pacifico: async () => {
         const ws = wb.addWorksheet("Modelo de Trama", { properties: { tabColor: { argb: "FF00549F" } } });
-        const headers = ["Tipo Doc", "Documento", "Ap. Paterno", "Ap. Materno", "Primer Nombre", "Segundo Nombre", "Fecha Nac.", "Sexo", "Nacionalidad", "Ocupacion", "Dpto", "Prov", "Distrito", "Direccion", "RUC", "Nivel Riesgo", "Mes Planilla", "Moneda Sueldo", "Sueldo", "Condicion", "Proy/Obra", "Tipo Producto", "Tipo Mov", "Inicio Vigencia", "Moneda Prima", "Cod Asegurado"];
+        // Nombres EXACTOS de la trama Pacifico
+        const headers = ["Tipo Documento", "Documento de Identidad", "Apellido Paterno", "Apellido Materno", "Primer Nombre", "Segundo Nombre", "Fecha Nacimiento (dd/mm/aaaa)", "Sexo", "Nacionalidad", "Ocupación", "Departamento", "Provincia", "Distrito", "Direccion", "RUC", "Nivel Riesgo", "Mes de Planilla", "Moneda Sueldo", "Importe Sueldo", "Condicion", "Proy/Obra", "Tipo Producto", "Tipo Movimiento", "Fecha Inicio Vigencia (dd/mm/aaaa)", "Moneda Prima", "Codigo Asegurado"];
         addCabeceraEmpresa(ws, sctr, headers.length, "TRAMA SCTR - PACIFICO SEGUROS");
         ws.columns = headers.map(() => ({ width: 14 }));
         const headerRow = ws.addRow(headers);
@@ -259,14 +260,15 @@ export const sctrExportService = {
 
       sanitas: async () => {
         const ws = wb.addWorksheet("Afiliados", { properties: { tabColor: { argb: "FF008542" } } });
-        const headers = ["Nombres*", "ApPaterno*", "ApMaterno", "TipoTrabajador*", "PaisNacimiento", "TipoIdent*", "NumIdent*", "Sexo*", "FecNacimiento*", "Moneda*", "Remuneracion*", "EstadoCivil*", "Ocupacion"];
+        // Columnas EXACTAS de la trama Sanitas/Crecer (Sede al final, no Ocupacion)
+        const headers = ["Nombres*", "ApPaterno*", "ApMaterno", "TipoTrabajador*", "PaisNacimiento", "TipoIdent*", "NumIdent*", "Sexo*", "FecNacimiento*", "Moneda*", "Remuneracion*", "EstadoCivil*", "Sede*"];
         addCabeceraEmpresa(ws, sctr, headers.length, "TRAMA SCTR - SANITAS / CRECER");
         ws.columns = headers.map(() => ({ width: 16 }));
         const headerRow = ws.addRow(headers);
         styleHeader(headerRow);
         const startRow = headerRow.number + 1;
         trab.forEach((t) => {
-          ws.addRow([t.nombres || "", t.apellidoPaterno || "", t.apellidoMaterno || "", "EMPLEADO", "PERU", t.tipoDoc || "DNI", t.nroDoc || "", t.sexo || "M", fmtDate(t.fechaNacimiento), "PEN", Number(t.sueldo) || 0, "", ""]);
+          ws.addRow([t.nombres || "", t.apellidoPaterno || "", t.apellidoMaterno || "", "EMPLEADO", "PERU", t.tipoDoc || "DNI", t.nroDoc || "", t.sexo || "M", fmtDate(t.fechaNacimiento), "PEN", Number(t.sueldo) || 0, "SOLTERO", "PRINCIPAL"]);
         });
         const lastDataRow = ws.lastRow!.number;
         styleDataRows(ws, startRow, lastDataRow);
