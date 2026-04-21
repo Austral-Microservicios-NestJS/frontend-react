@@ -4,7 +4,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { leadService } from "@/services/lead.service";
 import type { Lead, CreateLead, UpdateLead, EstadoLead } from "@/types/lead.interface";
 import { useAuthStore } from "@/store/auth.store";
-import { Roles } from "@/utils/roles";
 
 const DIAS_OCULTAR_FINALIZADOS = 3; // Leads CERRADO/PERDIDO se ocultan del kanban después de 3 días
 
@@ -17,19 +16,11 @@ export const useLeads = () => {
   const deleteMutation = leadService.useDelete();
   const [mostrarArchivados, setMostrarArchivados] = useState(false);
 
-  const rol = user?.rol?.nombreRol;
-  const isLimitedRole =
-    rol === Roles.PROMOTOR_VENTA ||
-    rol === Roles.PUNTO_VENTA ||
-    rol === Roles.REFERENCIADOR;
-
-  // Filtrar por rol y ocultar CERRADO/PERDIDO antiguos
+  // El filtro por rol ya se aplica server-side (leads-ms filtra WHERE asignado_a = userId).
+  // No duplicar aquí para no comparar UUID vs nombreUsuario.
   const leads = useMemo(() => {
     if (!Array.isArray(allLeads)) return [];
     let filtered = allLeads;
-    if (isLimitedRole) {
-      filtered = filtered.filter((lead) => lead.asignadoA === user?.nombreUsuario);
-    }
     if (!mostrarArchivados) {
       const ahora = new Date();
       const limite = DIAS_OCULTAR_FINALIZADOS * 24 * 60 * 60 * 1000;
@@ -40,7 +31,7 @@ export const useLeads = () => {
       });
     }
     return filtered;
-  }, [allLeads, isLimitedRole, user?.nombreUsuario, mostrarArchivados]);
+  }, [allLeads, mostrarArchivados]);
 
   const leadsByEstado = useMemo(() => {
     return {

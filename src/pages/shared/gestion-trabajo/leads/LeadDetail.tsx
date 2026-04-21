@@ -14,6 +14,7 @@ import { leadService } from "@/services/lead.service";
 import { polizaApi } from "@/services/poliza.service";
 import { clienteService } from "@/services/cliente.service";
 import { clienteDocumentoApi } from "@/services/cliente-documento.service";
+import { sctrExportService } from "@/services/sctr-export.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useClientes } from "@/hooks/useCliente";
 import { usePolizas } from "@/hooks/usePolizas";
@@ -201,12 +202,12 @@ export default function LeadDetail() {
         valorEstimado: leadState.valorEstimado, comision: leadState.comision,
         idCliente: leadState.idCliente, notas: leadState.notas,
       });
-      if (detalleAuto) { try { await leadService.updateDetalleAuto(id, detalleAuto); } catch { /* */ } }
-      if (detalleSoat) { try { await leadService.updateDetalleSoat(id, detalleSoat); } catch { /* */ } }
-      if (detalleSalud) { try { await leadService.updateDetalleSalud(id, detalleSalud); } catch { /* */ } }
-      if (detalleSCTR) { try { await leadService.updateDetalleSCTR(id, detalleSCTR); } catch { /* */ } }
-      if (detalleVida) { try { await leadService.updateDetalleVida(id, detalleVida); } catch { /* */ } }
-      if (detalleVidaLey) { try { await leadService.updateDetalleVidaLey(id, detalleVidaLey); } catch { /* */ } }
+      if (detalleAuto) { try { await leadService.updateDetalleAuto(id, detalleAuto); } catch (e) { console.error("Error detalle auto:", e); } }
+      if (detalleSoat) { try { await leadService.updateDetalleSoat(id, detalleSoat); } catch (e) { console.error("Error detalle soat:", e); } }
+      if (detalleSalud) { try { await leadService.updateDetalleSalud(id, detalleSalud); } catch (e) { console.error("Error detalle salud:", e); } }
+      if (detalleSCTR) { try { await leadService.updateDetalleSCTR(id, detalleSCTR); } catch (e) { console.error("Error detalle SCTR:", e); } }
+      if (detalleVida) { try { await leadService.updateDetalleVida(id, detalleVida); } catch (e) { console.error("Error detalle vida:", e); } }
+      if (detalleVidaLey) { try { await leadService.updateDetalleVidaLey(id, detalleVidaLey); } catch (e) { console.error("Error detalle vida ley:", e); } }
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2500);
     } catch (err) { console.error(err); } finally { setIsSaving(false); }
@@ -794,42 +795,30 @@ export default function LeadDetail() {
                         e.target.value = "";
                       }} />
                     </label>
-                    {/* Exportar Excel */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const wb = XLSX.utils.book_new();
-                        // Hoja 1: Datos empresa
-                        const empresaData = [
-                          ["FICHA SCTR - " + (detalleSCTR.razonSocial || "")],
-                          [],
-                          ["Campo", "Valor"],
-                          ["RUC Empresa", detalleSCTR.rucEmpresa ?? ""],
-                          ["Razon Social", detalleSCTR.razonSocial ?? ""],
-                          ["N Trabajadores", (detalleSCTR.trabajadores || []).length || detalleSCTR.numeroTrabajadores || 0],
-                          ["Planilla Mensual (S/)", detalleSCTR.planillaMensual ?? ""],
-                          ["Actividad Economica", detalleSCTR.actividadEconomica ?? ""],
-                          ["Tipo de Riesgo", detalleSCTR.tipoRiesgo ?? ""],
-                        ];
-                        const wsEmpresa = XLSX.utils.aoa_to_sheet(empresaData);
-                        wsEmpresa["!cols"] = [{ wch: 25 }, { wch: 45 }];
-                        XLSX.utils.book_append_sheet(wb, wsEmpresa, "Empresa");
-                        // Hoja 2: Trabajadores (formato trama estandar)
-                        const headers = ["TIPO_DOCUMENTO", "NRO_DOCUMENTO", "APELLIDO_PATERNO", "APELLIDO_MATERNO", "PRIMER_NOMBRE", "FECHA_NACIMIENTO", "SEXO", "IMPORTE_SUELDO_BRUTO"];
-                        const tRows = (detalleSCTR.trabajadores || []).map((t: any) => [
-                          t.tipoDoc || "DNI", t.nroDoc || "", t.apellidoPaterno || "", t.apellidoMaterno || "",
-                          t.nombres || "", t.fechaNacimiento || "", t.sexo || "M", t.sueldo || 0,
-                        ]);
-                        const wsTrab = XLSX.utils.aoa_to_sheet([headers, ...tRows]);
-                        wsTrab["!cols"] = headers.map(() => ({ wch: 20 }));
-                        XLSX.utils.book_append_sheet(wb, wsTrab, "Trabajadores");
-                        const nombre = (detalleSCTR.razonSocial || detalleSCTR.rucEmpresa || "sctr").replace(/[^a-zA-Z0-9]/g, "_").substring(0, 25);
-                        XLSX.writeFile(wb, `SCTR_${nombre}.xlsx`);
+                    {/* Exportar Excel estilizado por aseguradora */}
+                    <select
+                      onChange={async (e) => {
+                        const fmt = e.target.value;
+                        if (!fmt) return;
+                        e.target.value = "";
+                        try {
+                          await sctrExportService.exportar(fmt, detalleSCTR);
+                        } catch (err) {
+                          console.error("Error exportando SCTR:", err);
+                        }
                       }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
+                      className="px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg cursor-pointer appearance-none border-0"
+                      defaultValue=""
+                      style={{ backgroundImage: "none" }}
                     >
-                      <Download className="w-3.5 h-3.5" /> Exportar Excel
-                    </button>
+                      <option value="" disabled>Exportar Trama...</option>
+                      <option value="rimac">Rimac</option>
+                      <option value="mapfre">Mapfre</option>
+                      <option value="pacifico">Pacifico</option>
+                      <option value="positiva">La Positiva</option>
+                      <option value="sanitas">Sanitas / Crecer</option>
+                      <option value="estandar">Formato Estandar</option>
+                    </select>
                   </div>
                 }
               >

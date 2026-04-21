@@ -88,11 +88,9 @@ export const HelpChat = () => {
     setInput("");
     setLoading(true);
     try {
-      const { data } = await api.post("/chatbot/query", {
-        userId: user?.idUsuario,
-        userRole: user?.rol?.nombreRol,
-        query: `[AYUDA CRM] El usuario pregunta: "${text}". Responde breve y claro sobre como usar el CRM Austral. Maximo 3 oraciones.`,
-        conversationId: null,
+      const { data } = await api.post("/chatbot/help", {
+        question: text,
+        userRole: user?.rol?.nombreRol || "USUARIO",
       });
       setMessages((prev) => [...prev, { role: "assistant", content: data.response || "No pude procesar tu consulta." }]);
     } catch {

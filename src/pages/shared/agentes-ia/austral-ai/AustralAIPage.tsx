@@ -82,13 +82,18 @@ const getRandomQuestions = (count: number): string[] => {
 
 export default function AustralAIPage() {
   const { user } = useAuthStore();
-  const { messages, conversationId, addMessage, setConversationId, clearChat } =
+  const { messages, conversationId, addMessage, setConversationId, clearChat, setActiveUser } =
     useChatStore();
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isClearModalOpen, setIsClearModalOpen] = useState(false);
   const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
+
+  // Vincular chat al usuario actual
+  useEffect(() => {
+    if (user?.idUsuario) setActiveUser(user.idUsuario);
+  }, [user?.idUsuario, setActiveUser]);
   const recognitionRef = useRef<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -183,11 +188,13 @@ export default function AustralAIPage() {
       setConversationId(response.conversationId);
     } catch (error) {
       console.error("Error al enviar mensaje:", error);
+      // Resetear conversationId si hay error de permisos para crear nueva conversacion
+      setConversationId(undefined);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
         content:
-          "Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta de nuevo.",
+          "Hubo un error. Se ha reiniciado la conversacion. Por favor, intenta de nuevo.",
         timestamp: new Date(),
       };
       addMessage(errorMessage);
@@ -251,11 +258,12 @@ export default function AustralAIPage() {
       setConversationId(response.conversationId);
     } catch (error) {
       console.error("Error al enviar mensaje:", error);
+      setConversationId(undefined);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
         content:
-          "Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta de nuevo.",
+          "Hubo un error. Se ha reiniciado la conversacion. Por favor, intenta de nuevo.",
         timestamp: new Date(),
       };
       addMessage(errorMessage);
