@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   X, ChevronRight, ChevronLeft, Check,
   Shield, Car, Heart, Users, Briefcase, FileText,
-  Zap, Globe, Star, Umbrella, Sun, Eye, Send, ExternalLink, Loader2
+  Zap, Globe, Star, Umbrella, Sun, Eye, Send, ExternalLink, Loader2, Download, UploadCloud, Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { quoteService } from "@/services/quote.service";
@@ -33,12 +33,12 @@ const TIPOS_SEGURO = [
 // ─── Campos por tipo ──────────────────────────────────────────────────────────
 
 const getFields = (tipo: string, lead: any, detalles: Record<string, any>, cliente?: any) => {
-  const nombre = cliente 
+  const nombre = cliente
     ? [cliente.nombres, cliente.apellidos].filter(Boolean).join(" ") || cliente.razonSocial
     : [lead?.nombre, lead?.apellidos].filter(Boolean).join(" ");
-  
+
   const d = detalles[tipo] || {};
-  
+
   const commonHeader = [
     { key: "nombreAsegurado", label: "Nombre del asegurado", value: nombre, type: "text", span: 2 },
     { key: "dni", label: "DNI / RUC", value: cliente?.numeroDocumento || lead?.numeroDocumento || "", type: "text", span: 1 },
@@ -53,15 +53,22 @@ const getFields = (tipo: string, lead: any, detalles: Record<string, any>, clien
     case "VEHICULAR":
     case "AUTO": // Soporte para datos legacy
       return [
-      ...commonHeader,
-      ...addressFields,
-      { key: "placa", label: "Placa", value: d.placa || "", type: "text", span: 1 },
-      { key: "marca", label: "Marca", value: d.marca || "", type: "text", span: 1 },
-      { key: "modelo", label: "Modelo", value: d.modelo || "", type: "text", span: 1 },
-      { key: "anio", label: "Año", value: d.anio ? String(d.anio) : "", type: "text", span: 1 },
-      { key: "uso", label: "Uso del vehículo", value: d.usoVehiculo || d.uso || "PARTICULAR", type: "text", span: 1 },
-      { key: "sumaAsegurada", label: "Suma asegurada (S/)", value: d.valorComercial || lead?.valorEstimado ? String(d.valorComercial || lead?.valorEstimado) : "", type: "number", span: 1 },
-    ];
+        ...commonHeader,
+        ...addressFields,
+        { key: "placa", label: "Placa", value: d.placa || "", type: "text", span: 1 },
+        { key: "marca", label: "Marca", value: d.marca || "", type: "text", span: 1 },
+        { key: "modelo", label: "Modelo", value: d.modelo || "", type: "text", span: 1 },
+        { key: "anio", label: "Año", value: d.anio ? String(d.anio) : "", type: "text", span: 1 },
+        { key: "claseVehiculo", label: "Clase", value: d.claseVehiculo || "", type: "text", span: 1 },
+        { key: "version", label: "Versión", value: d.version || "", type: "text", span: 1 },
+        { key: "usoVehiculo", label: "Uso del vehículo", value: d.usoVehiculo || "PARTICULAR", type: "text", span: 1 },
+        { key: "valorComercial", label: "Valor comercial (S/)", value: d.valorComercial || lead?.valorEstimado ? String(d.valorComercial || lead?.valorEstimado) : "", type: "number", span: 1 },
+        { key: "zona", label: "Zona", value: d.zona || "LIMA", type: "text", span: 1 },
+        { key: "categoriaRiesgo", label: "Categoría Riesgo", value: d.categoriaRiesgo || "BAJO", type: "text", span: 1 },
+        { key: "primaComercial", label: "Prima Comercial ($)", value: "", type: "number", span: 1 },
+        { key: "igv", label: "IGV (18%) ($)", value: "", type: "number", span: 1 },
+        { key: "primaTotal", label: "Prima Total ($)", value: "", type: "number", span: 2 },
+      ];
     case "SOAT": return [
       ...commonHeader,
       ...addressFields,
@@ -101,14 +108,14 @@ const getFields = (tipo: string, lead: any, detalles: Record<string, any>, clien
     case "SCTR_SALUD":
     case "SCTR_PENSION":
       return [
-      ...commonHeader,
-      { key: "ruc", label: "RUC", value: d.rucEmpresa || lead?.numeroDocumento || "", type: "text", span: 1 },
-      { key: "razonSocial", label: "Razón social / empresa", value: d.razonSocial || lead?.empresa || "", type: "text", span: 2 },
-      { key: "nroTrabajadores", label: "N° de trabajadores", value: d.numeroTrabajadores || d.nroTrabajadores ? String(d.numeroTrabajadores || d.nroTrabajadores) : "", type: "number", span: 1 },
-      { key: "actividadEconomica", label: "Actividad económica", value: d.actividadEconomica || "", type: "text", span: 2 },
-      { key: "nivelRiesgo", label: "Nivel de riesgo", value: d.tipoRiesgo || d.nivelRiesgo || "MEDIO", type: "text", span: 1 },
-      { key: "sumaAsegurada", label: "Prima estimada (S/)", value: lead?.valorEstimado ? String(lead?.valorEstimado) : "", type: "number", span: 1 },
-    ];
+        ...commonHeader,
+        { key: "ruc", label: "RUC", value: d.rucEmpresa || lead?.numeroDocumento || "", type: "text", span: 1 },
+        { key: "razonSocial", label: "Razón social / empresa", value: d.razonSocial || lead?.empresa || "", type: "text", span: 2 },
+        { key: "nroTrabajadores", label: "N° de trabajadores", value: d.numeroTrabajadores || d.nroTrabajadores ? String(d.numeroTrabajadores || d.nroTrabajadores) : "", type: "number", span: 1 },
+        { key: "actividadEconomica", label: "Actividad económica", value: d.actividadEconomica || "", type: "text", span: 2 },
+        { key: "nivelRiesgo", label: "Nivel de riesgo", value: d.tipoRiesgo || d.nivelRiesgo || "MEDIO", type: "text", span: 1 },
+        { key: "sumaAsegurada", label: "Prima estimada (S/)", value: lead?.valorEstimado ? String(lead?.valorEstimado) : "", type: "number", span: 1 },
+      ];
     default: return [];
   }
 };
@@ -149,11 +156,19 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [quoteId, setQuoteId] = useState<string | null>(null);
 
+  const [isComparativo, setIsComparativo] = useState(false);
+  const [comparativoFile, setComparativoFile] = useState<File | null>(null);
+  const [extractedText, setExtractedText] = useState<string | null>(null);
+
   // Determinar si debemos saltar el paso de selección de tipo de seguro
   const skipTipoSeguro = !!lead?.tipoSeguro;
-  const STEPS = skipTipoSeguro 
+  const NORMAL_STEPS = skipTipoSeguro
     ? INITIAL_STEPS.filter(s => s !== "Tipo de seguro")
     : INITIAL_STEPS;
+    
+  const STEPS = isComparativo 
+    ? ["Aseguradora", "Subir PDF", "Confirmar datos", "Visualizar", "Enviar"] 
+    : NORMAL_STEPS;
 
   // Sincronizar tipo de seguro si viene del Lead
   useEffect(() => {
@@ -183,30 +198,33 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
   };
 
   const getFieldValidationError = (key: string, value: string) => {
+    // Campos opcionales
+    if (["claseVehiculo", "version", "igv", "primaTotal"].includes(key)) return null;
+
     if (!value || value.toString().trim() === "") return "Este campo es requerido";
-    
+
     const val = value.toString().trim();
-    
+
     if (key === "email") {
       const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       if (!emailRegex.test(val)) return "Formato de correo inválido";
     }
-    
+
     if (key === "dni") {
       if (!/^\d+$/.test(val)) return "Solo se permiten números";
       if (val.length !== 8) return "Debe tener 8 dígitos";
     }
-    
+
     if (key === "ruc") {
       if (!/^\d+$/.test(val)) return "Solo se permiten números";
       if (val.length !== 11) return "Debe tener 11 dígitos";
     }
-    
+
     if (key === "telefono") {
       if (!/^\d+$/.test(val)) return "Solo se permiten números";
       if (val.length !== 9) return "Debe tener 9 dígitos";
     }
-    
+
     return null;
   };
 
@@ -224,13 +242,14 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
     setIsGenerating(true);
     try {
       // 1. Crear cotización inicial
-      const q = await quoteService.create(lead.idLead, aseguradora || "Genérica");
+      const companyName = isComparativo ? "Comparativo" : (aseguradora || "Genérica");
+      const q = await quoteService.create(lead.idLead, companyName);
       // 2. Completar cotización (genera el PDF con los datos validados del modal)
       // Ahora enviamos formValues para que el backend persista los cambios antes de generar el PDF
       const completed = await quoteService.completeQuote(q.id, formValues);
       setPdfUrl(completed.pdfUrl || null);
       setQuoteId(completed.id);
-      
+
       // Encontrar el índice de "Visualizar" en STEPS para navegar correctamente
       const visualizarIndex = STEPS.indexOf("Visualizar");
       if (visualizarIndex !== -1) goTo(visualizarIndex);
@@ -278,9 +297,19 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
     }
   };
 
+  const handleDownload = () => {
+    if (!pdfUrl) return;
+    const link = document.createElement("a");
+    link.href = pdfUrl;
+    link.download = `Cotizacion_${lead?.nombre || "Seguro"}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleClose = () => {
     setTimeout(() => {
-      setStep(0); setDir(1); setAseguradora(null);
+      setStep(0); setDir(1); setAseguradora(null); setIsComparativo(false); setComparativoFile(null);
       setTipoSeguro(null); setFormValues({}); setConfirmed(false);
       setPdfUrl(null); setQuoteId(null); setIsGenerating(false); setIsSending(false);
     }, 300);
@@ -307,7 +336,7 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
 
           {/* Modal */}
           <motion.div
-            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col overflow-hidden"
+            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-5xl flex flex-col overflow-hidden"
             style={{ maxHeight: "88vh" }}
             initial={{ opacity: 0, scale: 0.95, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -352,10 +381,10 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
                       <span>{s}</span>
                     </div>
                     {i < STEPS.length - 1 && (
-                      <div className={cn("flex-1 h-px mx-1 transition-colors duration-300", 
+                      <div className={cn("flex-1 h-px mx-1 transition-colors duration-300",
                         // Ajuste de lógica para el color de la línea si hay saltos
-                        (skipTipoSeguro && i === 0 && step >= 2) || (i < (skipTipoSeguro && step >= 2 ? step - 1 : step)) 
-                          ? "bg-emerald-200" 
+                        (skipTipoSeguro && i === 0 && step >= 2) || (i < (skipTipoSeguro && step >= 2 ? step - 1 : step))
+                          ? "bg-emerald-200"
                           : "bg-gray-200"
                       )} />
                     )}
@@ -422,11 +451,117 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
                           );
                         })}
                       </div>
+
+                      <div className="mt-5 border-t border-gray-100 pt-5">
+                        <p className="text-sm text-gray-500 mb-3">O utiliza nuestra herramienta de análisis automático</p>
+                        <button
+                          onClick={() => { setAseguradora("comparativo"); setIsComparativo(true); handleTipoSelect("VEHICULAR"); }}
+                          className={cn(
+                            "relative flex w-full items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200 group bg-slate-50 border-slate-200 hover:border-slate-300",
+                            aseguradora === "comparativo" ? "border-[#003d5c] ring-2 ring-[#003d5c]/20 bg-[#003d5c]/5" : ""
+                          )}
+                        >
+                          <div className={cn(
+                            "w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-sm shrink-0 transition-colors",
+                            aseguradora === "comparativo" ? "bg-[#003d5c]" : "bg-slate-400 group-hover:bg-slate-500"
+                          )}>
+                            <Sparkles className="w-6 h-6" />
+                          </div>
+                          <div className="text-left flex-1">
+                            <p className={cn(
+                              "text-sm font-bold leading-none mb-1",
+                              aseguradora === "comparativo" ? "text-[#003d5c]" : "text-gray-800"
+                            )}>
+                              Comparativo Inteligente
+                            </p>
+                            <p className="text-[11px] text-gray-500">Extraeremos los datos automáticamente subiendo el PDF origen</p>
+                          </div>
+                          {aseguradora === "comparativo" && (
+                            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-5 h-5 rounded-full bg-[#003d5c] flex items-center justify-center">
+                              <Check className="w-3 h-3 text-white" />
+                            </motion.div>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ── Paso 2: Subir PDF (Comparativo) ── */}
+                  {currentStepLabel === "Subir PDF" && isComparativo && (
+                    <div className="flex flex-col items-center justify-center py-4">
+                      {!extractedText ? (
+                        <>
+                          <p className="text-sm text-gray-500 mb-6 text-center">
+                            Sube la cotización original de la otra aseguradora para extraer sus datos automáticamente.
+                          </p>
+                          
+                          <div className="w-full relative">
+                            <input
+                              type="file"
+                              id="file-upload"
+                              accept="application/pdf"
+                              className="hidden"
+                              onChange={(e) => {
+                                if (e.target.files && e.target.files.length > 0) {
+                                  setComparativoFile(e.target.files[0]);
+                                }
+                              }}
+                            />
+                            <label
+                              htmlFor="file-upload"
+                              className={cn(
+                                "flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-200",
+                                comparativoFile 
+                                  ? "border-emerald-400 bg-emerald-50" 
+                                  : "border-gray-300 bg-gray-50 hover:bg-gray-100 hover:border-[#003d5c]/50"
+                              )}
+                            >
+                              {comparativoFile ? (
+                                <div className="text-center">
+                                  <Check className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
+                                  <p className="text-sm font-semibold text-emerald-700">{comparativoFile.name}</p>
+                                  <p className="text-xs text-emerald-600/70 mt-1">Archivo seleccionado</p>
+                                </div>
+                              ) : (
+                                <div className="text-center">
+                                  <UploadCloud className="w-10 h-10 text-gray-400 mx-auto mb-2 group-hover:text-[#003d5c] transition-colors" />
+                                  <p className="text-sm font-semibold text-gray-600">Haz clic para buscar un PDF</p>
+                                  <p className="text-xs text-gray-400 mt-1">Máx 5MB</p>
+                                </div>
+                              )}
+                            </label>
+                          </div>
+                          
+                          {comparativoFile && (
+                            <button 
+                              onClick={() => { setComparativoFile(null); setExtractedText(null); }} 
+                              className="mt-4 text-xs font-semibold text-red-500 hover:text-red-700 transition-colors"
+                            >
+                              Quitar archivo
+                            </button>
+                          )}
+                        </>
+                      ) : (
+                        <div className="w-full">
+                          <p className="text-sm font-semibold text-gray-700 mb-2">Texto Crudo Extraído (Diagnóstico):</p>
+                          <textarea 
+                            readOnly
+                            className="w-full h-80 p-4 bg-gray-900 text-green-400 font-mono text-xs rounded-xl overflow-y-auto whitespace-pre-wrap"
+                            value={extractedText}
+                          />
+                          <button 
+                            onClick={() => { setExtractedText(null); setComparativoFile(null); }}
+                            className="mt-4 text-sm font-semibold text-gray-600 hover:text-gray-900 transition-colors"
+                          >
+                            Volver a subir
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
 
                   {/* ── Paso 2: Tipo de seguro ── */}
-                  {currentStepLabel === "Tipo de seguro" && (
+                  {currentStepLabel === "Tipo de seguro" && !isComparativo && (
                     <div>
                       {aseguradoraObj && (
                         <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-gray-50 rounded-xl border border-gray-100">
@@ -510,7 +645,7 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
                         {fields.map((f) => {
                           const error = getFieldValidationError(f.key, formValues[f.key]);
                           const isNumeric = ["dni", "ruc", "telefono", "anio", "valorVehiculo", "sumAsegurada", "nroTrabajadores"].includes(f.key);
-                          
+
                           return (
                             <div key={f.key} className={f.span === 2 ? "col-span-2" : ""}>
                               <div className="flex justify-between items-center mb-1">
@@ -526,12 +661,31 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
                                 onChange={(e) => {
                                   let val = e.target.value;
                                   if (isNumeric) val = val.replace(/\D/g, ""); // Solo números
-                                  setFormValues((prev) => ({ ...prev, [f.key]: val }));
+                                  
+                                  setFormValues((prev) => {
+                                    const next = { ...prev, [f.key]: val };
+                                    
+                                    // Cálculo automático de primas
+                                    if (f.key === "primaComercial") {
+                                      const primaNum = parseFloat(val);
+                                      if (!isNaN(primaNum)) {
+                                        const calIgv = (primaNum * 0.18).toFixed(2);
+                                        const calTotal = (primaNum * 1.18).toFixed(2);
+                                        next.igv = calIgv;
+                                        next.primaTotal = calTotal;
+                                      } else {
+                                        next.igv = "";
+                                        next.primaTotal = "";
+                                      }
+                                    }
+                                    
+                                    return next;
+                                  });
                                 }}
                                 className={cn(
                                   "w-full border rounded-xl px-3 py-2 text-sm transition-all focus:outline-none focus:ring-2",
-                                  formValues[f.key] && error 
-                                    ? "border-red-200 bg-red-50/30 focus:border-red-400 focus:ring-red-100" 
+                                  formValues[f.key] && error
+                                    ? "border-red-200 bg-red-50/30 focus:border-red-400 focus:ring-red-100"
                                     : "border-gray-200 bg-gray-50 focus:bg-white focus:border-[#003d5c]/50 focus:ring-[#003d5c]/10"
                                 )}
                               />
@@ -547,19 +701,28 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
                     <div className="flex flex-col h-full">
                       <div className="flex items-center justify-between mb-4">
                         <p className="text-sm text-gray-500">Vista previa de la cotización generada.</p>
-                        <button
-                          onClick={() => pdfUrl && window.open(pdfUrl, "_blank")}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#003d5c] bg-[#003d5c]/5 rounded-lg hover:bg-[#003d5c]/10 transition-colors"
-                        >
-                          <ExternalLink className="w-3.5 h-3.5" /> Expandir
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={handleDownload}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
+                          >
+                            <Download className="w-3.5 h-3.5" /> Descargar PDF
+                          </button>
+                          <button
+                            onClick={() => pdfUrl && window.open(pdfUrl, "_blank")}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#003d5c] bg-[#003d5c]/5 rounded-lg hover:bg-[#003d5c]/10 transition-colors"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" /> Expandir
+                          </button>
+                        </div>
                       </div>
 
-                      <div className="flex-1 bg-gray-100 rounded-xl overflow-hidden border border-gray-200 min-h-[400px]">
+                      <div className="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-inner mx-auto" style={{ width: "632.8px", height: "340.4px" }}>
                         {pdfUrl ? (
                           <iframe
-                            src={pdfUrl}
+                            src={`${pdfUrl}#toolbar=0&navpanes=0&view=FitH`}
                             className="w-full h-full border-none"
+                            style={{ display: "block" }}
                             title="Vista previa de cotización"
                           />
                         ) : (
@@ -642,7 +805,10 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
             {!confirmed && (
               <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/70 flex items-center justify-between shrink-0">
                 <button
-                  onClick={step === 0 ? handleClose : () => goTo(step - 1)}
+                  onClick={step === 0 ? handleClose : () => {
+                    if (step === 1 && isComparativo) setIsComparativo(false);
+                    goTo(step - 1);
+                  }}
                   disabled={isGenerating || isSending}
                   className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50"
                 >
@@ -657,6 +823,34 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
                     className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-[#003d5c] rounded-xl hover:bg-[#002d44] disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
                   >
                     Siguiente <ChevronRight className="w-4 h-4" />
+                  </button>
+                )}
+
+                {currentStepLabel === "Subir PDF" && isComparativo && !extractedText && (
+                  <button
+                    onClick={async () => {
+                      if (!comparativoFile) return;
+                      setIsGenerating(true);
+                      try {
+                        const res = await quoteService.uploadPdf(comparativoFile);
+                        if (res && res.rawText) {
+                          // Solo mostramos el texto crudo según lo solicitado por el usuario y no procedemos
+                          setExtractedText(res.rawText);
+                        } else {
+                          // Manejo de backend cuando falla la extracción manual
+                          throw new Error("No se pudo extraer.");
+                        }
+                      } catch (error) {
+                        alert("Error al procesar PDF. Verifica el formato.");
+                      } finally {
+                        setIsGenerating(false);
+                      }
+                    }}
+                    disabled={!comparativoFile || isGenerating}
+                    className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-[#003d5c] rounded-xl hover:bg-[#002d44] disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
+                  >
+                    {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                    {isGenerating ? "Analizando..." : "Ver Texto Extraído"}
                   </button>
                 )}
 

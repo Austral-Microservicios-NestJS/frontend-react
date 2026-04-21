@@ -61,5 +61,13 @@ export const quoteService = {
   }): Promise<{ success: boolean; mensaje: string }> => {
     const { data } = await api.post("/chatbot/enviar-cotizacion", params);
     return data;
+  },
+
+  // Subir PDF para análisis comparativo
+  uploadPdf: async (file: File): Promise<any> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const { data } = await api.postForm("/quotes/upload-pdf", formData);
+    return data;
   }
 };
