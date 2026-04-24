@@ -79,14 +79,18 @@ export const RegistrarUsuario = ({
   }, [isOpen, reset]);
 
   const onSubmit = async (data: any) => {
-    // Convertir porcentajeComision a número
+    // Garantizar que idSupervisor siempre vaya (RHF no lo envía si no está registrado)
     const dataToSend = {
       ...data,
       porcentajeComision: Number(data.porcentajeComision) || 0,
+      idSupervisor: user?.idUsuario,
     };
-    console.log("Datos a enviar:", dataToSend);
-    await addUsuario(dataToSend);
-    onClose();
+    try {
+      await addUsuario(dataToSend);
+      onClose();
+    } catch {
+      // addUsuario ya mostró el toast; dejamos el modal abierto para que corrija
+    }
   };
 
   return (
