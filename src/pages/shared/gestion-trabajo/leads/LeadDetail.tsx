@@ -24,6 +24,8 @@ import {
   FileCheck, CheckCircle, ChevronDown, ClipboardList,
 } from "lucide-react";
 import { GenerarCotizacionModal } from "@/components/modulos/leads/GenerarCotizacionModal";
+import { AgenteAsignadoCard } from "@/components/modulos/leads/detail/AgenteAsignadoCard";
+import { HistorialRecordatorios } from "@/components/modulos/leads/detail/HistorialRecordatorios";
 import * as XLSX from "xlsx";
 import days from "dayjs";
 import { useEffect, useState } from "react";
@@ -405,6 +407,16 @@ export default function LeadDetail() {
                 </div>
 
               </div>
+            </div>
+
+            {/* ══════════════════════════════════════════════
+                FILA 1.5 — Agente a cargo + Historial recordatorios (SBS)
+            ══════════════════════════════════════════════ */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <AgenteAsignadoCard asignadoA={leadState?.asignadoA} />
+              {id && (
+                <HistorialRecordatorios idLead={id} estadoLead={leadState?.estado || "NUEVO"} />
+              )}
             </div>
 
             {/* ══════════════════════════════════════════════

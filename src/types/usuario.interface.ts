@@ -20,6 +20,7 @@ interface Persona {
   tipoDocumento: string;
   numeroDocumento: string;
   telefono?: string;
+  telefonoEmpresarial?: string;
   direccion?: string;
   fechaCreacion: Date;
   fechaModificacion?: Date;
@@ -38,10 +39,12 @@ export interface CreateUsuario {
   tipoDocumento: string;
   numeroDocumento: string;
   telefono?: string;
+  telefonoEmpresarial?: string;
   direccion?: string;
   correo: string;
   porcentajeComision?: number;
   idRol: string;
+  idSupervisor?: string;
 }
 
 export interface UpdateUsuario extends Partial<CreateUsuario> {}

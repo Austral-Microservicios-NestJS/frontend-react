@@ -31,6 +31,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
+import { AgenteBadge } from "@/components/modulos/leads/AgenteBadge";
+import { useAuthStore } from "@/store/auth.store";
+import { Roles } from "@/utils/roles";
+
+const ROLES_VEN_AGENTE: string[] = [
+  Roles.ADMINISTRADOR,
+  Roles.EJECUTIVO_CUENTA,
+  Roles.BROKER,
+];
 
 type EstadoKey = "NUEVO" | "CONTACTADO" | "COTIZADO" | "EMITIDO" | "CERRADO" | "PERDIDO";
 
@@ -492,6 +501,9 @@ function LeadColumn({
 }
 
 function LeadCard({ lead, onEdit }: { lead: Lead; onEdit: (lead: Lead) => void }) {
+  const { user } = useAuthStore();
+  const verAgente = ROLES_VEN_AGENTE.includes(user?.rol?.nombreRol || "");
+
   const handleDragStart = (e: React.DragEvent) => {
     e.stopPropagation();
     e.dataTransfer.effectAllowed = "move";
@@ -573,6 +585,12 @@ function LeadCard({ lead, onEdit }: { lead: Lead; onEdit: (lead: Lead) => void }
             <p className="text-[10px] text-gray-500 italic line-clamp-2 leading-relaxed">
               "{lead.notas}"
             </p>
+          </div>
+        )}
+
+        {verAgente && (
+          <div className="mb-2.5 pb-2 border-b border-dashed border-gray-100">
+            <AgenteBadge asignadoA={(lead as any).asignadoA} compact />
           </div>
         )}
 
