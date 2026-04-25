@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type ReactNode } from "react";
 import { Bell, CheckCheck, AlertCircle, FileText, Settings, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { notificacionApi, type Notificacion } from "@/services/notificacion.service";
 
-const tipoIcon: Record<string, JSX.Element> = {
+const tipoIcon: Record<string, ReactNode> = {
   LEAD_ESTANCADO: <AlertCircle className="w-4 h-4 text-orange-500" />,
   RECORDATORIO_CLIENTE: <Bell className="w-4 h-4 text-blue-500" />,
   NUEVA_ASIGNACION: <FileText className="w-4 h-4 text-green-500" />,
