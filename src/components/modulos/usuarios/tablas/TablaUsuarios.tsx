@@ -1,6 +1,8 @@
 import { Table, BotonEditar } from "@/components/shared";
 import { type ColumnDef } from "@tanstack/react-table";
 import { type Usuario } from "@/types/usuario.interface";
+import { leadService } from "@/services/lead.service";
+import { useMemo } from "react";
 
 interface TablaUsuariosProps {
   usuarios: Usuario[];
@@ -8,6 +10,25 @@ interface TablaUsuariosProps {
 }
 
 export const TablaUsuarios = ({ usuarios, onEdit }: TablaUsuariosProps) => {
+  // Cargar todos los leads visibles (server-side ya filtra por rol).
+  // Para BROKER/ADMIN se obtiene la lista completa de su scope; cruzamos por asignadoA.
+  const { data: leads = [] } = leadService.useGetAll();
+  const leadsPorAgente = useMemo(() => {
+    const map: Record<string, { activos: number; emitidos: number }> = {};
+    for (const l of (Array.isArray(leads) ? leads : [])) {
+      const id = (l as any).asignadoA;
+      if (!id) continue;
+      if (!map[id]) map[id] = { activos: 0, emitidos: 0 };
+      const estado = (l as any).estado;
+      if (estado === "EMITIDO" || estado === "CERRADO") {
+        map[id].emitidos++;
+      } else if (estado !== "PERDIDO") {
+        map[id].activos++;
+      }
+    }
+    return map;
+  }, [leads]);
+
   const columns: ColumnDef<Usuario>[] = [
     {
       accessorKey: "nombreUsuario",
@@ -81,12 +102,43 @@ export const TablaUsuarios = ({ usuarios, onEdit }: TablaUsuariosProps) => {
     },
     {
       accessorKey: "persona.telefono",
-      header: "Teléfono",
+      header: "Teléfono personal",
       cell: ({ row }) => (
         <div className="text-sm text-gray-600">
           {row.original.persona?.telefono || "-"}
         </div>
       ),
+    },
+    {
+      accessorKey: "persona.telefonoEmpresarial",
+      header: "Tel empresarial",
+      cell: ({ row }) => {
+        const tel = row.original.persona?.telefonoEmpresarial;
+        return tel ? (
+          <div className="text-sm font-medium text-blue-700">{tel}</div>
+        ) : (
+          <span className="text-xs text-amber-600 italic">sin asignar</span>
+        );
+      },
+    },
+    {
+      id: "carga",
+      header: "Carga (activos / emitidos)",
+      cell: ({ row }) => {
+        const id = row.original.idUsuario;
+        const stats = leadsPorAgente[id] || { activos: 0, emitidos: 0 };
+        return (
+          <div className="flex items-center gap-1.5 text-xs">
+            <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-medium" title="Leads en proceso">
+              {stats.activos}
+            </span>
+            <span className="text-gray-300">/</span>
+            <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-medium" title="Pólizas emitidas/cerradas">
+              {stats.emitidos}
+            </span>
+          </div>
+        );
+      },
     },
     {
       accessorKey: "activo",
