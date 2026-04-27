@@ -39,6 +39,7 @@ export function HistorialRecordatorios({ idLead, estadoLead }: HistorialRecordat
   const [abierto, setAbierto] = useState(false);
   const { user } = useAuthStore();
   const rol = user?.rol?.nombreRol;
+  const esAdmin = rol === Roles.ADMINISTRADOR;
   const puedeEnviarManual =
     ROLES_ENVIAR_MANUAL.includes(rol || "") &&
     estadoLead !== "EMITIDO" &&
@@ -109,7 +110,7 @@ export function HistorialRecordatorios({ idLead, estadoLead }: HistorialRecordat
           ) : (
             <ul className="space-y-3">
               {historial.map((rec) => (
-                <RecordatorioItem key={rec.idRecordatorio} recordatorio={rec} />
+                <RecordatorioItem key={rec.idRecordatorio} recordatorio={rec} esAdmin={esAdmin} />
               ))}
             </ul>
           )}
@@ -119,7 +120,22 @@ export function HistorialRecordatorios({ idLead, estadoLead }: HistorialRecordat
   );
 }
 
-function RecordatorioItem({ recordatorio }: { recordatorio: LeadRecordatorio }) {
+// Detecta si el error es de configuración (responsabilidad admin/devops)
+// vs un error real (rebote de email, número inválido, etc.)
+function esErrorConfig(msg?: string): boolean {
+  if (!msg) return false;
+  const m = msg.toLowerCase();
+  return (
+    m.includes("api key") ||
+    m.includes("api_key") ||
+    m.includes("token no configurada") ||
+    m.includes("not configured") ||
+    m.includes("manychat_api_token") ||
+    m.includes("resend_api_key")
+  );
+}
+
+function RecordatorioItem({ recordatorio, esAdmin }: { recordatorio: LeadRecordatorio; esAdmin: boolean }) {
   const fecha = new Date(recordatorio.enviadoEn).toLocaleString("es-PE", {
     day: "2-digit",
     month: "2-digit",
@@ -142,8 +158,11 @@ function RecordatorioItem({ recordatorio }: { recordatorio: LeadRecordatorio }) 
       <MessageSquare className="h-3.5 w-3.5" />
     );
 
+  const errConfig = !recordatorio.exitoso && esErrorConfig(recordatorio.errorMensaje);
   const iconoEstado = recordatorio.exitoso ? (
     <CheckCircle className="h-4 w-4 text-green-600" />
+  ) : errConfig ? (
+    <AlertCircle className="h-4 w-4 text-gray-400" />
   ) : (
     <AlertCircle className="h-4 w-4 text-red-500" />
   );
@@ -187,9 +206,24 @@ function RecordatorioItem({ recordatorio }: { recordatorio: LeadRecordatorio }) 
             Estado al enviar: <b>{recordatorio.estadoLeadAlEnviar}</b> · {recordatorio.diasEnEstado} días en el estado
           </div>
           {!recordatorio.exitoso && recordatorio.errorMensaje && (
-            <div className="mt-1 rounded bg-red-50 p-2 text-xs text-red-700">
-              <b>Error:</b> {recordatorio.errorMensaje}
-            </div>
+            errConfig ? (
+              esAdmin ? (
+                <div className="mt-1 rounded bg-amber-50 p-2 text-xs text-amber-700 border border-amber-100">
+                  <b>⚙️ Configuración pendiente:</b> {recordatorio.errorMensaje}
+                  <div className="text-[10px] text-amber-600 mt-0.5">
+                    Configura la API key correspondiente en el VM para que se envíe.
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-1 text-[11px] text-gray-500 italic">
+                  Envío externo pendiente — el equipo técnico fue notificado.
+                </div>
+              )
+            ) : (
+              <div className="mt-1 rounded bg-red-50 p-2 text-xs text-red-700">
+                <b>Error:</b> {recordatorio.errorMensaje}
+              </div>
+            )
           )}
         </div>
       </div>
