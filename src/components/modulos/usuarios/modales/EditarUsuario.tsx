@@ -57,6 +57,7 @@ export const EditarUsuario = ({
       tipoDocumento: usuario.persona?.tipoDocumento || "",
       numeroDocumento: usuario.persona?.numeroDocumento || "",
       telefono: usuario.persona?.telefono || "",
+      telefonoEmpresarial: usuario.persona?.telefonoEmpresarial || "",
       direccion: usuario.persona?.direccion || "",
       correo: usuario.correo,
       idRol: usuario.rol?.idRol || "",
@@ -142,24 +143,35 @@ export const EditarUsuario = ({
 
             <FormGroupDivisor>
               <FormGroup>
-                <Label htmlFor="telefono">Teléfono</Label>
+                <Label htmlFor="telefono">Teléfono personal</Label>
                 <Input
                   id="telefono"
-                  type="text"
+                  type="tel"
                   placeholder="Ej: 912543678"
                   {...register("telefono")}
                 />
               </FormGroup>
               <FormGroup>
-                <Label htmlFor="direccion">Dirección</Label>
+                <Label htmlFor="telefonoEmpresarial">
+                  Teléfono empresarial <span className="text-xs text-gray-500">(único, visible al cliente)</span>
+                </Label>
                 <Input
-                  id="direccion"
-                  type="text"
-                  placeholder="Ej: Rio de la plata 440"
-                  {...register("direccion")}
+                  id="telefonoEmpresarial"
+                  type="tel"
+                  placeholder="Ej: 987654321"
+                  {...register("telefonoEmpresarial")}
                 />
               </FormGroup>
             </FormGroupDivisor>
+            <FormGroup>
+              <Label htmlFor="direccion">Dirección</Label>
+              <Input
+                id="direccion"
+                type="text"
+                placeholder="Ej: Río de la Plata 440"
+                {...register("direccion")}
+              />
+            </FormGroup>
 
             <FormGroupDivisor>
               <FormGroup>

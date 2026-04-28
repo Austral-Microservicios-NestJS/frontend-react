@@ -62,6 +62,7 @@ export const RegistrarUsuario = ({
       tipoDocumento: "",
       numeroDocumento: "",
       telefono: "",
+      telefonoEmpresarial: "",
       direccion: "",
       correo: "",
       idRol: "",
@@ -78,14 +79,18 @@ export const RegistrarUsuario = ({
   }, [isOpen, reset]);
 
   const onSubmit = async (data: any) => {
-    // Convertir porcentajeComision a número
+    // Garantizar que idSupervisor siempre vaya (RHF no lo envía si no está registrado)
     const dataToSend = {
       ...data,
       porcentajeComision: Number(data.porcentajeComision) || 0,
+      idSupervisor: user?.idUsuario,
     };
-    console.log("Datos a enviar:", dataToSend);
-    await addUsuario(dataToSend);
-    onClose();
+    try {
+      await addUsuario(dataToSend);
+      onClose();
+    } catch {
+      // addUsuario ya mostró el toast; dejamos el modal abierto para que corrija
+    }
   };
 
   return (
@@ -160,24 +165,35 @@ export const RegistrarUsuario = ({
 
             <FormGroupDivisor>
               <FormGroup>
-                <Label htmlFor="telefono">Telefono</Label>
+                <Label htmlFor="telefono">Teléfono personal</Label>
                 <Input
                   id="telefono"
-                  type="number"
+                  type="tel"
                   placeholder="Ej: 912543678"
                   {...register("telefono", { required: true })}
                 />
               </FormGroup>
               <FormGroup>
-                <Label htmlFor="direccion">Direccion</Label>
+                <Label htmlFor="telefonoEmpresarial">
+                  Teléfono empresarial <span className="text-xs text-gray-500">(único, visible al cliente)</span>
+                </Label>
                 <Input
-                  id="direccion"
-                  type="text"
-                  placeholder="Ej: Rio de la plata 440"
-                  {...register("direccion", { required: true })}
+                  id="telefonoEmpresarial"
+                  type="tel"
+                  placeholder="Ej: 987654321"
+                  {...register("telefonoEmpresarial")}
                 />
               </FormGroup>
             </FormGroupDivisor>
+            <FormGroup>
+              <Label htmlFor="direccion">Dirección</Label>
+              <Input
+                id="direccion"
+                type="text"
+                placeholder="Ej: Río de la Plata 440"
+                {...register("direccion", { required: true })}
+              />
+            </FormGroup>
 
             <FormGroupDivisor>
               <FormGroup>

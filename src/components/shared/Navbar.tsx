@@ -8,6 +8,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { useSidebarStore } from "@/store/sidebar.store";
 import { searchService, type SearchResults } from "@/services/search.service";
 import { motion, AnimatePresence } from "framer-motion";
+import { NotificationBell } from "@/components/shared/NotificationBell";
 import type { Cliente, TipoPersona } from "@/types/cliente.interface";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
@@ -344,8 +345,10 @@ export const Navbar = () => {
         </div>
       </div>
 
-      {/* ── Right: profile ── */}
+      {/* ── Right: notifications + profile ── */}
       <div className="absolute right-0 top-0 h-full flex items-center gap-1 px-4">
+        {/* Notification bell */}
+        <NotificationBell />
         {/* Profile */}
         <div className="relative ml-1" ref={dropdownRef}>
           <button

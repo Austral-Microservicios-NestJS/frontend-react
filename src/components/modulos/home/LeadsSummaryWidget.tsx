@@ -73,9 +73,12 @@ export const LeadsSummaryWidget = () => {
   }));
 
   const totalLeads = data.reduce((acc, item) => acc + item.value, 0);
+  // Conversión = leads que llegaron a EMITIDO o CERRADO (póliza vendida).
+  // Antes solo contaba CERRADO; los EMITIDO (objetivo principal del flujo) no se incluían.
+  const convertidos = leadsByEstado.EMITIDO.length + leadsByEstado.CERRADO.length;
   const tasaConversion =
     totalLeads > 0
-      ? ((leadsByEstado.CERRADO.length / totalLeads) * 100).toFixed(1)
+      ? ((convertidos / totalLeads) * 100).toFixed(1)
       : "0.0";
 
   const hotLeads = leadsByEstado.NUEVO.length;
