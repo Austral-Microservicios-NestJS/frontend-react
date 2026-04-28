@@ -157,7 +157,8 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
   const [quoteId, setQuoteId] = useState<string | null>(null);
 
   const [isComparativo, setIsComparativo] = useState(false);
-  const [comparativoFile, setComparativoFile] = useState<File | null>(null);
+  const [comparativoFiles, setComparativoFiles] = useState<File[]>([]);
+  const [extractedDataArray, setExtractedDataArray] = useState<any[]>([]);
   const [extractedText, setExtractedText] = useState<string | null>(null);
 
   // Determinar si debemos saltar el paso de selección de tipo de seguro
@@ -167,7 +168,7 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
     : INITIAL_STEPS;
     
   const STEPS = isComparativo 
-    ? ["Aseguradora", "Subir PDF", "Confirmar datos", "Visualizar", "Enviar"] 
+    ? ["Aseguradora", "Subir PDF", "Visualizar", "Enviar"] 
     : NORMAL_STEPS;
 
   // Sincronizar tipo de seguro si viene del Lead
@@ -309,9 +310,10 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
 
   const handleClose = () => {
     setTimeout(() => {
-      setStep(0); setDir(1); setAseguradora(null); setIsComparativo(false); setComparativoFile(null);
+      setStep(0); setDir(1); setAseguradora(null); setIsComparativo(false); setComparativoFiles([]);
       setTipoSeguro(null); setFormValues({}); setConfirmed(false);
       setPdfUrl(null); setQuoteId(null); setIsGenerating(false); setIsSending(false);
+      setExtractedDataArray([]);
     }, 300);
     onClose();
   };
@@ -489,10 +491,9 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
                   {/* ── Paso 2: Subir PDF (Comparativo) ── */}
                   {currentStepLabel === "Subir PDF" && isComparativo && (
                     <div className="flex flex-col items-center justify-center py-4">
-                      {!extractedText ? (
                         <>
                           <p className="text-sm text-gray-500 mb-6 text-center">
-                            Sube la cotización original de la otra aseguradora para extraer sus datos automáticamente.
+                            Sube la cotización original de la otra aseguradora para extraer sus datos automáticamente y generar el comparativo.
                           </p>
                           
                           <div className="w-full relative">
@@ -500,10 +501,12 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
                               type="file"
                               id="file-upload"
                               accept="application/pdf"
+                              multiple
                               className="hidden"
                               onChange={(e) => {
-                                if (e.target.files && e.target.files.length > 0) {
-                                  setComparativoFile(e.target.files[0]);
+                                if (e.target.files) {
+                                  const selectedFiles = Array.from(e.target.files).slice(0, 6);
+                                  setComparativoFiles(selectedFiles);
                                 }
                               }}
                             />
@@ -511,52 +514,42 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
                               htmlFor="file-upload"
                               className={cn(
                                 "flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-200",
-                                comparativoFile 
-                                  ? "border-emerald-400 bg-emerald-50" 
+                                comparativoFiles.length > 0 
+                                  ? "border-[#003d5c] bg-[#003d5c]/5" 
                                   : "border-gray-300 bg-gray-50 hover:bg-gray-100 hover:border-[#003d5c]/50"
                               )}
                             >
-                              {comparativoFile ? (
+                              {comparativoFiles.length > 0 ? (
                                 <div className="text-center">
-                                  <Check className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
-                                  <p className="text-sm font-semibold text-emerald-700">{comparativoFile.name}</p>
-                                  <p className="text-xs text-emerald-600/70 mt-1">Archivo seleccionado</p>
+                                  <div className="flex justify-center -space-x-2 mb-2">
+                                    {comparativoFiles.map((_, idx) => (
+                                      <div key={idx} className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center shadow-sm">
+                                        <FileText className="w-4 h-4 text-[#003d5c]" />
+                                      </div>
+                                    ))}
+                                  </div>
+                                  <p className="text-sm font-semibold text-[#003d5c]">{comparativoFiles.length} documento(s) seleccionado(s)</p>
+                                  <p className="text-xs text-[#003d5c]/70 mt-1">Listo para análisis en paralelo</p>
                                 </div>
                               ) : (
                                 <div className="text-center">
                                   <UploadCloud className="w-10 h-10 text-gray-400 mx-auto mb-2 group-hover:text-[#003d5c] transition-colors" />
-                                  <p className="text-sm font-semibold text-gray-600">Haz clic para buscar un PDF</p>
-                                  <p className="text-xs text-gray-400 mt-1">Máx 5MB</p>
+                                  <p className="text-sm font-semibold text-gray-600">Sube hasta 6 archivos PDF</p>
+                                  <p className="text-xs text-gray-400 mt-1">Haz clic para buscar</p>
                                 </div>
                               )}
                             </label>
                           </div>
                           
-                          {comparativoFile && (
+                          {comparativoFiles.length > 0 && !isGenerating && (
                             <button 
-                              onClick={() => { setComparativoFile(null); setExtractedText(null); }} 
+                              onClick={() => { setComparativoFiles([]); }} 
                               className="mt-4 text-xs font-semibold text-red-500 hover:text-red-700 transition-colors"
                             >
-                              Quitar archivo
+                              Limpiar archivos
                             </button>
                           )}
                         </>
-                      ) : (
-                        <div className="w-full">
-                          <p className="text-sm font-semibold text-gray-700 mb-2">Texto Crudo Extraído (Diagnóstico):</p>
-                          <textarea 
-                            readOnly
-                            className="w-full h-80 p-4 bg-gray-900 text-green-400 font-mono text-xs rounded-xl overflow-y-auto whitespace-pre-wrap"
-                            value={extractedText}
-                          />
-                          <button 
-                            onClick={() => { setExtractedText(null); setComparativoFile(null); }}
-                            className="mt-4 text-sm font-semibold text-gray-600 hover:text-gray-900 transition-colors"
-                          >
-                            Volver a subir
-                          </button>
-                        </div>
-                      )}
                     </div>
                   )}
 
@@ -826,31 +819,54 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
                   </button>
                 )}
 
-                {currentStepLabel === "Subir PDF" && isComparativo && !extractedText && (
+                {currentStepLabel === "Subir PDF" && isComparativo && (
                   <button
                     onClick={async () => {
-                      if (!comparativoFile) return;
+                      if (comparativoFiles.length === 0) return;
                       setIsGenerating(true);
                       try {
-                        const res = await quoteService.uploadPdf(comparativoFile);
-                        if (res && res.rawText) {
-                          // Solo mostramos el texto crudo según lo solicitado por el usuario y no procedemos
-                          setExtractedText(res.rawText);
+                        const res = await quoteService.uploadPdfs(comparativoFiles);
+                        if (res && res.success && res.data && res.data.length > 0) {
+                          // res.data ahora es un array de extracciones
+                          const allExtractions = res.data;
+                          setExtractedDataArray(allExtractions);
+
+                          // Para el PDF del visualizador, por ahora usamos la primera extracción 
+                          // o preparamos un objeto que contenga el array para el template HBS.
+                          const primaryExtraction = allExtractions[0]; 
+                          
+                          const newFormValues = { 
+                            ...formValues,
+                            ...primaryExtraction,
+                            primaTotal: primaryExtraction.prima_total_anual,
+                            // Inyectamos el array completo para que el template HBS pueda armar la tabla comparativa
+                            comparativoExtractions: allExtractions
+                          };
+                          setFormValues(newFormValues);
+                          
+                          // 2. Generar Cotización automáticamente
+                          const q = await quoteService.create(lead.idLead, "Comparativo");
+                          const completed = await quoteService.completeQuote(q.id, newFormValues);
+                          
+                          setPdfUrl(completed.pdfUrl || null);
+                          setQuoteId(completed.id);
+                          
+                          // 3. Ir a Visualizar
+                          goTo(2);
                         } else {
-                          // Manejo de backend cuando falla la extracción manual
-                          throw new Error("No se pudo extraer.");
+                          throw new Error("No se pudo extraer información de los archivos.");
                         }
                       } catch (error) {
-                        alert("Error al procesar PDF. Verifica el formato.");
+                        alert("Error al procesar archivos mediante IA. Verifique los límites de OpenAI.");
                       } finally {
                         setIsGenerating(false);
                       }
                     }}
-                    disabled={!comparativoFile || isGenerating}
-                    className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-[#003d5c] rounded-xl hover:bg-[#002d44] disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
+                    disabled={comparativoFiles.length === 0 || isGenerating}
+                    className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-purple-600 hover:bg-purple-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm rounded-xl"
                   >
                     {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                    {isGenerating ? "Analizando..." : "Ver Texto Extraído"}
+                    {isGenerating ? "Analizando lote..." : `Analizar ${comparativoFiles.length} pDFs y Generar Cuadro`}
                   </button>
                 )}
 

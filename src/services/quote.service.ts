@@ -63,10 +63,10 @@ export const quoteService = {
     return data;
   },
 
-  // Subir PDF para análisis comparativo
-  uploadPdf: async (file: File): Promise<any> => {
+  // Subir PDFs para análisis comparativo (hasta 6)
+  uploadPdfs: async (files: File[]): Promise<any> => {
     const formData = new FormData();
-    formData.append('file', file);
+    files.forEach(file => formData.append('files', file));
     const { data } = await api.postForm("/quotes/upload-pdf", formData);
     return data;
   }
