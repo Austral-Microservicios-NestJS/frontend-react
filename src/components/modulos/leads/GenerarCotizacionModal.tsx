@@ -158,8 +158,7 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
 
   const [isComparativo, setIsComparativo] = useState(true);
   const [comparativoFiles, setComparativoFiles] = useState<File[]>([]);
-  const [extractedDataArray, setExtractedDataArray] = useState<any[]>([]);
-  const [extractedText, setExtractedText] = useState<string | null>(null);
+  const [, setExtractedDataArray] = useState<any[]>([]);
 
   // Eliminado skipTipoSeguro por falta de uso
 

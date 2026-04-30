@@ -133,7 +133,17 @@ export const Table = <T,>({
   const [showColumnSelector, setShowColumnSelector] = useState(false);
   const [density, setDensity] = useState<TableDensity>(defaultDensity);
   const [currentPageSize, setCurrentPageSize] = useState(pageSize);
+  const [pageIndex, setPageIndex] = useState(0);
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
+
+  // Clamp pageIndex si data se reduce (ej: borras items y quedas en página fantasma)
+  useEffect(() => {
+    const totalRows = data?.length || 0;
+    const totalPages = Math.max(1, Math.ceil(totalRows / currentPageSize));
+    if (pageIndex >= totalPages) {
+      setPageIndex(Math.max(0, totalPages - 1));
+    }
+  }, [data?.length, currentPageSize, pageIndex]);
   const columnSelectorRef = useRef<HTMLDivElement>(null);
 
   const usingServerPagination = serverPagination !== undefined;
@@ -190,8 +200,18 @@ export const Table = <T,>({
       sorting,
       globalFilter: usingServerSearch ? serverSearch.searchTerm : globalFilter,
       columnVisibility: tableColumnVisibility,
-      pagination: { pageSize: currentPageSize, pageIndex: 0 },
+      pagination: { pageSize: currentPageSize, pageIndex },
       columnSizing,
+    },
+    onPaginationChange: (updater) => {
+      const next =
+        typeof updater === "function"
+          ? updater({ pageSize: currentPageSize, pageIndex })
+          : updater;
+      setPageIndex(next.pageIndex);
+      if (next.pageSize !== currentPageSize) {
+        setCurrentPageSize(next.pageSize);
+      }
     },
     onSortingChange: setSorting,
     onGlobalFilterChange: usingServerSearch
