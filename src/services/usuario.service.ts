@@ -51,6 +51,11 @@ export const usuarioApi = {
     return response.data;
   },
 
+  remove: async (id: string) => {
+    const response = await api.delete(`/usuarios/${id}`);
+    return response.data;
+  },
+
   getBrokersBySupervisor: async (idSupervisor: string) => {
     const response = await api.get<any[]>(`/usuarios/brokers/supervisor/${idSupervisor}`);
     return response.data || [];
@@ -117,6 +122,16 @@ export const usuarioApi = {
     return useMutation({
       mutationFn: ({ id, data }: { id: string; data: UpdateUsuario }) =>
         usuarioApi.update(id, data),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: USUARIOS_KEY });
+      },
+    });
+  },
+
+  useRemove: () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+      mutationFn: (id: string) => usuarioApi.remove(id),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: USUARIOS_KEY });
       },

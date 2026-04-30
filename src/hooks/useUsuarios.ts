@@ -26,15 +26,30 @@ export const useUsuarios = () => {
   const updateUsuario = async (id: string, data: UpdateUsuario) => {
     try {
       await update.mutateAsync({ id, data });
-      toast.success("Usuario actualizado exitosamente");
-    } catch (error) {
-      toast.error("No se pudo actualizar el usuario.");
+      toast.success("Usuario actualizado correctamente");
+    } catch (error: any) {
+      const msg = error?.response?.data?.message || "No se pudo actualizar el usuario.";
+      toast.error(typeof msg === "string" ? msg : "Error al actualizar");
+      throw error;
+    }
+  };
+
+  const remove = usuarioApi.useRemove();
+  const removeUsuario = async (id: string) => {
+    try {
+      await remove.mutateAsync(id);
+      toast.success("Usuario eliminado correctamente");
+    } catch (error: any) {
+      const msg = error?.response?.data?.message || "No se pudo eliminar el usuario.";
+      toast.error(typeof msg === "string" ? msg : "Error al eliminar");
+      throw error;
     }
   };
 
   return {
     addUsuario,
     updateUsuario,
+    removeUsuario,
     getUsuarios,
     usuarios,
     isLoading,

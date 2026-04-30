@@ -1,4 +1,4 @@
-import { Table, BotonEditar } from "@/components/shared";
+import { Table, BotonEditar, BotonEliminar } from "@/components/shared";
 import { type ColumnDef } from "@tanstack/react-table";
 import { type Usuario } from "@/types/usuario.interface";
 import { leadService } from "@/services/lead.service";
@@ -7,9 +7,24 @@ import { useMemo } from "react";
 interface TablaUsuariosProps {
   usuarios: Usuario[];
   onEdit?: (usuario: Usuario) => void;
+  onDelete?: (usuario: Usuario) => Promise<void> | void;
 }
 
-export const TablaUsuarios = ({ usuarios, onEdit }: TablaUsuariosProps) => {
+export const TablaUsuarios = ({ usuarios, onEdit, onDelete }: TablaUsuariosProps) => {
+  const handleDelete = async (u: Usuario) => {
+    const nombre =
+      `${u.persona?.nombres || ""} ${u.persona?.apellidos || ""}`.trim() ||
+      u.nombreUsuario ||
+      u.correo;
+    const ok = window.confirm(
+      `¿Eliminar a ${nombre}?\n\nQuedará INACTIVO y no podrá hacer login. ` +
+      `El historial (leads, recordatorios, asignaciones) se conserva por auditoría SBS.\n\n` +
+      `Esta acción se puede revertir contactando soporte.`
+    );
+    if (!ok || !onDelete) return;
+    try { await onDelete(u); } catch { /* el hook ya muestra toast */ }
+  };
+
   // Cargar todos los leads visibles (server-side ya filtra por rol).
   // Para BROKER/ADMIN se obtiene la lista completa de su scope; cruzamos por asignadoA.
   const { data: leads = [] } = leadService.useGetAll();
@@ -167,11 +182,22 @@ export const TablaUsuarios = ({ usuarios, onEdit }: TablaUsuariosProps) => {
     {
       id: "acciones",
       header: "Acciones",
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2">
-          {onEdit && <BotonEditar onClick={() => onEdit(row.original)} />}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const u = row.original;
+        // No mostrar eliminar para usuarios ya inactivos
+        const puedeEliminar = !!onDelete && u.activo !== false;
+        return (
+          <div className="flex items-center gap-2">
+            {onEdit && <BotonEditar onClick={() => onEdit(u)} />}
+            {puedeEliminar && (
+              <BotonEliminar
+                onClick={() => handleDelete(u)}
+                title="Eliminar usuario"
+              />
+            )}
+          </div>
+        );
+      },
     },
   ];
 

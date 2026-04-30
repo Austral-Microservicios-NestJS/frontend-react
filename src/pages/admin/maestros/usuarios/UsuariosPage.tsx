@@ -17,7 +17,7 @@ export default function UsuariosPage() {
   const [editingUsuario, setEditingUsuario] = useState<Usuario | null>(null);
   const { user } = useAuthStore();
   const { roles } = useRoles();
-  const { addUsuario, updateUsuario, usuarios } = useUsuarios();
+  const { addUsuario, updateUsuario, removeUsuario, usuarios } = useUsuarios();
 
   const updateComision = asignacionApi.useUpdateComision();
 
@@ -66,7 +66,11 @@ export default function UsuariosPage() {
         />
       </Header>
 
-      <TablaUsuarios usuarios={usuarios} onEdit={handleEdit} />
+      <TablaUsuarios
+        usuarios={usuarios}
+        onEdit={handleEdit}
+        onDelete={(u) => removeUsuario(u.idUsuario)}
+      />
 
       <RegistrarUsuario
         isOpen={isRegistrarOpen}
