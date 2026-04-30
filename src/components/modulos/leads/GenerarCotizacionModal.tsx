@@ -122,7 +122,7 @@ const getFields = (tipo: string, lead: any, detalles: Record<string, any>, clien
 
 // ─── Stepper ──────────────────────────────────────────────────────────────────
 
-const INITIAL_STEPS = ["Aseguradora", "Tipo de seguro", "Confirmar datos", "Visualizar", "Enviar"];
+const STEPS = ["Subir PDF", "Visualizar", "Enviar"];
 
 // ─── Variantes de animación ───────────────────────────────────────────────────
 
@@ -147,8 +147,8 @@ interface Props {
 export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles = {} }: Props) => {
   const [step, setStep] = useState(0);
   const [dir, setDir] = useState(1);
-  const [aseguradora, setAseguradora] = useState<string | null>(null);
-  const [tipoSeguro, setTipoSeguro] = useState<string | null>(null);
+  const [aseguradora, setAseguradora] = useState<string | null>("comparativo");
+  const [tipoSeguro, setTipoSeguro] = useState<string | null>("VEHICULAR");
   const [formValues, setFormValues] = useState<Record<string, string>>({});
   const [confirmed, setConfirmed] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -156,20 +156,12 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [quoteId, setQuoteId] = useState<string | null>(null);
 
-  const [isComparativo, setIsComparativo] = useState(false);
+  const [isComparativo, setIsComparativo] = useState(true);
   const [comparativoFiles, setComparativoFiles] = useState<File[]>([]);
   const [extractedDataArray, setExtractedDataArray] = useState<any[]>([]);
   const [extractedText, setExtractedText] = useState<string | null>(null);
 
-  // Determinar si debemos saltar el paso de selección de tipo de seguro
-  const skipTipoSeguro = !!lead?.tipoSeguro;
-  const NORMAL_STEPS = skipTipoSeguro
-    ? INITIAL_STEPS.filter(s => s !== "Tipo de seguro")
-    : INITIAL_STEPS;
-    
-  const STEPS = isComparativo 
-    ? ["Aseguradora", "Subir PDF", "Visualizar", "Enviar"] 
-    : NORMAL_STEPS;
+  // Eliminado skipTipoSeguro por falta de uso
 
   // Sincronizar tipo de seguro si viene del Lead
   useEffect(() => {
@@ -310,8 +302,8 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
 
   const handleClose = () => {
     setTimeout(() => {
-      setStep(0); setDir(1); setAseguradora(null); setIsComparativo(false); setComparativoFiles([]);
-      setTipoSeguro(null); setFormValues({}); setConfirmed(false);
+      setStep(0); setDir(1); setAseguradora("comparativo"); setIsComparativo(true); setComparativoFiles([]);
+      setTipoSeguro("VEHICULAR"); setFormValues({}); setConfirmed(false);
       setPdfUrl(null); setQuoteId(null); setIsGenerating(false); setIsSending(false);
       setExtractedDataArray([]);
     }, 300);
@@ -353,7 +345,7 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
                   <FileText className="w-4.5 h-4.5 text-violet-600" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-gray-900 leading-none">Generar Cotización</h2>
+                  <h2 className="text-base font-bold text-gray-900 leading-none">Generar Comparativo</h2>
                   <p className="text-xs text-gray-400 mt-0.5">{lead?.nombre} {lead?.apellidos || ""}</p>
                 </div>
               </div>
@@ -384,10 +376,7 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
                     </div>
                     {i < STEPS.length - 1 && (
                       <div className={cn("flex-1 h-px mx-1 transition-colors duration-300",
-                        // Ajuste de lógica para el color de la línea si hay saltos
-                        (skipTipoSeguro && i === 0 && step >= 2) || (i < (skipTipoSeguro && step >= 2 ? step - 1 : step))
-                          ? "bg-emerald-200"
-                          : "bg-gray-200"
+                        i < step ? "bg-emerald-200" : "bg-gray-200"
                       )} />
                     )}
                   </div>
@@ -799,7 +788,6 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
               <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/70 flex items-center justify-between shrink-0">
                 <button
                   onClick={step === 0 ? handleClose : () => {
-                    if (step === 1 && isComparativo) setIsComparativo(false);
                     goTo(step - 1);
                   }}
                   disabled={isGenerating || isSending}
@@ -852,7 +840,7 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
                           setQuoteId(completed.id);
                           
                           // 3. Ir a Visualizar
-                          goTo(2);
+                          goTo(1);
                         } else {
                           throw new Error("No se pudo extraer información de los archivos.");
                         }

@@ -255,7 +255,7 @@ export default function LeadDetail() {
             }`}
             title={!leadState?.idCliente ? "Debe vincular un cliente antes de generar una cotización" : ""}
           >
-            <ClipboardList className="w-4 h-4" /> Generar Cotización
+            <ClipboardList className="w-4 h-4" /> Generar Comparativo
           </button>
           <button
             onClick={handleRegistrarCliente}
