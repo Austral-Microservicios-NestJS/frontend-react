@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { quoteService } from "@/services/quote.service";
+import { toast } from "sonner";
 
 // ─── Aseguradoras ─────────────────────────────────────────────────────────────
 
@@ -813,38 +814,53 @@ export const GenerarCotizacionModal = ({ open, onClose, lead, cliente, detalles 
                       setIsGenerating(true);
                       try {
                         const res = await quoteService.uploadPdfs(comparativoFiles);
-                        if (res && res.success && res.data && res.data.length > 0) {
-                          // res.data ahora es un array de extracciones
-                          const allExtractions = res.data;
-                          setExtractedDataArray(allExtractions);
 
-                          // Para el PDF del visualizador, por ahora usamos la primera extracción 
-                          // o preparamos un objeto que contenga el array para el template HBS.
-                          const primaryExtraction = allExtractions[0]; 
-                          
-                          const newFormValues = { 
-                            ...formValues,
-                            ...primaryExtraction,
-                            primaTotal: primaryExtraction.prima_total_anual,
-                            // Inyectamos el array completo para que el template HBS pueda armar la tabla comparativa
-                            comparativoExtractions: allExtractions
-                          };
-                          setFormValues(newFormValues);
-                          
-                          // 2. Generar Cotización automáticamente
-                          const q = await quoteService.create(lead.idLead, "Comparativo");
-                          const completed = await quoteService.completeQuote(q.id, newFormValues);
-                          
-                          setPdfUrl(completed.pdfUrl || null);
-                          setQuoteId(completed.id);
-                          
-                          // 3. Ir a Visualizar
-                          goTo(1);
-                        } else {
-                          throw new Error("No se pudo extraer información de los archivos.");
+                        if (!res?.success || !Array.isArray(res?.data) || res.data.length === 0) {
+                          toast.error(res?.message || "No se pudo extraer información de los archivos.");
+                          return;
                         }
-                      } catch (error) {
-                        alert("Error al procesar archivos mediante IA. Verifique los límites de OpenAI.");
+
+                        if (res.message) {
+                          toast.warning(res.message);
+                        }
+
+                        const allExtractions = res.data;
+                        setExtractedDataArray(allExtractions);
+
+                        const primaryExtraction = allExtractions[0];
+                        const newFormValues = {
+                          ...formValues,
+                          ...primaryExtraction,
+                          primaTotal: primaryExtraction.prima_total_anual,
+                          comparativoExtractions: allExtractions,
+                        };
+                        setFormValues(newFormValues);
+
+                        const q = await quoteService.create(lead.idLead, "Comparativo");
+                        const completed = await quoteService.completeQuote(q.id, newFormValues);
+
+                        setPdfUrl(completed.pdfUrl || null);
+                        setQuoteId(completed.id);
+                        goTo(1);
+                      } catch (error: any) {
+                        const apiData = error?.response?.data;
+                        const friendly =
+                          apiData?.message ||
+                          apiData?.error ||
+                          error?.message ||
+                          "Error al procesar archivos mediante IA.";
+                        const code = apiData?.errorCode;
+                        if (code === "NO_API_KEY" || code === "OPENAI_AUTH") {
+                          toast.error("El servicio de IA no está disponible. Avisa al administrador.", {
+                            description: friendly,
+                          });
+                        } else if (code === "OPENAI_RATE_LIMIT") {
+                          toast.error("Límite de OpenAI alcanzado", { description: friendly });
+                        } else if (code === "EMPTY_PDF") {
+                          toast.error("PDF sin texto", { description: friendly });
+                        } else {
+                          toast.error(friendly);
+                        }
                       } finally {
                         setIsGenerating(false);
                       }
