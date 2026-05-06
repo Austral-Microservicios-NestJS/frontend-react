@@ -79,10 +79,11 @@ export const EditarCliente = ({
   }, [tipoDocumento, setValue]);
 
   const handleFormSubmit = async (data: UpdateCliente) => {
-    const isNumericDoc = data.tipoDocumento === "DNI" || data.tipoDocumento === "RUC";
     const dataSubmit = {
       ...data,
-      numeroDocumento: isNumericDoc ? Number(data.numeroDocumento) : data.numeroDocumento,
+      numeroDocumento: data.numeroDocumento
+        ? String(data.numeroDocumento).trim()
+        : undefined,
       latitud:
         data.latitud !== undefined && data.latitud !== null
           ? Number(data.latitud)

@@ -80,7 +80,7 @@ export interface Cliente {
   nombres?: string;
   apellidos?: string;
   tipoDocumento: TipoDocumento;
-  numeroDocumento: number;
+  numeroDocumento: string;
   direccion: string;
   distrito?: string;
   provincia?: string;

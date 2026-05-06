@@ -229,8 +229,6 @@ export const RegistrarCliente = ({
   }, [isOpen, reset, initialValues, user]);
 
   const onSubmit = async (data: any) => {
-    const isNumericDoc = data.tipoDocumento === "DNI" || data.tipoDocumento === "RUC";
-
     const documentos: any[] = [];
     if (cartaFile) {
       setUploadingCarta(true);
@@ -248,7 +246,9 @@ export const RegistrarCliente = ({
 
     const dataSubmit = {
       ...data,
-      numeroDocumento: isNumericDoc ? Number(data.numeroDocumento) : data.numeroDocumento,
+      numeroDocumento: data.numeroDocumento
+        ? String(data.numeroDocumento).trim()
+        : null,
       telefono1: data.telefono1 || null,
       telefono2: data.telefono2 || null,
       whatsapp: data.whatsapp || null,
