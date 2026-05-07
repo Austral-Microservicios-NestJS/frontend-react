@@ -1,4 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import {
   Header,
   Modal,
@@ -101,13 +103,10 @@ export default function LeadDetail() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
   const { user } = useAuthStore();
   const { addCliente } = useClientes();
+  const queryClient = useQueryClient();
 
   const { data: lead, isLoading } = leadService.useGetById(id || "");
   const { addPoliza } = usePolizas();
-  const idClienteVinculado = (lead as any)?.idCliente || "";
-  const { data: polizasCliente = [] } = polizaApi.useGetAllByCliente(idClienteVinculado);
-  const { data: clienteVinculado } = clienteService.useGetById(idClienteVinculado);
-  const { data: documentosCliente = [] } = clienteDocumentoApi.useGetByCliente(idClienteVinculado);
 
   const [detalleVidaLey, setDetalleVidaLey] = useState<any | null>(null);
   const [detalleAuto, setDetalleAuto] = useState<any | null>(null);
@@ -116,6 +115,13 @@ export default function LeadDetail() {
   const [detalleVida, setDetalleVida] = useState<any | null>(null);
   const [detalleSoat, setDetalleSoat] = useState<any | null>(null);
   const [leadState, setLeadState] = useState<any | null>(null);
+
+  // idCliente: prioriza leadState (estado local actualizado tras vincular)
+  // sobre lead (React Query cache, que puede estar stale hasta que se invalide).
+  const idClienteVinculado = (leadState?.idCliente as string) || (lead as any)?.idCliente || "";
+  const { data: polizasCliente = [] } = polizaApi.useGetAllByCliente(idClienteVinculado);
+  const { data: clienteVinculado } = clienteService.useGetById(idClienteVinculado);
+  const { data: documentosCliente = [] } = clienteDocumentoApi.useGetByCliente(idClienteVinculado);
   const [isConsultaModalOpen, setIsConsultaModalOpen] = useState(false);
   const [isRegistrarClienteOpen, setIsRegistrarClienteOpen] = useState(false);
   const [isRegistrarPolizaOpen, setIsRegistrarPolizaOpen] = useState(false);
@@ -170,11 +176,36 @@ export default function LeadDetail() {
   };
 
   const handleAddClienteAndLink = async (clienteData: any) => {
+    if (!id) return;
     const newCliente = await addCliente(clienteData);
-    if (newCliente?.idCliente && id) {
-      await leadService.update(id, { idCliente: newCliente.idCliente });
-      await leadService.cambiarEstado(id, "COTIZADO", user?.nombreUsuario, "Cliente registrado y vinculado");
-      setLeadState((s: any) => ({ ...s, idCliente: newCliente.idCliente, estado: "COTIZADO" }));
+    const nuevoId = newCliente?.idCliente;
+    if (!nuevoId) {
+      toast.error(
+        "Cliente creado pero el backend no devolvió ID — no se pudo vincular automáticamente al lead.",
+      );
+      return;
+    }
+
+    try {
+      await leadService.update(id, { idCliente: nuevoId });
+      await leadService.cambiarEstado(
+        id,
+        "COTIZADO",
+        user?.nombreUsuario,
+        "Cliente registrado y vinculado",
+      );
+      // Optimistic update local
+      setLeadState((s: any) => ({ ...s, idCliente: nuevoId, estado: "COTIZADO" }));
+      // Invalidar caches: lead detail + lista de leads + cliente recién creado
+      queryClient.invalidateQueries({ queryKey: ["leads", id] });
+      queryClient.invalidateQueries({ queryKey: ["leads"] });
+      queryClient.invalidateQueries({ queryKey: ["clientes", nuevoId] });
+      toast.success("Cliente vinculado al lead — estado: COTIZADO");
+    } catch (err: any) {
+      toast.error(
+        err?.response?.data?.message ||
+          "El cliente se creó pero falló la vinculación al lead. Reintenta o vincúlalo manualmente.",
+      );
     }
   };
 
