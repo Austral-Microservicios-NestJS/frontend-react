@@ -184,15 +184,15 @@ export const TablaUsuarios = ({ usuarios, onEdit, onDelete }: TablaUsuariosProps
       header: "Acciones",
       cell: ({ row }) => {
         const u = row.original;
-        // No mostrar eliminar para usuarios ya inactivos
-        const puedeEliminar = !!onDelete && u.activo !== false;
+        const yaInactivo = u.activo === false;
         return (
           <div className="flex items-center gap-2">
             {onEdit && <BotonEditar onClick={() => onEdit(u)} />}
-            {puedeEliminar && (
+            {onDelete && (
               <BotonEliminar
                 onClick={() => handleDelete(u)}
-                title="Eliminar usuario"
+                disabled={yaInactivo}
+                title={yaInactivo ? "Usuario ya inactivo" : "Eliminar usuario"}
               />
             )}
           </div>
