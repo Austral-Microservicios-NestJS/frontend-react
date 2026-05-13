@@ -121,7 +121,8 @@ export function HistorialRecordatorios({ idLead, estadoLead }: HistorialRecordat
 }
 
 // Detecta si el error es de configuración (responsabilidad admin/devops)
-// vs un error real (rebote de email, número inválido, etc.)
+// o una limitación operativa (cliente sin chat activo, etc.) —
+// en ambos casos se muestra como advertencia amarilla, no error rojo.
 function esErrorConfig(msg?: string): boolean {
   if (!msg) return false;
   const m = msg.toLowerCase();
@@ -131,7 +132,21 @@ function esErrorConfig(msg?: string): boolean {
     m.includes("token no configurada") ||
     m.includes("not configured") ||
     m.includes("manychat_api_token") ||
-    m.includes("resend_api_key")
+    m.includes("resend_api_key") ||
+    esLimitacionWhatsApp(msg)
+  );
+}
+
+// Distingue la limitación operativa de WhatsApp (cliente sin chat activo)
+// del error de configuración (api key faltante) — para mostrar mensaje
+// específico al agente y no decir "el equipo técnico fue notificado".
+function esLimitacionWhatsApp(msg?: string): boolean {
+  if (!msg) return false;
+  const m = msg.toLowerCase();
+  return (
+    m.includes("no tiene chat activo") ||
+    m.includes("whatsapp business no permite") ||
+    m.includes("no iniciaron conversación")
   );
 }
 
@@ -207,7 +222,14 @@ function RecordatorioItem({ recordatorio, esAdmin }: { recordatorio: LeadRecorda
           </div>
           {!recordatorio.exitoso && recordatorio.errorMensaje && (
             errConfig ? (
-              esAdmin ? (
+              esLimitacionWhatsApp(recordatorio.errorMensaje) ? (
+                <div className="mt-1 rounded bg-amber-50 p-2 text-xs text-amber-800 border border-amber-100">
+                  <b>💬 WhatsApp no disponible:</b> el cliente no ha iniciado conversación con el bot de Austral.
+                  <div className="text-[11px] text-amber-700 mt-1">
+                    Pídele al cliente que escriba al chatbot de WhatsApp para activar los recordatorios automáticos. WhatsApp Business no permite mensajes en frío.
+                  </div>
+                </div>
+              ) : esAdmin ? (
                 <div className="mt-1 rounded bg-amber-50 p-2 text-xs text-amber-700 border border-amber-100">
                   <b>⚙️ Configuración pendiente:</b> {recordatorio.errorMensaje}
                   <div className="text-[10px] text-amber-600 mt-0.5">
