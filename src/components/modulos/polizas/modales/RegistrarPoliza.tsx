@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import {
   ModalContainer,
   Modal,
@@ -99,6 +99,12 @@ export const RegistrarPoliza = ({
   const watchIdBroker = watch("idBroker");
   const watchIdAgente = watch("idAgente");
 
+  // Recordar la última selección para la que ya auto-poblamos la comisión.
+  // Evita que los efectos (que se re-ejecutan en cada render por referencias
+  // inestables / watch) sobreescriban lo que el usuario escribe manualmente.
+  const appliedBrokerIdRef = useRef<string | undefined>(undefined);
+  const appliedAgenteIdRef = useRef<string | undefined>(undefined);
+
   // Obtener productos del ramo seleccionado
   const { data: productos = [] } = productoApi.useGetByRamo(watchIdRamo || "");
 
@@ -125,6 +131,10 @@ export const RegistrarPoliza = ({
 
   // Resetear formulario cuando el modal se cierra o abre
   useEffect(() => {
+    // Olvidar la última auto-población para que reabrir el modal vuelva a
+    // sugerir la comisión de la selección.
+    appliedBrokerIdRef.current = undefined;
+    appliedAgenteIdRef.current = undefined;
     if (!isOpen) {
       reset();
     } else {
@@ -231,38 +241,50 @@ export const RegistrarPoliza = ({
     }
   }, [watchVigenciaInicio, watchTipoVigencia, setValue]);
 
-  // Auto-poblar comisiones cuando se selecciona broker
+  // Auto-poblar comisiones cuando se selecciona broker.
+  // Solo se aplica UNA vez por selección: si el broker no cambió respecto a la
+  // última auto-población, no se toca el campo y el usuario puede escribir libre.
   useEffect(() => {
-    if (watchIdBroker && isAdmin) {
+    if (!watchIdBroker) return;
+    if (watchIdBroker === appliedBrokerIdRef.current) return;
+
+    let applied = false;
+
+    if (isAdmin) {
       const selectedBroker = brokers.find((b) => b.idUsuario === watchIdBroker);
       if (selectedBroker) {
         setValue("comisionBroker", selectedBroker.porcentajeComision);
+        applied = true;
       }
     }
 
     // Para BROKER: usar su propia asignación con el supervisor
     if (isBroker && watchIdBroker === uid) {
-      // Obtener supervisor del broker para obtener su comisión
+      const targetId = watchIdBroker;
       asignacionApi.getSupervisor(uid!).then((data) => {
-        if (data) {
+        if (data && appliedBrokerIdRef.current === targetId) {
           setValue("comisionBroker", data.porcentajeComision);
         }
       });
+      applied = true;
     }
 
     // Para AGENTE: usar la comisión del broker desde supervisorAsignacion
-    if (isAgent && supervisorAsignacion) {
-      // El broker del agente es su supervisor
-      // Necesitamos obtener la comisión del broker (supervisor del agente)
-      // que viene de la asignación ADMIN->BROKER
-      if (supervisorAsignacion.supervisor.idUsuario === watchIdBroker) {
-        asignacionApi.getSupervisor(watchIdBroker).then((data) => {
-          if (data) {
-            setValue("comisionBroker", data.porcentajeComision);
-          }
-        });
-      }
+    if (
+      isAgent &&
+      supervisorAsignacion &&
+      supervisorAsignacion.supervisor.idUsuario === watchIdBroker
+    ) {
+      const targetId = watchIdBroker;
+      asignacionApi.getSupervisor(watchIdBroker).then((data) => {
+        if (data && appliedBrokerIdRef.current === targetId) {
+          setValue("comisionBroker", data.porcentajeComision);
+        }
+      });
+      applied = true;
     }
+
+    if (applied) appliedBrokerIdRef.current = watchIdBroker;
   }, [
     watchIdBroker,
     brokers,
@@ -276,37 +298,45 @@ export const RegistrarPoliza = ({
 
   // Auto-poblar comisión de agente cuando se selecciona
   useEffect(() => {
-    if (watchIdAgente) {
-      // Para ADMINISTRADOR: buscar agente en allAgentes
-      if (isAdmin && allAgentes.length > 0) {
-        const agente = allAgentes.find(
-          (a: any) => a.idUsuario === watchIdAgente,
-        );
-        if (agente?.porcentajeComision) {
-          setValue("comisionAgente", agente.porcentajeComision);
-        }
-      }
+    if (!watchIdAgente) return;
+    if (watchIdAgente === appliedAgenteIdRef.current) return;
 
-      // Para BROKER: buscar asignación del agente en subordinados
-      if (isBroker && subordinados.length > 0) {
-        const agenteAsignacion = subordinados.find(
-          (asig) => asig.subordinado.idUsuario === watchIdAgente,
-        );
+    let applied = false;
 
-        if (agenteAsignacion) {
-          setValue("comisionAgente", agenteAsignacion.porcentajeComision);
-        }
-      }
-
-      // Para AGENTE: su propia comisión viene de su asignación con el supervisor
-      if (
-        isAgent &&
-        watchIdAgente === user?.idUsuario &&
-        supervisorAsignacion
-      ) {
-        setValue("comisionAgente", supervisorAsignacion.porcentajeComision);
+    // Para ADMINISTRADOR: buscar agente en allAgentes
+    if (isAdmin && allAgentes.length > 0) {
+      const agente = allAgentes.find(
+        (a: any) => a.idUsuario === watchIdAgente,
+      );
+      if (agente?.porcentajeComision) {
+        setValue("comisionAgente", agente.porcentajeComision);
+        applied = true;
       }
     }
+
+    // Para BROKER: buscar asignación del agente en subordinados
+    if (isBroker && subordinados.length > 0) {
+      const agenteAsignacion = subordinados.find(
+        (asig) => asig.subordinado.idUsuario === watchIdAgente,
+      );
+
+      if (agenteAsignacion) {
+        setValue("comisionAgente", agenteAsignacion.porcentajeComision);
+        applied = true;
+      }
+    }
+
+    // Para AGENTE: su propia comisión viene de su asignación con el supervisor
+    if (
+      isAgent &&
+      watchIdAgente === user?.idUsuario &&
+      supervisorAsignacion
+    ) {
+      setValue("comisionAgente", supervisorAsignacion.porcentajeComision);
+      applied = true;
+    }
+
+    if (applied) appliedAgenteIdRef.current = watchIdAgente;
   }, [
     watchIdAgente,
     allAgentes,

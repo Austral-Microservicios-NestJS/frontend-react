@@ -19,6 +19,9 @@ export default function UsuariosPage() {
   const { roles } = useRoles();
   const { addUsuario, updateUsuario, removeUsuario, usuarios } = useUsuarios();
 
+  // Solo mostrar usuarios activos: los inactivos se consideran eliminados
+  const usuariosActivos = usuarios.filter((u) => u.activo !== false);
+
   const updateComision = asignacionApi.useUpdateComision();
 
   const handleEdit = (usuario: Usuario) => {
@@ -67,7 +70,7 @@ export default function UsuariosPage() {
       </Header>
 
       <TablaUsuarios
-        usuarios={usuarios}
+        usuarios={usuariosActivos}
         onEdit={handleEdit}
         onDelete={(u) => removeUsuario(u.idUsuario)}
       />

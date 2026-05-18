@@ -17,9 +17,10 @@ export const TablaUsuarios = ({ usuarios, onEdit, onDelete }: TablaUsuariosProps
       u.nombreUsuario ||
       u.correo;
     const ok = window.confirm(
-      `¿Eliminar a ${nombre}?\n\nQuedará INACTIVO y no podrá hacer login. ` +
-      `El historial (leads, recordatorios, asignaciones) se conserva por auditoría SBS.\n\n` +
-      `Esta acción se puede revertir contactando soporte.`
+      `¿ELIMINAR DEFINITIVAMENTE a ${nombre}?\n\n` +
+      `Se borrará de forma PERMANENTE de la base de datos ` +
+      `(usuario, datos personales, asignaciones y notificaciones).\n\n` +
+      `Esta acción NO se puede deshacer.`
     );
     if (!ok || !onDelete) return;
     try { await onDelete(u); } catch { /* el hook ya muestra toast */ }
@@ -184,15 +185,13 @@ export const TablaUsuarios = ({ usuarios, onEdit, onDelete }: TablaUsuariosProps
       header: "Acciones",
       cell: ({ row }) => {
         const u = row.original;
-        const yaInactivo = u.activo === false;
         return (
           <div className="flex items-center gap-2">
             {onEdit && <BotonEditar onClick={() => onEdit(u)} />}
             {onDelete && (
               <BotonEliminar
                 onClick={() => handleDelete(u)}
-                disabled={yaInactivo}
-                title={yaInactivo ? "Usuario ya inactivo" : "Eliminar usuario"}
+                title="Eliminar usuario"
               />
             )}
           </div>
