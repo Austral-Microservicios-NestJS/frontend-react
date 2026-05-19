@@ -12,15 +12,6 @@ export const useGetSiniestrosByPoliza = (idPoliza: string) => {
   });
 };
 
-export const useGetSiniestro = (id: string) => {
-  return useQuery({
-    queryKey: siniestroKeys.detail(id),
-    queryFn: () => siniestroService.getById(id),
-    enabled: !!id,
-    refetchOnWindowFocus: false,
-  });
-};
-
 export const useCreateSiniestro = () => {
   const queryClient = useQueryClient();
   return useMutation({
