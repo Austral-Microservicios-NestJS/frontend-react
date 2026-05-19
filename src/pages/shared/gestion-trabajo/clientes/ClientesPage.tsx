@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { Header, BotonRegistro } from "@/components/shared";
+import { Header, BotonRegistro, ModalConfirmacion } from "@/components/shared";
 import { useSidebar } from "@/hooks/useSidebar";
 import { useAuthStore } from "@/store/auth.store";
 import { RegistrarCliente } from "@/components/modulos/clientes/modales/RegistrarCliente";
@@ -72,23 +72,20 @@ export default function ClientesPage() {
   };
 
   const deleteCliente = clienteService.useDelete();
+  const [clienteAEliminar, setClienteAEliminar] = useState<Cliente | null>(null);
 
-  const handleDelete = async (cliente: Cliente) => {
-    const nombre =
-      cliente.razonSocial ||
-      `${cliente.nombres || ""} ${cliente.apellidos || ""}`.trim() ||
-      cliente.numeroDocumento ||
-      "este cliente";
-    const ok = window.confirm(
-      `¿ELIMINAR DEFINITIVAMENTE a ${nombre}?\n\n` +
-        `Se borrará de forma PERMANENTE de la base de datos ` +
-        `(cliente, contactos, documentos, contexto e inversiones).\n\n` +
-        `Esta acción NO se puede deshacer.`,
-    );
-    if (!ok) return;
+  const nombreCliente = (c: Cliente) =>
+    c.razonSocial ||
+    `${c.nombres || ""} ${c.apellidos || ""}`.trim() ||
+    c.numeroDocumento ||
+    "este cliente";
+
+  const confirmarEliminarCliente = async () => {
+    if (!clienteAEliminar) return;
     try {
-      await deleteCliente.mutateAsync(cliente.idCliente);
+      await deleteCliente.mutateAsync(clienteAEliminar.idCliente);
       toast.success("Cliente eliminado");
+      setClienteAEliminar(null);
     } catch {
       toast.error("No se pudo eliminar el cliente");
     }
@@ -143,7 +140,7 @@ export default function ClientesPage() {
         <TablaClientes
           clientes={clientes}
           onEdit={handleEdit}
-          onDelete={isAdmin ? handleDelete : undefined}
+          onDelete={isAdmin ? setClienteAEliminar : undefined}
           serverPagination={isAdmin ? {
             currentPage: page,
             totalPages: meta.totalPages,
@@ -179,6 +176,22 @@ export default function ClientesPage() {
           cliente={editingCliente}
         />
       )}
+
+      <ModalConfirmacion
+        isOpen={!!clienteAEliminar}
+        onClose={() => setClienteAEliminar(null)}
+        onConfirm={confirmarEliminarCliente}
+        title="Eliminar cliente"
+        message={
+          clienteAEliminar
+            ? `¿Eliminar definitivamente a ${nombreCliente(clienteAEliminar)}? ` +
+              `Se borrará de forma permanente de la base de datos (cliente, ` +
+              `contactos, documentos, contexto e inversiones). Esta acción no se puede deshacer.`
+            : ""
+        }
+        confirmText="Eliminar definitivamente"
+        isLoading={deleteCliente.isPending}
+      />
     </>
   );
 }

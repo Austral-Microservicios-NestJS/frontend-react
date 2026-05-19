@@ -1,8 +1,8 @@
-import { Table, BotonEditar, BotonEliminar } from "@/components/shared";
+import { Table, BotonEditar, BotonEliminar, ModalConfirmacion } from "@/components/shared";
 import { type ColumnDef } from "@tanstack/react-table";
 import { type Usuario } from "@/types/usuario.interface";
 import { leadService } from "@/services/lead.service";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 interface TablaUsuariosProps {
   usuarios: Usuario[];
@@ -11,19 +11,25 @@ interface TablaUsuariosProps {
 }
 
 export const TablaUsuarios = ({ usuarios, onEdit, onDelete }: TablaUsuariosProps) => {
-  const handleDelete = async (u: Usuario) => {
-    const nombre =
-      `${u.persona?.nombres || ""} ${u.persona?.apellidos || ""}`.trim() ||
-      u.nombreUsuario ||
-      u.correo;
-    const ok = window.confirm(
-      `¿ELIMINAR DEFINITIVAMENTE a ${nombre}?\n\n` +
-      `Se borrará de forma PERMANENTE de la base de datos ` +
-      `(usuario, datos personales, asignaciones y notificaciones).\n\n` +
-      `Esta acción NO se puede deshacer.`
-    );
-    if (!ok || !onDelete) return;
-    try { await onDelete(u); } catch { /* el hook ya muestra toast */ }
+  const [deletingUsuario, setDeletingUsuario] = useState<Usuario | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const nombreDe = (u: Usuario) =>
+    `${u.persona?.nombres || ""} ${u.persona?.apellidos || ""}`.trim() ||
+    u.nombreUsuario ||
+    u.correo;
+
+  const confirmarEliminar = async () => {
+    if (!deletingUsuario || !onDelete) return;
+    setIsDeleting(true);
+    try {
+      await onDelete(deletingUsuario);
+      setDeletingUsuario(null);
+    } catch {
+      /* el hook ya muestra toast */
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   // Cargar todos los leads visibles (server-side ya filtra por rol).
@@ -190,7 +196,7 @@ export const TablaUsuarios = ({ usuarios, onEdit, onDelete }: TablaUsuariosProps
             {onEdit && <BotonEditar onClick={() => onEdit(u)} />}
             {onDelete && (
               <BotonEliminar
-                onClick={() => handleDelete(u)}
+                onClick={() => setDeletingUsuario(u)}
                 title="Eliminar usuario"
               />
             )}
@@ -201,16 +207,34 @@ export const TablaUsuarios = ({ usuarios, onEdit, onDelete }: TablaUsuariosProps
   ];
 
   return (
-    <Table
-      data={usuarios}
-      columns={columns}
-      searchPlaceholder="Buscar por usuario, nombre, correo..."
-      pageSize={10}
-      showSearch={true}
-      showPagination={true}
-      showColumnToggle={true}
-      emptyMessage="No hay usuarios registrados"
-      tableId="tabla-usuarios"
-    />
+    <>
+      <Table
+        data={usuarios}
+        columns={columns}
+        searchPlaceholder="Buscar por usuario, nombre, correo..."
+        pageSize={10}
+        showSearch={true}
+        showPagination={true}
+        showColumnToggle={true}
+        emptyMessage="No hay usuarios registrados"
+        tableId="tabla-usuarios"
+      />
+
+      <ModalConfirmacion
+        isOpen={!!deletingUsuario}
+        onClose={() => setDeletingUsuario(null)}
+        onConfirm={confirmarEliminar}
+        title="Eliminar usuario"
+        message={
+          deletingUsuario
+            ? `¿Eliminar definitivamente a ${nombreDe(deletingUsuario)}? ` +
+              `Se borrará de forma permanente de la base de datos (usuario, datos ` +
+              `personales, asignaciones y notificaciones). Esta acción no se puede deshacer.`
+            : ""
+        }
+        confirmText="Eliminar definitivamente"
+        isLoading={isDeleting}
+      />
+    </>
   );
 };

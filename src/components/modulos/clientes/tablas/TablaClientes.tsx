@@ -1,4 +1,4 @@
-import { Table } from "@/components/shared";
+import { Table, BotonEliminar } from "@/components/shared";
 import { type ColumnDef } from "@tanstack/react-table";
 import { type Cliente } from "@/types/cliente.interface";
 import { useNavigate } from "react-router-dom";
@@ -8,7 +8,7 @@ import {
   PopoverTrigger,
   PopoverClose,
 } from "@/components/ui/popover";
-import { FileText, MoreHorizontal, Pencil, DollarSign, Trash2 } from "lucide-react";
+import { FileText, MoreHorizontal, Pencil, DollarSign } from "lucide-react";
 import { ButtonIA } from "@/components/ui/ButtonIA";
 import { useState } from "react";
 import { ContextoIAModal } from "@/components/modulos/clientes/modales/ContextoIAModal";
@@ -141,76 +141,73 @@ export const TablaClientes = ({
       id: "acciones",
       header: "Acciones",
       cell: ({ row }) => (
-        <Popover>
-          <PopoverTrigger asChild>
-            <button
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              title="Acciones"
-            >
-              <MoreHorizontal className="w-5 h-5 text-gray-600" />
-            </button>
-          </PopoverTrigger>
-          <PopoverContent className="w-48 p-1" align="end">
-            <div className="flex flex-col">
-              <div className="p-1 mb-1 border-b border-gray-100">
-                <ButtonIA
-                  className="w-full"
-                  onClick={() => setSelectedClienteForIA(row.original)}
-                >
-                  Dale contexto a la IA
-                </ButtonIA>
-              </div>
-              {onEdit && (
+        <div className="flex items-center gap-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                title="Acciones"
+              >
+                <MoreHorizontal className="w-5 h-5 text-gray-600" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-1" align="end">
+              <div className="flex flex-col">
+                <div className="p-1 mb-1 border-b border-gray-100">
+                  <ButtonIA
+                    className="w-full"
+                    onClick={() => setSelectedClienteForIA(row.original)}
+                  >
+                    Dale contexto a la IA
+                  </ButtonIA>
+                </div>
+                {onEdit && (
+                  <PopoverClose asChild>
+                    <button
+                      onClick={() => onEdit(row.original)}
+                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                    >
+                      <Pencil className="w-4 h-4" />
+                      Editar
+                    </button>
+                  </PopoverClose>
+                )}
                 <PopoverClose asChild>
                   <button
-                    onClick={() => onEdit(row.original)}
+                    onClick={() =>
+                      navigate(
+                        `/dashboard/gestion-trabajo/clientes/${row.original.idCliente}/polizas`,
+                      )
+                    }
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
                   >
-                    <Pencil className="w-4 h-4" />
-                    Editar
+                    <FileText className="w-4 h-4" />
+                    Ver Pólizas
                   </button>
                 </PopoverClose>
-              )}
-              <PopoverClose asChild>
-                <button
-                  onClick={() =>
-                    navigate(
-                      `/dashboard/gestion-trabajo/clientes/${row.original.idCliente}/polizas`,
-                    )
-                  }
-                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-                >
-                  <FileText className="w-4 h-4" />
-                  Ver Pólizas
-                </button>
-              </PopoverClose>
-              <PopoverClose asChild>
-                <button
-                  onClick={() =>
-                    navigate(
-                      `/dashboard/gestion-trabajo/clientes/${row.original.idCliente}/inversiones`,
-                    )
-                  }
-                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-                >
-                  <DollarSign className="w-4 h-4" />
-                  Ver Inversiones
-                </button>
-              </PopoverClose>
-              {onDelete && (
                 <PopoverClose asChild>
                   <button
-                    onClick={() => onDelete(row.original)}
-                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-red-600 hover:bg-red-50 rounded-md transition-colors border-t border-gray-100 mt-1"
+                    onClick={() =>
+                      navigate(
+                        `/dashboard/gestion-trabajo/clientes/${row.original.idCliente}/inversiones`,
+                      )
+                    }
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
                   >
-                    <Trash2 className="w-4 h-4" />
-                    Eliminar
+                    <DollarSign className="w-4 h-4" />
+                    Ver Inversiones
                   </button>
                 </PopoverClose>
-              )}
-            </div>
-          </PopoverContent>
-        </Popover>
+              </div>
+            </PopoverContent>
+          </Popover>
+          {onDelete && (
+            <BotonEliminar
+              onClick={() => onDelete(row.original)}
+              title="Eliminar cliente"
+            />
+          )}
+        </div>
       ),
     },
   ];
