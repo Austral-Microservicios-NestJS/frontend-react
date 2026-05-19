@@ -8,7 +8,7 @@ import {
   PopoverTrigger,
   PopoverClose,
 } from "@/components/ui/popover";
-import { FileText, MoreHorizontal, Pencil, DollarSign } from "lucide-react";
+import { FileText, MoreHorizontal, Pencil, DollarSign, Trash2 } from "lucide-react";
 import { ButtonIA } from "@/components/ui/ButtonIA";
 import { useState } from "react";
 import { ContextoIAModal } from "@/components/modulos/clientes/modales/ContextoIAModal";
@@ -16,6 +16,7 @@ import { ContextoIAModal } from "@/components/modulos/clientes/modales/ContextoI
 interface TablaClientesProps {
   clientes: Cliente[];
   onEdit?: (cliente: Cliente) => void;
+  onDelete?: (cliente: Cliente) => void;
   serverPagination?: {
     currentPage: number;
     totalPages: number;
@@ -28,6 +29,7 @@ interface TablaClientesProps {
 export const TablaClientes = ({
   clientes,
   onEdit,
+  onDelete,
   serverPagination,
 }: TablaClientesProps) => {
   const navigate = useNavigate();
@@ -195,6 +197,17 @@ export const TablaClientes = ({
                   Ver Inversiones
                 </button>
               </PopoverClose>
+              {onDelete && (
+                <PopoverClose asChild>
+                  <button
+                    onClick={() => onDelete(row.original)}
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-red-600 hover:bg-red-50 rounded-md transition-colors border-t border-gray-100 mt-1"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Eliminar
+                  </button>
+                </PopoverClose>
+              )}
             </div>
           </PopoverContent>
         </Popover>

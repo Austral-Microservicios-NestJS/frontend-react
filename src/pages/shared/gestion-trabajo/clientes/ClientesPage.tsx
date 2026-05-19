@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { clienteService } from "@/services/cliente.service";
 import type { Cliente, UpdateCliente } from "@/types/cliente.interface";
 import { Roles } from "@/utils/roles";
+import { toast } from "sonner";
 
 export default function ClientesPage() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
@@ -70,6 +71,29 @@ export default function ClientesPage() {
     }
   };
 
+  const deleteCliente = clienteService.useDelete();
+
+  const handleDelete = async (cliente: Cliente) => {
+    const nombre =
+      cliente.razonSocial ||
+      `${cliente.nombres || ""} ${cliente.apellidos || ""}`.trim() ||
+      cliente.numeroDocumento ||
+      "este cliente";
+    const ok = window.confirm(
+      `¿ELIMINAR DEFINITIVAMENTE a ${nombre}?\n\n` +
+        `Se borrará de forma PERMANENTE de la base de datos ` +
+        `(cliente, contactos, documentos, contexto e inversiones).\n\n` +
+        `Esta acción NO se puede deshacer.`,
+    );
+    if (!ok) return;
+    try {
+      await deleteCliente.mutateAsync(cliente.idCliente);
+      toast.success("Cliente eliminado");
+    } catch {
+      toast.error("No se pudo eliminar el cliente");
+    }
+  };
+
   // const handleDownloadTemplate = async () => {
   //   try {
   //     await clienteService.downloadTemplate();
@@ -119,6 +143,7 @@ export default function ClientesPage() {
         <TablaClientes
           clientes={clientes}
           onEdit={handleEdit}
+          onDelete={isAdmin ? handleDelete : undefined}
           serverPagination={isAdmin ? {
             currentPage: page,
             totalPages: meta.totalPages,
