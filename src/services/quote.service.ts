@@ -13,24 +13,11 @@ export interface Quote {
 }
 
 export const quoteService = {
-  // Obtener la cotización más reciente de un lead
-  getLatestByLeadId: async (leadId: string): Promise<Quote | null> => {
-    try {
-      console.log(`Buscando cotización para lead: ${leadId}`);
-      // Nota: El backend de gateway no tiene un endpoint directo por leadId, 
-      // así que usaremos el de buscar todas y filtraremos en el frontend o 
-      // implementaremos la búsqueda por ID de lead si existiera.
-      // Como el controller de gateway solo tiene 'find_one_quote', asumiremos 
-      // que el ID de la cotización se maneja en el flujo del lead.
-      
-      // Intentamos obtener por el ID de cotización (si el lead lo tuviera)
-      // Pero como el lead no tiene id_quote en el interface, buscaremos una vía alternativa.
-      // Por ahora, devolvemos null y dejaremos que se cree/complete una.
-      return null;
-    } catch (error) {
-      console.error("Error al obtener cotización:", error);
-      return null;
-    }
+  // Obtener la cotización más reciente de un lead.
+  // El gateway solo expone `find_one_quote` por id de cotización, no por leadId,
+  // así que esta función queda como stub para la futura búsqueda alternativa.
+  getLatestByLeadId: async (_leadId: string): Promise<Quote | null> => {
+    return null;
   },
 
   // Completar y generar PDF de la cotización

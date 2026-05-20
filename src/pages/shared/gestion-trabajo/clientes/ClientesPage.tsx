@@ -91,14 +91,6 @@ export default function ClientesPage() {
     }
   };
 
-  // const handleDownloadTemplate = async () => {
-  //   try {
-  //     await clienteService.downloadTemplate();
-  //     toast.success("Plantilla descargada correctamente");
-  //   } catch (error) {
-  //     toast.error("Error al descargar la plantilla");
-  //   }
-  // };
 
   return (
     <>
@@ -109,14 +101,6 @@ export default function ClientesPage() {
         onToggleSidebar={toggleSidebar}
       >
         <div className="flex gap-2">
-          {/* <Button
-            variant="outline"
-            onClick={handleDownloadTemplate}
-            title="Descargar plantilla de Excel"
-          >
-            <Download className="mr-2 h-4 w-4" />
-            Descargar Plantilla
-          </Button> */}
           <Button
             variant="outline"
             onClick={() => setIsImportarOpen(true)}

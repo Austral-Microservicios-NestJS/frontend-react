@@ -26,7 +26,6 @@ export const ButtonIA = ({
         onClick={(e) => {
           e.stopPropagation();
           onClick?.();
-          console.log("Asistente IA activado");
         }}
       >
         <Sparkles className="h-3.5 w-3.5 mr-1" />

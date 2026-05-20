@@ -37,26 +37,11 @@ export const chatbotService = {
     request: ChatbotQueryRequest
   ): Promise<ChatbotQueryResponse> => {
     try {
-      console.log(
-        "🌐 Chatbot Service - Request completo:",
-        JSON.stringify(request, null, 2)
-      );
-      console.log(
-        "🌐 Chatbot Service - Tiene conversationId?:",
-        !!request.conversationId
-      );
-
       const { data } = await api.post("/chatbot/query", request);
-
-      console.log(
-        "🌐 Chatbot Service - Response crudo:",
-        JSON.stringify(data, null, 2)
-      );
-
-      // El backend envía directamente { response: "...", conversationId: "...", timestamp: "..." }
+      // Backend envía directamente { response, conversationId, timestamp }
       return data;
     } catch (error) {
-      console.error("❌ Chatbot Service - Error completo:", error);
+      console.error("Chatbot Service - Error:", error);
       throw error;
     }
   },
