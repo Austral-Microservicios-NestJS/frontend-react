@@ -1,4 +1,4 @@
-import { Table, BotonEditar } from "@/components/shared";
+import { Table, BotonEditar, BotonEliminar } from "@/components/shared";
 import { type ColumnDef } from "@tanstack/react-table";
 import { type Ramo } from "@/types/ramo.interface";
 import { useNavigate } from "react-router-dom";
@@ -7,9 +7,10 @@ import { Package } from "lucide-react";
 interface TablaRamosProps {
   ramos: Ramo[];
   onEdit?: (ramo: Ramo) => void;
+  onDelete?: (ramo: Ramo) => void;
 }
 
-export const TablaRamos = ({ ramos, onEdit }: TablaRamosProps) => {
+export const TablaRamos = ({ ramos, onEdit, onDelete }: TablaRamosProps) => {
   const navigate = useNavigate();
 
   const columns: ColumnDef<Ramo>[] = [
@@ -92,6 +93,12 @@ export const TablaRamos = ({ ramos, onEdit }: TablaRamosProps) => {
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
           {onEdit && <BotonEditar onClick={() => onEdit(row.original)} />}
+          {onDelete && (
+            <BotonEliminar
+              onClick={() => onDelete(row.original)}
+              title="Eliminar ramo"
+            />
+          )}
           <button
             onClick={() =>
               navigate(

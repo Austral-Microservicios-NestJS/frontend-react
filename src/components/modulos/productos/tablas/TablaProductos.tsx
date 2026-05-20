@@ -1,13 +1,14 @@
-import { Table } from "@/components/shared";
+import { Table, BotonEliminar } from "@/components/shared";
 import { type ColumnDef } from "@tanstack/react-table";
 import { type Producto } from "@/types/producto.interface";
 import { CheckCircle, XCircle } from "lucide-react";
 
 interface TablaProductosProps {
   productos: Producto[];
+  onDelete?: (producto: Producto) => void;
 }
 
-export const TablaProductos = ({ productos }: TablaProductosProps) => {
+export const TablaProductos = ({ productos, onDelete }: TablaProductosProps) => {
   const columns: ColumnDef<Producto>[] = [
     {
       accessorKey: "codigo",
@@ -95,6 +96,22 @@ export const TablaProductos = ({ productos }: TablaProductosProps) => {
         </div>
       ),
     },
+    ...(onDelete
+      ? [
+          {
+            id: "acciones",
+            header: "Acciones",
+            cell: ({ row }: { row: { original: Producto } }) => (
+              <div className="flex items-center gap-2">
+                <BotonEliminar
+                  onClick={() => onDelete(row.original)}
+                  title="Eliminar producto"
+                />
+              </div>
+            ),
+          } as ColumnDef<Producto>,
+        ]
+      : []),
   ];
 
   return (

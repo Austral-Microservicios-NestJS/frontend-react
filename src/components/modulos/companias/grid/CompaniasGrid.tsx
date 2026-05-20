@@ -1,22 +1,29 @@
-import { Grid, BotonEditar } from "@/components/shared";
+import { Grid, BotonEditar, BotonEliminar } from "@/components/shared";
 import type { Compania } from "@/types/compania.interface";
 import { Building2, Mail, Phone, Globe, MapPin } from "lucide-react";
 
 interface Props {
   companias: Compania[];
   onEdit?: (compania: Compania) => void;
+  onDelete?: (compania: Compania) => void;
 }
 
-export const CompaniasGrid = ({ companias, onEdit }: Props) => {
+export const CompaniasGrid = ({ companias, onEdit, onDelete }: Props) => {
   return (
     <Grid
       data={companias}
       renderItem={(compania) => (
         <div className="group bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-200 relative">
-          {/* Botón de editar - visible en hover */}
-          {onEdit && (
-            <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-              <BotonEditar onClick={() => onEdit(compania)} />
+          {/* Acciones (editar / eliminar) — visibles en hover */}
+          {(onEdit || onDelete) && (
+            <div className="absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+              {onEdit && <BotonEditar onClick={() => onEdit(compania)} />}
+              {onDelete && (
+                <BotonEliminar
+                  onClick={() => onDelete(compania)}
+                  title="Eliminar compañía"
+                />
+              )}
             </div>
           )}
 
