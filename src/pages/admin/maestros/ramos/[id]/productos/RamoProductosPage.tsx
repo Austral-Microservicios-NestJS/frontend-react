@@ -1,18 +1,29 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Header, BotonRegistro } from "@/components/shared";
+import { Header, BotonRegistro, ModalConfirmacion } from "@/components/shared";
 import { useSidebar } from "@/hooks/useSidebar";
 import { RegistrarProducto } from "@/components/modulos/productos";
 import { TablaProductos } from "@/components/modulos/productos/tablas/TablaProductos";
 import { useProductosByRamo } from "@/hooks/useProductosByRamo";
 import { ramoApi } from "@/services/ramo.service";
+import { productoApi } from "@/services/producto.service";
+import { useAuthStore } from "@/store/auth.store";
+import { Roles } from "@/utils/roles";
+import type { Producto } from "@/types/producto.interface";
 import { ArrowLeft } from "lucide-react";
+import { toast } from "sonner";
 
 export default function RamoProductosPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isSidebarOpen, toggleSidebar } = useSidebar();
+  const { user } = useAuthStore();
+  const isAdmin = user?.rol?.nombreRol === Roles.ADMINISTRADOR;
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [productoAEliminar, setProductoAEliminar] = useState<Producto | null>(
+    null,
+  );
 
   // Obtener información del ramo
   const { data: ramo, isLoading: isLoadingRamo } = ramoApi.useGetById(id || "");
@@ -24,10 +35,23 @@ export default function RamoProductosPage() {
     addProducto,
   } = useProductosByRamo(id);
 
+  const deleteProducto = productoApi.useDelete();
+
   const isLoading = isLoadingRamo || isLoadingProductos;
 
   const handleGoBack = () => {
     navigate("/dashboard/admin/maestros/ramos");
+  };
+
+  const confirmarEliminarProducto = async () => {
+    if (!productoAEliminar) return;
+    try {
+      await deleteProducto.mutateAsync(productoAEliminar.idProducto);
+      toast.success("Producto eliminado");
+      setProductoAEliminar(null);
+    } catch {
+      toast.error("No se pudo eliminar el producto");
+    }
   };
 
   return (
@@ -81,7 +105,10 @@ export default function RamoProductosPage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           </div>
         ) : (
-          <TablaProductos productos={productos} />
+          <TablaProductos
+            productos={productos}
+            onDelete={isAdmin ? setProductoAEliminar : undefined}
+          />
         )}
       </div>
 
@@ -93,6 +120,20 @@ export default function RamoProductosPage() {
           idRamo={id}
         />
       )}
+
+      <ModalConfirmacion
+        isOpen={!!productoAEliminar}
+        onClose={() => setProductoAEliminar(null)}
+        onConfirm={confirmarEliminarProducto}
+        title="Eliminar producto"
+        message={
+          productoAEliminar
+            ? `¿Eliminar definitivamente el producto "${productoAEliminar.nombre}"? Las pólizas y leads que referencien este producto pueden quedar huérfanos. Esta acción no se puede deshacer.`
+            : ""
+        }
+        confirmText="Eliminar definitivamente"
+        isLoading={deleteProducto.isPending}
+      />
     </>
   );
 }

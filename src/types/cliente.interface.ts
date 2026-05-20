@@ -31,21 +31,6 @@ export enum TipoDocumentoArchivo {
   OTRO = "OTRO",
 }
 
-export const tipoDocumentoArchivoOptions = [
-  { value: TipoDocumentoArchivo.DNI_FRONTAL, label: "DNI" },
-  { value: TipoDocumentoArchivo.DNI_POSTERIOR, label: "DNI Posterior" },
-  { value: TipoDocumentoArchivo.RUC_FICHA, label: "RUC" },
-  {
-    value: TipoDocumentoArchivo.CONSTANCIA_SITUACION,
-    label: "Constancia de Situacion",
-  },
-  {
-    value: TipoDocumentoArchivo.CARTA_NOMBRAMIENTO,
-    label: "Carta de Nombramiento",
-  },
-  { value: TipoDocumentoArchivo.OTRO, label: "Otro" },
-] as const;
-
 export interface ClienteContexto {
   idContexto: string;
   idCliente: string;

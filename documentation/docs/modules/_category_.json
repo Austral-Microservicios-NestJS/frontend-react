@@ -1,0 +1,9 @@
+{
+  "label": "Módulos",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "title": "Módulos del CRM",
+    "description": "Un capítulo por dominio: Usuarios, Clientes, Leads, Pólizas, Tareas, Agentes IA."
+  }
+}

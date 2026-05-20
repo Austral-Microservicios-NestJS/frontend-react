@@ -46,8 +46,6 @@ export const RegistrarProducto = ({
     handleSubmit,
     reset,
     control,
-    getValues,
-    watch,
     formState: { errors },
   } = useForm<CreateProductoDto>({
     defaultValues: {
@@ -90,8 +88,6 @@ export const RegistrarProducto = ({
         : data.descripcion,
     };
 
-    console.log("RegistrarProducto onSubmit payload:", payload);
-
     // Validación cliente: evitar enviar si campos obligatorios están vacíos
     if (!payload.nombre || String(payload.nombre).trim() === "") {
       toast.error("El nombre del producto es obligatorio");
@@ -100,20 +96,6 @@ export const RegistrarProducto = ({
     if (!payload.descripcion || String(payload.descripcion).trim() === "") {
       toast.error("La descripción del producto es obligatoria");
       return;
-    }
-    try {
-      console.log("RegistrarProducto getValues():", getValues());
-    } catch (e) {
-      console.log("RegistrarProducto getValues() error:", e);
-    }
-    try {
-      console.log(
-        "RegistrarProducto watch nombre, descripcion:",
-        watch("nombre"),
-        watch("descripcion"),
-      );
-    } catch (e) {
-      console.log("RegistrarProducto watch() error:", e);
     }
 
     await addProducto(payload);

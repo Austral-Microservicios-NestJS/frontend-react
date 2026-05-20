@@ -1,0 +1,9 @@
+{
+  "label": "Convenciones",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "title": "Convenciones del frontend",
+    "description": "Estilo, validaciones, roles y patrones del CRM."
+  }
+}

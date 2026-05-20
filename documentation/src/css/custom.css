@@ -1,0 +1,258 @@
+/**
+ * Austral CRM — Documentación
+ * Tokens: --austral-azul #003d5c · --austral-azul-ejecutivo #0c4cba · --austral-rojo #d71440
+ * Tipografía: Figtree (igual al CRM)
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@300..900&family=JetBrains+Mono:wght@400;600&display=swap");
+
+:root {
+  --ifm-color-primary: #003d5c;
+  --ifm-color-primary-dark: #003652;
+  --ifm-color-primary-darker: #00334d;
+  --ifm-color-primary-darkest: #00293f;
+  --ifm-color-primary-light: #074d70;
+  --ifm-color-primary-lighter: #0b5478;
+  --ifm-color-primary-lightest: #126b97;
+
+  --ifm-font-family-base: "Figtree", system-ui, -apple-system, sans-serif;
+  --ifm-font-family-monospace: "JetBrains Mono", ui-monospace, monospace;
+  --ifm-heading-font-family: "Figtree", system-ui, sans-serif;
+  --ifm-heading-font-weight: 700;
+
+  --ifm-code-font-size: 92%;
+  --ifm-code-background: rgba(0, 61, 92, 0.06);
+  --ifm-code-color: #003d5c;
+
+  --ifm-navbar-background-color: #ffffff;
+  --ifm-navbar-shadow: 0 1px 3px rgba(0, 61, 92, 0.08);
+
+  --docusaurus-highlighted-code-line-bg: rgba(0, 61, 92, 0.1);
+
+  --austral-azul: #003d5c;
+  --austral-azul-ejecutivo: #0c4cba;
+  --austral-rojo: #d71440;
+  --austral-bg-soft: #f5f8fb;
+}
+
+[data-theme="dark"] {
+  --ifm-color-primary: #5fb3d4;
+  --ifm-color-primary-dark: #43a4cd;
+  --ifm-color-primary-darker: #359dc9;
+  --ifm-color-primary-darkest: #2780a6;
+  --ifm-color-primary-light: #7cc1db;
+  --ifm-color-primary-lighter: #8ac8df;
+  --ifm-color-primary-lightest: #b4ddec;
+
+  --ifm-background-color: #0a1a26;
+  --ifm-background-surface-color: #0e2331;
+  --ifm-code-background: rgba(95, 179, 212, 0.12);
+  --ifm-code-color: #b4ddec;
+
+  --docusaurus-highlighted-code-line-bg: rgba(95, 179, 212, 0.18);
+}
+
+/* ─── Navbar refinado ───────────────────────────────────────── */
+.navbar {
+  border-bottom: 1px solid rgba(0, 61, 92, 0.08);
+}
+.navbar__title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+[data-theme="dark"] .navbar {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ─── Hero & landing ────────────────────────────────────────── */
+.hero--austral {
+  background: linear-gradient(
+    135deg,
+    var(--austral-azul) 0%,
+    #0a5478 50%,
+    var(--austral-azul-ejecutivo) 100%
+  );
+  color: #fff;
+  padding: 6rem 0 5rem;
+  position: relative;
+  overflow: hidden;
+}
+.hero--austral::before {
+  content: "";
+  position: absolute;
+  inset: -40% -20% auto auto;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(215, 20, 64, 0.18), transparent 70%);
+  pointer-events: none;
+}
+.hero--austral::after {
+  content: "";
+  position: absolute;
+  inset: auto auto -40% -20%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(12, 76, 186, 0.35), transparent 70%);
+  pointer-events: none;
+}
+.hero--austral h1 {
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
+}
+.hero--austral p {
+  font-size: 1.2rem;
+  opacity: 0.92;
+  max-width: 640px;
+  margin: 0 auto 2rem;
+  position: relative;
+  z-index: 1;
+}
+.hero__buttons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+.hero__buttons .button {
+  font-weight: 600;
+  padding: 0.85rem 1.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.hero__buttons .button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+}
+.hero__buttons .button--primary {
+  background: #ffffff;
+  color: var(--austral-azul);
+  border-color: transparent;
+}
+.hero__buttons .button--secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  backdrop-filter: blur(6px);
+}
+
+/* ─── Feature cards (homepage) ─────────────────────────────── */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  padding: 4rem 0 3rem;
+}
+.feature-card {
+  background: #fff;
+  border: 1px solid rgba(0, 61, 92, 0.1);
+  border-radius: 14px;
+  padding: 1.5rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    border-color 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+.feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0, 61, 92, 0.08);
+  border-color: rgba(0, 61, 92, 0.22);
+}
+.feature-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--austral-azul);
+}
+.feature-card h3 {
+  margin: 0.25rem 0 0.6rem;
+  font-size: 1.1rem;
+  color: var(--austral-azul);
+}
+.feature-card p {
+  color: #4a5b6b;
+  font-size: 0.94rem;
+  line-height: 1.55;
+  margin: 0;
+}
+.feature-card .feature-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(0, 61, 92, 0.08);
+  color: var(--austral-azul);
+  margin-bottom: 0.25rem;
+  font-size: 1.2rem;
+}
+
+[data-theme="dark"] .feature-card {
+  background: #102433;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .feature-card:hover {
+  border-color: rgba(95, 179, 212, 0.5);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+}
+[data-theme="dark"] .feature-card h3 {
+  color: var(--ifm-color-primary);
+}
+[data-theme="dark"] .feature-card p {
+  color: #b3c4d4;
+}
+[data-theme="dark"] .feature-card::before {
+  background: var(--ifm-color-primary);
+}
+[data-theme="dark"] .feature-card .feature-icon {
+  background: rgba(95, 179, 212, 0.12);
+  color: var(--ifm-color-primary);
+}
+
+/* ─── Markdown content ─────────────────────────────────────── */
+.markdown h1 {
+  letter-spacing: -0.02em;
+}
+.markdown h2 {
+  border-bottom: 1px solid rgba(0, 61, 92, 0.1);
+  padding-bottom: 0.4rem;
+  margin-top: 2.5rem;
+}
+[data-theme="dark"] .markdown h2 {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+.markdown blockquote {
+  border-left: 4px solid var(--austral-azul);
+  background: var(--austral-bg-soft);
+  border-radius: 0 8px 8px 0;
+}
+[data-theme="dark"] .markdown blockquote {
+  background: rgba(95, 179, 212, 0.06);
+  border-left-color: var(--ifm-color-primary);
+}
+
+/* ─── Admonitions custom flavor ────────────────────────────── */
+.theme-admonition {
+  border-radius: 10px;
+}
+
+/* ─── Sidebar polish ───────────────────────────────────────── */
+.menu__link {
+  border-radius: 8px;
+  font-weight: 500;
+}
+.menu__link--active {
+  background: rgba(0, 61, 92, 0.08);
+}
+[data-theme="dark"] .menu__link--active {
+  background: rgba(95, 179, 212, 0.1);
+}
