@@ -4,12 +4,13 @@ import { Header, BotonRegistro, ModalConfirmacion } from "@/components/shared";
 import { useSidebar } from "@/hooks/useSidebar";
 import { RegistrarProducto } from "@/components/modulos/productos";
 import { TablaProductos } from "@/components/modulos/productos/tablas/TablaProductos";
+import { EditarProducto } from "@/components/modulos/productos/modales/EditarProducto";
 import { useProductosByRamo } from "@/hooks/useProductosByRamo";
 import { ramoApi } from "@/services/ramo.service";
 import { productoApi } from "@/services/producto.service";
 import { useAuthStore } from "@/store/auth.store";
 import { Roles } from "@/utils/roles";
-import type { Producto } from "@/types/producto.interface";
+import type { Producto, UpdateProductoDto } from "@/types/producto.interface";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
@@ -21,6 +22,7 @@ export default function RamoProductosPage() {
   const isAdmin = user?.rol?.nombreRol === Roles.ADMINISTRADOR;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProducto, setEditingProducto] = useState<Producto | null>(null);
   const [productoAEliminar, setProductoAEliminar] = useState<Producto | null>(
     null,
   );
@@ -33,6 +35,7 @@ export default function RamoProductosPage() {
     productos,
     isLoading: isLoadingProductos,
     addProducto,
+    updateProducto,
   } = useProductosByRamo(id);
 
   const deleteProducto = productoApi.useDelete();
@@ -41,6 +44,17 @@ export default function RamoProductosPage() {
 
   const handleGoBack = () => {
     navigate("/dashboard/admin/maestros/ramos");
+  };
+
+  const handleEditSubmit = async (data: UpdateProductoDto) => {
+    if (!editingProducto) return;
+    try {
+      await updateProducto(editingProducto.idProducto, data);
+      toast.success("Producto actualizado");
+      setEditingProducto(null);
+    } catch {
+      toast.error("No se pudo actualizar el producto");
+    }
   };
 
   const confirmarEliminarProducto = async () => {
@@ -107,6 +121,7 @@ export default function RamoProductosPage() {
         ) : (
           <TablaProductos
             productos={productos}
+            onEdit={isAdmin ? setEditingProducto : undefined}
             onDelete={isAdmin ? setProductoAEliminar : undefined}
           />
         )}
@@ -118,6 +133,15 @@ export default function RamoProductosPage() {
           onClose={() => setIsModalOpen(false)}
           addProducto={addProducto}
           idRamo={id}
+        />
+      )}
+
+      {editingProducto && (
+        <EditarProducto
+          isOpen={!!editingProducto}
+          onClose={() => setEditingProducto(null)}
+          onSubmit={handleEditSubmit}
+          producto={editingProducto}
         />
       )}
 

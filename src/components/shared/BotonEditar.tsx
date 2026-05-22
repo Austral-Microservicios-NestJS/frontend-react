@@ -5,12 +5,14 @@ interface BotonEditarProps {
   onClick: () => void;
   size?: "sm" | "md";
   className?: string;
+  title?: string;
 }
 
 export const BotonEditar = ({
   onClick,
   size = "sm",
   className,
+  title = "Editar",
 }: BotonEditarProps) => {
   const sizeClasses = size === "sm" ? "p-1.5" : "p-2";
   const iconSize = size === "sm" ? "h-4 w-4" : "h-5 w-5";
@@ -27,7 +29,7 @@ export const BotonEditar = ({
         sizeClasses,
         className
       )}
-      title="Editar"
+      title={title}
     >
       <Pencil className={iconSize} />
     </button>
