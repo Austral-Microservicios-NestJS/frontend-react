@@ -5,20 +5,20 @@ import { toast } from "sonner";
 import { useAuthStore } from "@/store/auth.store";
 import { useAgentes } from "@/hooks/useAgentes";
 
-export const usePolizas = (idCliente?: string) => {
+export const usePolizas = (idCliente?: string, enabled = true) => {
   const { user } = useAuthStore();
-  const { agentes } = useAgentes();
+  const { agentes } = useAgentes(enabled && user?.rol?.nombreRol === "BROKER");
   const userRole = user?.rol?.nombreRol || "";
   const userId = user?.idUsuario || "";
 
   // Logic to determine which query to run
   const getQuery = () => {
     // 1. If searching by specific client, always prioritize that
-    if (idCliente) return polizaApi.useGetAllByCliente(idCliente);
+    if (idCliente) return polizaApi.useGetAllByCliente(idCliente, enabled);
 
     // 2. Role based logic
     if (userRole === "ADMINISTRADOR") {
-      return polizaApi.useGetAll();
+      return polizaApi.useGetAll(enabled);
     }
 
     if (userRole === "BROKER") {
@@ -29,15 +29,15 @@ export const usePolizas = (idCliente?: string) => {
       // Also include the broker? Maybe. But let's stick to agents.
       // If agents list is empty, this might return empty or error.
       // We should pass agentIds. If empty, maybe handle gracefully.
-      return polizaApi.useGetAllByUsuarios(agentIds);
+      return polizaApi.useGetAllByUsuarios(agentIds, enabled);
     }
 
     if (userRole === "AGENTE") {
-      return polizaApi.useGetAllByUsuario(userId);
+      return polizaApi.useGetAllByUsuario(userId, enabled);
     }
 
     // Default fallback (maybe empty or standard getAll if permissions allow)
-    return polizaApi.useGetAll();
+    return polizaApi.useGetAll(enabled);
   };
 
   const {

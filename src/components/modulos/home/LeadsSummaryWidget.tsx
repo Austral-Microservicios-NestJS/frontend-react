@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useLeads } from "@/hooks/useLeads";
 import { Users, ArrowRight, TrendingUp, Flame, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -65,7 +66,16 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 export const LeadsSummaryWidget = () => {
-  const { leadsByEstado, isLoading } = useLeads();
+  const [shouldLoad, setShouldLoad] = useState(false);
+  const { leadsByEstado, isLoading } = useLeads(shouldLoad);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setShouldLoad(true);
+    }, 1200);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   const data = STATUS_CONFIG.map((s) => ({
     ...s,

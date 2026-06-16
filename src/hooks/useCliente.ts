@@ -4,7 +4,7 @@ import type { CreateCliente, UpdateCliente } from "@/types/cliente.interface";
 import { clienteService } from "@/services/cliente.service";
 import { useAuthStore } from "@/store/auth.store";
 
-export const useClientes = () => {
+export const useClientes = (enabled = true) => {
   const { user } = useAuthStore();
   const idUsuario = user?.idUsuario || "";
 
@@ -13,7 +13,7 @@ export const useClientes = () => {
     data: clientes = [],
     isLoading,
     error,
-  } = clienteService.useGetByUsuario(idUsuario, user?.rol?.nombreRol);
+  } = clienteService.useGetByUsuario(idUsuario, user?.rol?.nombreRol, enabled);
 
   const createMutation = clienteService.useCreate();
   const updateMutation = clienteService.useUpdate();

@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useClientes } from "@/hooks/useCliente";
 import { usePolizas } from "@/hooks/usePolizas";
 import { useLeads } from "@/hooks/useLeads";
@@ -6,10 +7,19 @@ import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 
 export const StatsRowWidget = () => {
-  const { clientes, clientesActivos, isLoading: loadingClientes } = useClientes();
-  const { polizas, isLoading: loadingPolizas } = usePolizas();
-  const { leads } = useLeads();
+  const [shouldLoad, setShouldLoad] = useState(false);
+  const { clientes, clientesActivos, isLoading: loadingClientes } = useClientes(shouldLoad);
+  const { polizas, isLoading: loadingPolizas } = usePolizas(undefined, shouldLoad);
+  const { leads } = useLeads(shouldLoad);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setShouldLoad(true);
+    }, 1800);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   const polizasVigentes = polizas.filter((p) => p.estado === "VIGENTE").length;
 

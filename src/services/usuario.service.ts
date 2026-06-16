@@ -99,11 +99,11 @@ export const usuarioApi = {
     });
   },
 
-  useGetSubordinados: (idSupervisor: string) => {
+  useGetSubordinados: (idSupervisor: string, enabled = true) => {
     return useQuery({
       queryKey: [...USUARIOS_KEY, "subordinados", idSupervisor],
       queryFn: () => usuarioApi.getSubordinados(idSupervisor),
-      enabled: !!idSupervisor,
+      enabled: enabled && !!idSupervisor,
     });
   },
 

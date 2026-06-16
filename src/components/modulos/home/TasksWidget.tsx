@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useTareas } from "@/hooks/useTareas";
 import { CheckSquare, Clock, ArrowRight, AlertCircle } from "lucide-react";
 import dayjs from "dayjs";
@@ -13,7 +14,16 @@ const PRIORITY_CONFIG = {
 };
 
 export const TasksWidget = () => {
-  const { tareas, isLoading } = useTareas();
+  const [shouldLoad, setShouldLoad] = useState(false);
+  const { tareas, isLoading } = useTareas(shouldLoad);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setShouldLoad(true);
+    }, 900);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   const today = dayjs();
   const nextWeek = today.add(7, "day");

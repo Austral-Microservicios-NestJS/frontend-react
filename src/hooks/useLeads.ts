@@ -7,10 +7,10 @@ import { useAuthStore } from "@/store/auth.store";
 
 const DIAS_OCULTAR_FINALIZADOS = 3; // Leads CERRADO/PERDIDO se ocultan del kanban después de 3 días
 
-export const useLeads = () => {
+export const useLeads = (enabled = true) => {
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
-  const { data: allLeads = [], isLoading, error } = leadService.useGetAll();
+  const { data: allLeads = [], isLoading, error } = leadService.useGetAll(enabled);
   const createMutation = leadService.useCreate();
   const updateMutation = leadService.useUpdate();
   const deleteMutation = leadService.useDelete();

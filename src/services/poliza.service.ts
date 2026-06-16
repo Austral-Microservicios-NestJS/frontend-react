@@ -60,34 +60,35 @@ export const polizaApi = {
     });
   },
 
-  useGetAll: () => {
+  useGetAll: (enabled = true) => {
     return useQuery({
       queryKey: POLIZAS_KEY,
       queryFn: () => polizaApi.getAll(),
+      enabled,
     });
   },
 
-  useGetAllByCliente: (idCliente: string) => {
+  useGetAllByCliente: (idCliente: string, enabled = true) => {
     return useQuery({
       queryKey: [...POLIZAS_KEY, "cliente", idCliente],
       queryFn: () => polizaApi.getAllByCliente(idCliente),
-      enabled: !!idCliente,
+      enabled: enabled && !!idCliente,
     });
   },
 
-  useGetAllByUsuario: (userId: string) => {
+  useGetAllByUsuario: (userId: string, enabled = true) => {
     return useQuery({
       queryKey: [...POLIZAS_KEY, "usuario", userId],
       queryFn: () => polizaApi.getAllByUsuario(userId),
-      enabled: !!userId,
+      enabled: enabled && !!userId,
     });
   },
 
-  useGetAllByUsuarios: (userIds: string[]) => {
+  useGetAllByUsuarios: (userIds: string[], enabled = true) => {
     return useQuery({
       queryKey: [...POLIZAS_KEY, "usuarios", userIds],
       queryFn: () => polizaApi.getAllByUsuarios(userIds),
-      enabled: userIds.length > 0,
+      enabled: enabled && userIds.length > 0,
     });
   },
 

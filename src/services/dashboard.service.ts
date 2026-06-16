@@ -44,6 +44,7 @@ export type InsightsParams = {
   limite?: number;
   userId?: string;
   userRole?: string;
+  enabled?: boolean;
 };
 
 const QUERY_KEY = "dashboard";
@@ -85,6 +86,7 @@ export const dashboardService = {
     return useQuery({
       queryKey: [QUERY_KEY, "insights", params],
       queryFn: () => dashboardService.getInsights(params),
+      enabled: params.enabled ?? true,
       staleTime: 5 * 60 * 1000, // 5 minutos - no refrescar tan seguido
       retry: 1,
       refetchOnWindowFocus: false,

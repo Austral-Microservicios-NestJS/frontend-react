@@ -141,10 +141,11 @@ export const leadService = {
 
   // ==================== REACT QUERY HOOKS ====================
 
-  useGetAll: () => {
+  useGetAll: (enabled = true) => {
     return useQuery({
       queryKey: [QUERY_KEY],
       queryFn: leadService.getAll,
+      enabled,
       retry: false,
       refetchOnWindowFocus: true,
       refetchInterval: 30000, // Auto-refresh cada 30s para mostrar leads del chatbot

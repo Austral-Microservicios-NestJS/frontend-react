@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { dashboardService } from "@/services/dashboard.service";
 import type { Insight } from "@/services/dashboard.service";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ButtonIA } from "@/components/ui/ButtonIA";
 import { useAuthStore } from "@/store/auth.store";
@@ -44,12 +44,23 @@ const getInsightStyle = (
 
 export const AIInsightsWidget = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [shouldLoad, setShouldLoad] = useState(false);
   const user = useAuthStore((state) => state.user);
   const isBroker = user?.rol?.nombreRol?.toUpperCase() === "BROKER";
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setShouldLoad(true);
+    }, 2500);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
   const { data, isLoading, error, refetch } = dashboardService.useGetInsights({
     incluirNoticias: true,
     incluirContextos: true,
     limite: 5,
+    enabled: shouldLoad,
     ...(isBroker
       ? { userId: user?.idUsuario, userRole: user?.rol?.nombreRol }
       : {}),
@@ -71,7 +82,7 @@ export const AIInsightsWidget = () => {
   };
 
   // Estado de carga
-  if (isLoading) {
+  if (!shouldLoad || isLoading) {
     return (
       <Card className="h-full border-none shadow-sm ring-1 ring-[#003d5c]/10 hover:ring-[#003d5c]/20 transition-all overflow-hidden">
         <div className="p-4 h-full flex flex-col">

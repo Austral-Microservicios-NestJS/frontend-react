@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { MapPin, ArrowRight, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -50,14 +50,28 @@ const miniMapOptions: google.maps.MapOptions = {
 
 export const MapWidget = () => {
   const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
+  const [shouldLoad, setShouldLoad] = useState(false);
   const user = useAuthStore((state) => state.user);
 
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setShouldLoad(true);
+    }, 3500);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
   const { data: clientes = [], isLoading: loadingClientes } =
-    clienteService.useGetByUsuario(user?.idUsuario || "", user?.rol?.nombreRol);
+    clienteService.useGetByUsuario(
+      user?.idUsuario || "",
+      user?.rol?.nombreRol,
+      shouldLoad,
+    );
 
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY || "",
     libraries: ["places"],
+    preventGoogleFontsLoading: true,
   });
 
   const clientesConCoordenadas = clientes
@@ -89,7 +103,7 @@ export const MapWidget = () => {
   );
 
   const isReady =
-    isLoaded && !loadingClientes && !loadError && GOOGLE_MAPS_API_KEY;
+    shouldLoad && isLoaded && !loadingClientes && !loadError && GOOGLE_MAPS_API_KEY;
 
   return (
     <div className="h-full bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col">
@@ -121,6 +135,11 @@ export const MapWidget = () => {
                 <>
                   <MapPin className="w-6 h-6 text-gray-300" />
                   <p className="text-xs text-gray-400">Mapa no disponible</p>
+                </>
+              ) : !shouldLoad ? (
+                <>
+                  <MapPin className="w-6 h-6 text-gray-300" />
+                  <p className="text-xs text-gray-400">Cargando mapa...</p>
                 </>
               ) : (
                 <div className="w-6 h-6 border-2 border-[#003d5c] border-t-transparent rounded-full animate-spin" />

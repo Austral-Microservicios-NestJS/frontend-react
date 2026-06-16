@@ -23,10 +23,19 @@ function tiempoRelativo(fecha: string): string {
 
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
+  const [shouldLoadCount, setShouldLoadCount] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  const { data: count = 0 } = notificacionApi.useContador();
-  const { data: notifs = [], isLoading } = notificacionApi.useListar(false);
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setShouldLoadCount(true);
+    }, 1500);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
+  const { data: count = 0 } = notificacionApi.useContador(shouldLoadCount);
+  const { data: notifs = [], isLoading } = notificacionApi.useListar(false, open);
   const marcarLeida = notificacionApi.useMarcarLeida();
   const marcarTodas = notificacionApi.useMarcarTodasLeidas();
 

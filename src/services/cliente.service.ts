@@ -179,11 +179,11 @@ export const clienteService = {
     });
   },
 
-  useGetByUsuario: (idUsuario: string, rol?: string) => {
+  useGetByUsuario: (idUsuario: string, rol?: string, enabled = true) => {
     return useQuery({
       queryKey: [QUERY_KEY, "usuario", idUsuario, rol || null],
       queryFn: () => clienteService.getByUsuario(idUsuario, rol),
-      enabled: !!idUsuario,
+      enabled: enabled && !!idUsuario,
       retry: false,
       refetchOnWindowFocus: false,
     });

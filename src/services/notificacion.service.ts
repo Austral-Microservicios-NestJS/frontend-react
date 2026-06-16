@@ -38,18 +38,22 @@ export const notificacionApi = {
   },
 
   // ───── Hooks ─────
-  useListar: (soloNoLeidas = false) =>
+  useListar: (soloNoLeidas = false, enabled = true) =>
     useQuery({
       queryKey: ["notificaciones", { soloNoLeidas }],
       queryFn: () => notificacionApi.listar(soloNoLeidas, 50),
-      refetchInterval: 30_000, // refetch cada 30s para ver nuevas
+      enabled,
+      refetchInterval: 60_000,
+      refetchOnWindowFocus: false,
     }),
 
-  useContador: () =>
+  useContador: (enabled = true) =>
     useQuery({
       queryKey: ["notificaciones", "count"],
       queryFn: notificacionApi.contarNoLeidas,
-      refetchInterval: 30_000,
+      enabled,
+      refetchInterval: 60_000,
+      refetchOnWindowFocus: false,
     }),
 
   useMarcarLeida: () => {

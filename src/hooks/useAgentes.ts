@@ -31,7 +31,7 @@ function mensajeErrorAmigable(error: any): string {
   return texto.length > 200 ? "Error al registrar. Verifica los datos." : texto;
 }
 
-export const useAgentes = () => {
+export const useAgentes = (enabled = true) => {
   const { user } = useAuthStore();
   const qc = useQueryClient();
   const idSupervisor = user?.idUsuario || "";
@@ -42,7 +42,7 @@ export const useAgentes = () => {
     isError,
     error,
     refetch: getAgentes,
-  } = usuarioApi.useGetSubordinados(idSupervisor);
+  } = usuarioApi.useGetSubordinados(idSupervisor, enabled);
 
   const agentes = agentesData || [];
 
